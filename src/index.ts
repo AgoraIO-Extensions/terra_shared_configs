@@ -1,1 +1,1 @@
-export * from './parsers/index.ts';
+export * from './parsers/index';
