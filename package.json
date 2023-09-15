@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@agoraio-extensions/cxx-parser": ">=0.1.0",
+    "@agoraio-extensions/cxx-parser": ">=0.1.1",
     "@agoraio-extensions/terra-core": ">=0.1.0",
     "@types/node": "^20.6.0",
     "glob": "^10.3.4",
