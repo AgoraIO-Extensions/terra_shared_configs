@@ -9,11 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^20.6.0",
-    "typescript": "^5.2.2",
-    "ts-node": "^10.9.1",
-    "glob": "^10.3.4",
+    "@agoraio-extensions/cxx-parser": ">=0.1.0",
     "@agoraio-extensions/terra-core": ">=0.1.0",
-    "@agoraio-extensions/cxx-parser": ">=0.1.0"
+    "@types/node": "^20.6.0",
+    "glob": "^10.3.4",
+    "mustache": "^4.2.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/mustache": "^4.2.2"
   }
 }
