@@ -2,10 +2,18 @@
   "name": "@agoraio-extensions/terra_shared_configs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.6.0",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "glob": "^10.3.4",
+    "@agoraio-extensions/terra-core": ">=0.1.0",
+    "@agoraio-extensions/cxx-parser": ">=0.1.0"
+  }
 }
