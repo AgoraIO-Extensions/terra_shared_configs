@@ -57,6 +57,7 @@ export function RemoveNodeParser(
         node.asClazz().member_variables = filterNode(
           node.asClazz().member_variables, name_configs, regex_configs
         );
+        node.asClazz().methods = filterNode(node.asClazz().methods, name_configs, regex_configs);
         node.asClazz().methods.forEach((method) => {
           method.parameters = filterNode(method.parameters, name_configs, regex_configs);
         });
