@@ -3,7 +3,7 @@ import {
   ParseResult,
   TerraContext,
 } from "@agoraio-extensions/terra-core";
-import CXXParser, { CXXFile, CXXParserConfigs, CXXTYPE, Clazz } from "@agoraio-extensions/cxx-parser";
+import { CXXFile, CXXParser, CXXParserConfigs, CXXTYPE, Clazz } from "@agoraio-extensions/cxx-parser";
 
 
 function generateCustomNodes(parseConfig: TerraContext, cxxParserConfigs: CXXParserConfigs): ParseResult | undefined {
