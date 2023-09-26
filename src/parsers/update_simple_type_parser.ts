@@ -1,6 +1,11 @@
-import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
-import { ParseResult, TerraContext, resolvePath } from '@agoraio-extensions/terra-core';
 import { readFileSync } from 'fs';
+
+import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
+import {
+  ParseResult,
+  TerraContext,
+  resolvePath,
+} from '@agoraio-extensions/terra-core';
 
 export type UpdateSimpleTypeParserArgs = {
   configJson?: string;
@@ -9,7 +14,10 @@ export type UpdateSimpleTypeParserArgs = {
 
 export type UpdateNodeConfig = Record<string, string>;
 
-function updateNode<T extends CXXTerraNode>(node: T[] | T, configs: UpdateNodeConfig) {
+function updateNode<T extends CXXTerraNode>(
+  node: T[] | T,
+  configs: UpdateNodeConfig
+) {
   if (Array.isArray(node)) {
     node.forEach((it) => {
       updateNode(it, configs);

@@ -1,4 +1,9 @@
-import { CXXFile, CXXTYPE, EnumConstant, Enumz } from '@agoraio-extensions/cxx-parser';
+import {
+  CXXFile,
+  CXXTYPE,
+  EnumConstant,
+  Enumz,
+} from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
 const TYPES_SIZE: Record<string, string> = {
@@ -50,10 +55,7 @@ export function FixEnumConstantParser(
           }
           lastEnumValue = parseInt(enumConstant.source);
           if (isNaN(lastEnumValue)) {
-            enumConstant.value = fixEnumConstantValue(
-              enumz,
-              enumConstant
-            );
+            enumConstant.value = fixEnumConstantValue(enumz, enumConstant);
           } else {
             enumConstant.value = `${lastEnumValue}`;
           }
