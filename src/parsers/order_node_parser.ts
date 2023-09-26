@@ -1,5 +1,5 @@
-import { CXXFile, CXXTYPE, CXXTerraNode } from "@agoraio-extensions/cxx-parser";
-import { ParseResult, TerraContext } from "@agoraio-extensions/terra-core";
+import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
 export function OrderNodeParser(
   terraContext: TerraContext,

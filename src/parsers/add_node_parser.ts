@@ -1,18 +1,20 @@
-import path from "path";
+import path from 'path';
+
 import {
-  ParseResult,
-  TerraContext,
-} from "@agoraio-extensions/terra-core";
-import { CXXFile, CXXParser, CXXParserConfigs, CXXTYPE, Clazz } from "@agoraio-extensions/cxx-parser";
+  CXXFile,
+  CXXParser,
+  CXXParserConfigs,
+  CXXTYPE,
+  Clazz,
+} from '@agoraio-extensions/cxx-parser';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-
-function generateCustomNodes(parseConfig: TerraContext, cxxParserConfigs: CXXParserConfigs): ParseResult | undefined {
+function generateCustomNodes(
+  parseConfig: TerraContext,
+  cxxParserConfigs: CXXParserConfigs
+): ParseResult | undefined {
   const customParser = CXXParser;
-  return customParser(
-    parseConfig,
-    cxxParserConfigs,
-    undefined,
-  );
+  return customParser(parseConfig, cxxParserConfigs, undefined);
 }
 
 export function AddNodeParser(
@@ -24,15 +26,12 @@ export function AddNodeParser(
   customNodes?.nodes.forEach((f) => {
     let file = f as CXXFile;
     // find file which has same name after remove custrom prefix
-    const foundFile = preParseResult?.nodes.find(
-      (it) => {
-        return path.basename(file.file_path) ===
-          `${path.basename(
-            (it as CXXFile).file_path
-          )}`;
-      }
-
-    );
+    const foundFile = preParseResult?.nodes.find((it) => {
+      return (
+        path.basename(file.file_path) ===
+        `${path.basename((it as CXXFile).file_path)}`
+      );
+    });
     if (!foundFile) {
       return;
     }

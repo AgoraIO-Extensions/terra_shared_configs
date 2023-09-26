@@ -1,6 +1,18 @@
-import { CXXFile, CXXTYPE, CXXTerraNode, MemberVariable, SimpleTypeKind, Variable } from '@agoraio-extensions/cxx-parser';
-import { ParseResult, TerraContext, resolvePath } from '@agoraio-extensions/terra-core';
 import { readFileSync } from 'fs';
+
+import {
+  CXXFile,
+  CXXTYPE,
+  CXXTerraNode,
+  MemberVariable,
+  SimpleTypeKind,
+  Variable,
+} from '@agoraio-extensions/cxx-parser';
+import {
+  ParseResult,
+  TerraContext,
+  resolvePath,
+} from '@agoraio-extensions/terra-core';
 
 export type PointerToArrayParserArgs = {
   configJson?: string;
@@ -61,9 +73,19 @@ export function PointerToArrayParser(
     let file = f as CXXFile;
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
-        markArray(node.asStruct().member_variables, node, name_configs, regex_configs);
+        markArray(
+          node.asStruct().member_variables,
+          node,
+          name_configs,
+          regex_configs
+        );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
-        markArray(node.asClazz().member_variables, node, name_configs, regex_configs);
+        markArray(
+          node.asClazz().member_variables,
+          node,
+          name_configs,
+          regex_configs
+        );
         node.asClazz().methods.forEach((method) => {
           markArray(method.parameters, method, name_configs, regex_configs);
         });

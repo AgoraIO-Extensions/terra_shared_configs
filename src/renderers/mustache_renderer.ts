@@ -1,8 +1,8 @@
 import fs, { readFileSync } from 'fs';
 import path from 'path';
 
-import * as Mustache from 'mustache';
 import { RenderResult } from '@agoraio-extensions/terra-core';
+import * as Mustache from 'mustache';
 
 export interface MustacheRenderConfiguration {
   /**
@@ -29,7 +29,9 @@ export interface MustacheRenderConfiguration {
   templateFilePostfix?: string;
 }
 
-export function renderWithConfiguration(config: MustacheRenderConfiguration): RenderResult[] {
+export function renderWithConfiguration(
+  config: MustacheRenderConfiguration
+): RenderResult[] {
   const {
     fileNameTemplatePath,
     fileContentTemplatePath,

@@ -1,13 +1,22 @@
-import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
-import { ParseResult, TerraContext, resolvePath } from '@agoraio-extensions/terra-core';
 import { readFileSync } from 'fs';
+
+import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
+import {
+  ParseResult,
+  TerraContext,
+  resolvePath,
+} from '@agoraio-extensions/terra-core';
 
 export type RemoveNodeParserArgs = {
   configJson?: string;
   configJsonFilePath?: string;
 };
 
-function filterNode<T extends CXXTerraNode>(nodes: T[], name_configs: string[], regex_configs: string[]): T[] {
+function filterNode<T extends CXXTerraNode>(
+  nodes: T[],
+  name_configs: string[],
+  regex_configs: string[]
+): T[] {
   return nodes.filter((node) => {
     var flag = true;
     if (name_configs.includes(node.fullName)) {
@@ -24,7 +33,6 @@ function filterNode<T extends CXXTerraNode>(nodes: T[], name_configs: string[], 
     return flag;
   });
 }
-
 
 export function RemoveNodeParser(
   terraContext: TerraContext,
@@ -51,15 +59,27 @@ export function RemoveNodeParser(
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
         node.asStruct().member_variables = filterNode(
-          node.asStruct().member_variables, name_configs, regex_configs
+          node.asStruct().member_variables,
+          name_configs,
+          regex_configs
         );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
         node.asClazz().member_variables = filterNode(
-          node.asClazz().member_variables, name_configs, regex_configs
+          node.asClazz().member_variables,
+          name_configs,
+          regex_configs
         );
-        node.asClazz().methods = filterNode(node.asClazz().methods, name_configs, regex_configs);
+        node.asClazz().methods = filterNode(
+          node.asClazz().methods,
+          name_configs,
+          regex_configs
+        );
         node.asClazz().methods.forEach((method) => {
-          method.parameters = filterNode(method.parameters, name_configs, regex_configs);
+          method.parameters = filterNode(
+            method.parameters,
+            name_configs,
+            regex_configs
+          );
         });
       }
     });
