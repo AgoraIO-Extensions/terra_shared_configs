@@ -49,10 +49,9 @@ function updateNode<T extends CXXTerraNode>(
 
 export function UpdateSimpleTypeParser(
   terraContext: TerraContext,
-  _args: any,
+  args: UpdateSimpleTypeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let args = _args as UpdateSimpleTypeParserArgs;
   if (args.configJson === undefined) {
     args.configJson = readFileSync(
       resolvePath(args.configJsonFilePath!, terraContext.configDir)

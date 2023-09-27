@@ -9,19 +9,23 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-function generateCustomNodes(
+export type AddNodeParserArgs = CXXParserConfigs & {
+  customHeaderFileNamePrefix?: string;
+};
+
+export const generateCustomNodes = (
   parseConfig: TerraContext,
   cxxParserConfigs: CXXParserConfigs
-): ParseResult | undefined {
+): ParseResult | undefined => {
   const customParser = CXXParser;
   return customParser(parseConfig, cxxParserConfigs, undefined);
-}
+};
 
-export function AddNodeParser(
+export const AddNodeParser = (
   terraContext: TerraContext,
-  args: any,
+  args: AddNodeParserArgs,
   preParseResult?: ParseResult
-): ParseResult | undefined {
+): ParseResult | undefined => {
   const customNodes = generateCustomNodes(terraContext, args);
   customNodes?.nodes.forEach((f) => {
     let file = f as CXXFile;
@@ -29,7 +33,9 @@ export function AddNodeParser(
     const foundFile = preParseResult?.nodes.find((it) => {
       return (
         path.basename(file.file_path) ===
-        `${path.basename((it as CXXFile).file_path)}`
+        `${args.customHeaderFileNamePrefix}${path.basename(
+          (it as CXXFile).file_path
+        )}`
       );
     });
     if (!foundFile) {
@@ -81,4 +87,4 @@ export function AddNodeParser(
     });
   });
   return preParseResult;
-}
+};

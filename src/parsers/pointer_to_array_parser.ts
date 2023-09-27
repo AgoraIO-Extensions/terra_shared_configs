@@ -51,11 +51,9 @@ function markArray(
 
 export function PointerToArrayParser(
   terraContext: TerraContext,
-  _args: any,
+  args: PointerToArrayParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let args = _args as PointerToArrayParserArgs;
-
   if (args.configJson === undefined) {
     args.configJson = readFileSync(
       resolvePath(args.configJsonFilePath!, terraContext.configDir)

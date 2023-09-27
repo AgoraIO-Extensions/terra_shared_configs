@@ -36,10 +36,9 @@ function filterNode<T extends CXXTerraNode>(
 
 export function RemoveNodeParser(
   terraContext: TerraContext,
-  _args: any,
+  args: RemoveNodeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let args = _args as RemoveNodeParserArgs;
   if (args.configJson === undefined) {
     args.configJson = readFileSync(
       resolvePath(args.configJsonFilePath!, terraContext.configDir)
