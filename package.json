@@ -11,6 +11,7 @@
   },
   "files": [
     "dist",
+    "headers",
     "src",
     "!**/__tests__",
     "!**/__fixtures__",
