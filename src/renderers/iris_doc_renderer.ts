@@ -9,13 +9,14 @@ import {
   TerraContext,
 } from '@agoraio-extensions/terra-core';
 
+export const irisDocRepoURL = 'https://github.com/littleGnAl/iris-doc';
+
 function cloneIrisDoc(terraBuildDir: string): string {
   let irisDocDirPath = path.join(terraBuildDir, 'iris_doc');
 
-  let irisDocRepoDirPath = path.join(terraBuildDir, 'iris-doc');
   // Skip if the iris-doc repo already exists
-  if (fs.existsSync(irisDocRepoDirPath)) {
-    return irisDocRepoDirPath;
+  if (fs.existsSync(irisDocDirPath)) {
+    return irisDocDirPath;
   }
 
   if (!fs.existsSync(irisDocDirPath)) {
@@ -23,16 +24,17 @@ function cloneIrisDoc(terraBuildDir: string): string {
   }
 
   // git clone the https://github.com/littleGnAl/iris-doc repo into irisDocDirPath
-  let irisDocRepoURL = 'https://github.com/littleGnAl/iris-doc';
   let gitCommand = `git clone ${irisDocRepoURL} ${irisDocDirPath} --depth 1`;
 
   execSync(gitCommand, { encoding: 'utf8', stdio: 'inherit' });
 
-  return irisDocRepoDirPath;
+  return irisDocDirPath;
 }
 
 function irisDocScript(
   irisDocDir: string,
+  language: string,
+  fmtConfig: string,
   exportFilePath: string,
   templateUrl: string
 ) {
@@ -40,15 +42,16 @@ function irisDocScript(
   let installRequirements = `python3 -m pip install -r ${requirementsPath}`;
   const installRequirementsOut = execSync(installRequirements, {
     encoding: 'utf8',
+    stdio: 'inherit',
   });
   console.log(installRequirementsOut);
 
-  let fmtConfigPath = path.join(irisDocDir, 'fmt_config', 'fmt_dart.yaml');
+  let fmtConfigPath = path.join(irisDocDir, 'fmt_config', fmtConfig);
 
   exportFilePath = path.resolve(exportFilePath);
 
   let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
-  let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=${templateUrl}`;
+  let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`;
 
   execSync(irisDocCommand, { encoding: 'utf8', stdio: 'inherit' });
 }
@@ -56,17 +59,38 @@ function irisDocScript(
 export interface IrisDocRendererArgs {
   exportFilePath: string;
   templateUrl: string;
+  language: string;
+  fmtConfig: string;
 }
 
-export default function IrisDocRenderer(
+/// e.g.,
+/// ```yaml
+/// renderers:
+///   - name: IrisDocRenderer
+///     package: '@agoraio-extensions/terra_shared_configs'
+///     args:
+///       language: dart
+///       fmtConfig: fmt_dart.yaml
+///       exportFilePath: ../../lib/agora_rtc_engine.dart
+///       templateUrl: https://github.com/AgoraIO/agora_doc_source/releases/download/master-build/flutter_ng_json_template_en.json
+/// ```
+export function IrisDocRenderer(
   terraContext: TerraContext,
   args: IrisDocRendererArgs,
-  _: ParseResult
+  _?: ParseResult
 ): RenderResult[] {
   let irisDocRepoDirPath = cloneIrisDoc(terraContext.buildDir);
   assert(args.exportFilePath);
   assert(args.templateUrl);
+  assert(args.language);
+  assert(args.fmtConfig);
 
-  irisDocScript(irisDocRepoDirPath, args.exportFilePath, args.templateUrl);
+  irisDocScript(
+    irisDocRepoDirPath,
+    args.language,
+    args.fmtConfig,
+    args.exportFilePath,
+    args.templateUrl
+  );
   return [];
 }
