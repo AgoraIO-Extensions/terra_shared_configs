@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
