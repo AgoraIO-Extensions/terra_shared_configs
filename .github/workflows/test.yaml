@@ -19,10 +19,7 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           scope: "@agoraio-extensions"
 
-      - name: Prepare SSH
-        env:
-          GITHUB_TOKEN: ${{ secrets.PRIVATE_KEY }}
-        uses: AgoraIO-Extensions/actions/.github/actions/ssh@ssh-ci
+      - uses: AgoraIO-Extensions/actions/.github/actions/ssh@ssh-ci
         with:
           private-key: ${{ secrets.PRIVATE_KEY }}
 
