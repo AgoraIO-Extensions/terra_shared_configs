@@ -20,6 +20,8 @@ jobs:
           scope: "@agoraio-extensions"
 
       - name: Prepare SSH
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRIVATE_KEY }}
         uses: AgoraIO-Extensions/actions/.github/actions/ssh@ssh-ci
         with:
           private-key: ${{ secrets.PRIVATE_KEY }}
