@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@agoraio-extensions/cxx-parser@https://github.com/AgoraIO-Extensions/terra#head=dev/yarn2-adaptation&workspace=cxx-parser":
+"@agoraio-extensions/cxx-parser@git@github.com:AgoraIO-Extensions/terra.git#head=dev/yarn2-adaptation&workspace=cxx-parser":
   version: 0.1.8
-  resolution: "@agoraio-extensions/cxx-parser@https://github.com/AgoraIO-Extensions/terra.git#workspace=cxx-parser&commit=021ecdeb79ace06cd0f2ae78b4334e72b6f52e95"
+  resolution: "@agoraio-extensions/cxx-parser@git@github.com:AgoraIO-Extensions/terra.git#workspace=cxx-parser&commit=3ef62fac3b68011840296a9cfd58e3c9aa1af044"
   dependencies:
     glob: "npm:^10.3.4"
     yaml: "npm:^2.1.3"
@@ -24,9 +24,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@agoraio-extensions/terra-core@https://github.com/AgoraIO-Extensions/terra#head=dev/yarn2-adaptation&workspace=terra-core":
+"@agoraio-extensions/terra-core@git@github.com:AgoraIO-Extensions/terra.git#head=dev/yarn2-adaptation&workspace=terra-core":
   version: 0.1.5
-  resolution: "@agoraio-extensions/terra-core@https://github.com/AgoraIO-Extensions/terra.git#workspace=terra-core&commit=021ecdeb79ace06cd0f2ae78b4334e72b6f52e95"
+  resolution: "@agoraio-extensions/terra-core@git@github.com:AgoraIO-Extensions/terra.git#workspace=terra-core&commit=3ef62fac3b68011840296a9cfd58e3c9aa1af044"
   checksum: 673c3b6246e097d180d40a899fdce23fdad80aa92f2b593173baba2aecc5d103a2d74ac346486c6a2349a1016ade82d48dd618c0860e6a29c680f471d1aea06a
   languageName: node
   linkType: hard
@@ -35,8 +35,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@agoraio-extensions/terra_shared_configs@workspace:."
   dependencies:
-    "@agoraio-extensions/cxx-parser": "https://github.com/AgoraIO-Extensions/terra#head=dev/yarn2-adaptation&workspace=cxx-parser"
-    "@agoraio-extensions/terra-core": "https://github.com/AgoraIO-Extensions/terra#head=dev/yarn2-adaptation&workspace=terra-core"
+    "@agoraio-extensions/cxx-parser": "git@github.com:AgoraIO-Extensions/terra.git#head=dev/yarn2-adaptation&workspace=cxx-parser"
+    "@agoraio-extensions/terra-core": "git@github.com:AgoraIO-Extensions/terra.git#head=dev/yarn2-adaptation&workspace=terra-core"
     "@types/jest": "npm:^29.5.1"
     "@types/mustache": "npm:^4.2.2"
     "@types/node": "npm:^20.5.9"
