@@ -22,8 +22,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@agoraio-extensions/cxx-parser": "latest",
-    "@agoraio-extensions/terra-core": "latest",
+    "@agoraio-extensions/cxx-parser": "AgoraIO-Extensions/terra#head=main&workspace=cxx-parser",
+    "@agoraio-extensions/terra-core": "latAgoraIO-Extensions/terra#head=main&workspace=terra-core",
     "mustache": "^4.2.0"
   },
   "devDependencies": {
