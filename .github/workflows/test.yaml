@@ -23,7 +23,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          echo "$PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 700 ~/.ssh/id_rsa
+          eval $(ssh-agent -s)
+          ssh-add ~/.ssh/id_rsa
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           yarn set version berry
           yarn
           yarn run test
