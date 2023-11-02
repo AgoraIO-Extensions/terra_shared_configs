@@ -23,15 +23,14 @@ jobs:
 
       - name: Reconfigure git to use HTTP authentication
         run: >
-          git config --global url."https://github.com/".insteadOf
-          ssh://git@github.com/
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
       # - uses: AgoraIO-Extensions/actions/.github/actions/ssh@ssh-ci
       #   with:
       #     private-key: ${{ secrets.PRIVATE_KEY }}
 
       - name: Run unit test
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           yarn set version berry
