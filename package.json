@@ -22,8 +22,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@agoraio-extensions/cxx-parser": "latest",
-    "@agoraio-extensions/terra-core": "latest",
+    "@agoraio-extensions/cxx-parser": "git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=cxx-parser",
+    "@agoraio-extensions/terra-core": "git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=terra-core",
     "mustache": "^4.2.0"
   },
   "devDependencies": {
@@ -42,5 +42,6 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
-  }
+  },
+  "packageManager": "yarn@4.0.1"
 }
