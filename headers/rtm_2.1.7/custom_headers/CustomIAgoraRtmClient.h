@@ -5,6 +5,7 @@
 #include "IAgoraRtmPresence.h"
 #include "IAgoraRtmLock.h"
 #include "AgoraRtmBase.h"
+#include "IAgoraRtmClient.h"
 
 namespace agora {
 namespace rtm {

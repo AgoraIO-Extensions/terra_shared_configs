@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AgoraRtmBase.h"
+#include "IAgoraStreamChannel.h"
 
 namespace agora {
 namespace rtm {
