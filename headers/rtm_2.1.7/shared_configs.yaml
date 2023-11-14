@@ -1,0 +1,18 @@
+include_header_dirs:
+  - include
+  - ../system
+  - /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+
+visit_headers:
+  - include/AgoraRtmBase.h
+  - include/IAgoraRtmClient.h
+  - include/IAgoraRtmLock.h
+  - include/IAgoraRtmPresence.h
+  - include/IAgoraRtmService.h
+  - include/IAgoraRtmStorage.h
+  # - include/IAgoraService.h
+  - include/IAgoraStreamChannel.h
+
+custom_headers:
+  - custom_headers/CustomIAgoraRtmClient.h
+  - custom_headers/CustomIAgoraStreamChannel.h
