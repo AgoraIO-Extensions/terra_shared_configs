@@ -13,3 +13,6 @@ visit_headers:
   # - include/IAgoraService.h
   - include/IAgoraStreamChannel.h
 
+custom_headers:
+  - custom_headers/CustomIAgoraRtmClient.h
+  - custom_headers/CustomIAgoraStreamChannel.h
