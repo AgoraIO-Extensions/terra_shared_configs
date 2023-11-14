@@ -9,6 +9,7 @@
 
 namespace agora {
 namespace rtm {
+namespace ext {
 
 class IRtmClient {
   // ----------------------------- 👇🏻new API👇🏻 -----------------------------
@@ -20,5 +21,6 @@ class IRtmClient {
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
+} // namespace ext
 } // namespace rtm
 } // namespace agora

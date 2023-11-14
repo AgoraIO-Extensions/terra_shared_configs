@@ -5,6 +5,7 @@
 
 namespace agora {
 namespace rtm {
+namespace ext {
 
 class IStreamChannel {
   // ----------------------------- 👇🏻new API👇🏻 -----------------------------
@@ -16,5 +17,6 @@ class IStreamChannel {
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
+} // namespace ext
 } // namespace rtm
 } // namespace agora
