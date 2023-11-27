@@ -34,7 +34,7 @@ struct AudioDeviceInfo {
   const char *deviceName;
 };
 
-class IRtcEngineBase {
+class IRtcEngine {
   // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
 
   // virtual int joinChannel(const char* token, const char* channelId, uid_t uid,
@@ -101,7 +101,12 @@ class IRtcEngineBase {
   virtual int addVideoWatermark(const char *watermarkUrl,
                                 const WatermarkOptions &options) = 0;
 
-  
+  // virtual int joinChannelWithUserAccount(const char* token, const char* channelId,
+  //                                        const char* userAccount, const ChannelMediaOptions& options) = 0;
+  virtual int
+  joinChannelWithUserAccount(const char *token, const char *channelId,
+                             const char *userAccount,
+                             const ChannelMediaOptions *options = NULL) = 0;
 
   // virtual int enableExtension(const char* provider, const char* extension, const ExtensionInfo& extensionInfo, bool enable = true) = 0;
   virtual int enableExtension(const char *provider, const char *extension,
@@ -129,8 +134,16 @@ class IRtcEngineBase {
   virtual int
   startScreenCapture(const ScreenCaptureParameters2 &captureParams) = 0;
 
+  // virtual int startScreenCapture(VIDEO_SOURCE_TYPE sourceType, const ScreenCaptureConfiguration& config) = 0;
+  virtual int startScreenCaptureBySourceType(
+      VIDEO_SOURCE_TYPE sourceType,
+      const ScreenCaptureConfiguration &config) = 0;
+
   // virtual int stopScreenCapture() = 0;
   virtual int stopScreenCapture() = 0;
+
+  // virtual int stopScreenCapture(VIDEO_SOURCE_TYPE sourceType) = 0;
+  virtual int stopScreenCaptureBySourceType(VIDEO_SOURCE_TYPE sourceType) = 0;
 
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 
@@ -169,6 +182,10 @@ class IRtcEngineBase {
 
 #ifdef __ELECTRON__
   virtual void destroyRendererByView(view_t view) = 0;
+
+  virtual void destroyRendererByConfig(VIDEO_SOURCE_TYPE sourceType,
+                                       const char *channelId = NULL,
+                                       uid_t uid = 0) = 0;
 #endif
 
 
@@ -183,25 +200,6 @@ class IRtcEngineBase {
 
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 
-};
-
-class IRtcEngine {
-  // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
-  // virtual int joinChannelWithUserAccount(const char* token, const char* channelId,
-  //                                        const char* userAccount, const ChannelMediaOptions& options) = 0;
-  virtual int
-  joinChannelWithUserAccount(const char *token, const char *channelId,
-                             const char *userAccount,
-                             const ChannelMediaOptions *options = NULL) = 0;
-  // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
-
-  // ----------------------------- 👇🏻new API👇🏻 -----------------------------
-
-#ifdef __ELECTRON__
-  virtual void destroyRendererByConfig(VIDEO_SOURCE_TYPE sourceType,
-                                       const char *channelId = NULL,
-                                       uid_t uid = 0) = 0;
-#endif
   // reason: keep
   // original: 
   // virtual int preloadChannel(const char* token, const char* channelId, uid_t uid) = 0;
@@ -211,22 +209,6 @@ class IRtcEngine {
   // original: 
   // virtual int preloadChannel(const char* token, const char* channelId, const char* userAccount) = 0;
   virtual int preloadChannelWithUserAccount(const char* token, const char* channelId, const char* userAccount) = 0;
-  // ----------------------------- 👆🏻new API👆🏻 -----------------------------
-};
-
-class IRtcEngineS {
-  // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
-
-  // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
-
-  // ----------------------------- 👇🏻new API👇🏻 -----------------------------
-
-#ifdef __ELECTRON__
-  virtual void destroyRendererByConfig(VIDEO_SOURCE_TYPE sourceType,
-                                       const char *channelId = NULL,
-                                       const char* userAccount) = 0;
-#endif
-  // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
 } // namespace ext
