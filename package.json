@@ -7,8 +7,7 @@
     "build": "tsc",
     "test": "jest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepack": "tsc"
+    "lint": "eslint \"**/*.{js,ts,tsx}\""
   },
   "files": [
     "dist",
