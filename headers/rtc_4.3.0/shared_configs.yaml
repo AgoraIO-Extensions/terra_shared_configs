@@ -5,38 +5,23 @@ include_header_dirs:
 
 visit_headers:
   - include/AgoraBase.h
-  - include/AgoraBaseS.h
-  - include/AgoraCommonBase.h
   - include/AgoraMediaBase.h
-  - include/AgoraMediaBaseS.h
-  - include/AgoraMediaCommonBase.h
   - include/AgoraMediaPlayerTypes.h
   - include/AgoraOptional.h
   - include/AgoraRefPtr.h
   - include/IAgoraH265Transcoder.h
-  - include/IAgoraH265TranscoderBase.h
-  - include/IAgoraH265TranscoderS.h
   - include/IAgoraLog.h
   - include/IAgoraMediaEngine.h
-  - include/IAgoraMediaEngineBase.h
-  - include/IAgoraMediaEngineS.h
   - include/IAgoraMediaPlayer.h
   - include/IAgoraMediaPlayerSource.h
   - include/IAgoraMediaRecorder.h
-  - include/IAgoraMediaRecorderBase.h
-  - include/IAgoraMediaRecorderS.h
   - include/IAgoraMediaStreamingSource.h
   - include/IAgoraMusicContentCenter.h
   - include/IAgoraParameter.h
   - include/IAgoraRhythmPlayer.h
   - include/IAgoraRtcEngine.h
-  - include/IAgoraRtcEngineBase.h
   - include/IAgoraRtcEngineEx.h
-  - include/IAgoraRtcEngineExS.h
-  - include/IAgoraRtcEngineS.h
   - include/IAgoraSpatialAudio.h
-  - include/IAgoraSpatialAudioBase.h
-  - include/IAgoraSpatialAudioS.h
   - include/IAudioDeviceManager.h
 
 custom_headers:

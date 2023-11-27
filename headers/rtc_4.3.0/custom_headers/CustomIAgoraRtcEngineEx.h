@@ -21,20 +21,6 @@ class IRtcEngineEx {
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 };
 
-class IRtcEngineExS {
-  // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
-
-  // virtual int leaveChannelEx(const RtcConnection& connection, const LeaveChannelOptions& options) = 0;
-  virtual int leaveChannelEx(const RtcConnectionS &connectionS,
-                             const LeaveChannelOptions *options = NULL) = 0;
-
-  // virtual int createDataStreamEx(int* streamId, DataStreamConfig& config, const RtcConnection& connection) = 0;
-  virtual int createDataStreamEx(int *streamId, DataStreamConfig &config,
-                                 const RtcConnectionS &connectionS) = 0;
-
-  // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
-};
-
 } // namespace ext
 } // namespace rtc
 } // namespace agora
