@@ -149,6 +149,9 @@ class IRtcEngine {
 
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
 
+  // virtual int startPreview() = 0;
+  virtual int startPreviewWithoutSourceType() = 0;
+
   // virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
   // AGORA_IID_AUDIO_DEVICE_MANAGER = 1,
   virtual IAudioDeviceManager *getAudioDeviceManager() = 0;
