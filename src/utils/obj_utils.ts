@@ -7,6 +7,16 @@
  * @returns True if the property is equal to the value, false otherwise.
  */
 export function checkPropertyEq(obj: any, key: string, value: any): boolean {
+  function _arraysAreIdentical(arr1: any, arr2: any) {
+    if (arr1.length !== arr2.length) return false;
+    for (var i = 0, len = arr1.length; i < len; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   if (!obj.hasOwnProperty(key)) {
     return false;
   }
@@ -15,6 +25,10 @@ export function checkPropertyEq(obj: any, key: string, value: any): boolean {
 
   if (!eq && typeof value === 'string') {
     eq = new RegExp(value).test(obj[key]);
+  }
+
+  if (!eq && Array.isArray(value) && Array.isArray(obj[key])) {
+    eq = _arraysAreIdentical(value, obj[key]);
   }
 
   return eq;
@@ -38,7 +52,13 @@ export function checkObjInclude(obj1: any, obj2: any): boolean {
     let v1 = obj1[k2];
     let v2 = obj2[k2];
     if (v1) {
-      if (typeof v1 === 'object' && typeof v2 === 'object') {
+      // Object but not array
+      if (
+        typeof v1 === 'object' &&
+        !Array.isArray(v1) &&
+        typeof v2 === 'object' &&
+        !Array.isArray(v2)
+      ) {
         isIncluded = isIncluded && checkObjInclude(v1, v2);
       } else {
         isIncluded = isIncluded && checkPropertyEq(obj1, k2, obj2[k2]);

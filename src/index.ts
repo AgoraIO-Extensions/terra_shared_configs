@@ -7,3 +7,4 @@ export * from './parsers/update_simple_type_parser';
 export * from './parsers/pointer_marker_parser';
 export * from './renderers/mustache_renderer';
 export * from './renderers/iris_doc_renderer';
+export * from './utils/obj_utils';
