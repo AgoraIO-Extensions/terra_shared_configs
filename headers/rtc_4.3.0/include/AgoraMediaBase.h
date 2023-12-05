@@ -294,7 +294,10 @@ struct ContentInspectModule {
  */
 struct ContentInspectConfig {
   const char* extraInfo;
-
+  /**
+   * The specific server configuration for image moderation. Please contact technical support.
+   */
+  const char* serverConfig;
   /**The content inspect modules, max length of modules is 32.
    * the content(snapshot of send video stream, image) can be used to max of 32 types functions.
    */
@@ -305,11 +308,12 @@ struct ContentInspectConfig {
    ContentInspectConfig& operator=(const ContentInspectConfig& rth)
 	{
         extraInfo = rth.extraInfo;
+        serverConfig = rth.serverConfig;
         moduleCount = rth.moduleCount;
 		memcpy(&modules, &rth.modules,  MAX_CONTENT_INSPECT_MODULE_COUNT * sizeof(ContentInspectModule));
 		return *this;
 	}
-  ContentInspectConfig() :extraInfo(NULL), moduleCount(0){}
+  ContentInspectConfig() :extraInfo(NULL), serverConfig(NULL), moduleCount(0){}
 };
 
 namespace base {
@@ -1528,7 +1532,7 @@ enum MediaRecorderStreamType {
  */
 enum RecorderState {
   /**
-   * -1: An error occurs during the recording. See RecorderErrorCode for the reason.
+   * -1: An error occurs during the recording. See RecorderReasonCode for the reason.
    */
   RECORDER_STATE_ERROR = -1,
   /**
