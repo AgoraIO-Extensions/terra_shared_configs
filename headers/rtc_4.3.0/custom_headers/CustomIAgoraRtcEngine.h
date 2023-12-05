@@ -145,6 +145,9 @@ class IRtcEngine {
   // virtual int stopScreenCapture(VIDEO_SOURCE_TYPE sourceType) = 0;
   virtual int stopScreenCaptureBySourceType(VIDEO_SOURCE_TYPE sourceType) = 0;
 
+  // AGORA_CPP_API static void release(bool sync = false);
+  virtual void release(bool sync = false) = 0;
+
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
