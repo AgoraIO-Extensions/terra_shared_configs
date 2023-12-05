@@ -33,8 +33,10 @@
 
 #if defined(AGORARTC_EXPORT)
 #define AGORA_API extern "C" __declspec(dllexport)
+#define AGORA_CPP_API __declspec(dllexport)
 #else
 #define AGORA_API extern "C" __declspec(dllimport)
+#define AGORA_CPP_API __declspec(dllimport)
 #endif  // AGORARTC_EXPORT
 
 #define AGORA_CALL __cdecl
@@ -46,11 +48,13 @@
 #include <TargetConditionals.h>
 
 #define AGORA_API extern "C" __attribute__((visibility("default")))
+#define AGORA_CPP_API __attribute__((visibility("default")))
 #define AGORA_CALL
 
 #elif defined(__ANDROID__) || defined(__linux__)
 
 #define AGORA_API extern "C" __attribute__((visibility("default")))
+#define AGORA_CPP_API __attribute__((visibility("default")))
 #define AGORA_CALL
 
 #define __deprecated
@@ -58,6 +62,7 @@
 #else  // !_WIN32 && !__APPLE__ && !(__ANDROID__ || __linux__)
 
 #define AGORA_API extern "C"
+#define AGORA_CPP_API
 #define AGORA_CALL
 
 #define __deprecated
@@ -1263,7 +1268,7 @@ struct SenderOptions {
 
   SenderOptions()
   : ccMode(CC_ENABLED),
-    codecType(VIDEO_CODEC_H264),
+    codecType(VIDEO_CODEC_H265),
     targetBitrate(6500) {}
 };
 
@@ -1599,7 +1604,7 @@ struct EncodedVideoFrameInfo {
    */
   uid_t uid;
   /**
-   * The codec type of the local video stream. See #VIDEO_CODEC_TYPE. The default value is `VIDEO_CODEC_H264 (2)`.
+   * The codec type of the local video stream. See #VIDEO_CODEC_TYPE. The default value is `VIDEO_CODEC_H265 (3)`.
    */
   VIDEO_CODEC_TYPE codecType;
   /**
@@ -1873,7 +1878,7 @@ struct VideoEncoderConfiguration {
   AdvanceOptions advanceOptions;
 
   VideoEncoderConfiguration(const VideoDimensions& d, int f, int b, ORIENTATION_MODE m, VIDEO_MIRROR_MODE_TYPE mirror = VIDEO_MIRROR_MODE_DISABLED)
-    : codecType(VIDEO_CODEC_H264),
+    : codecType(VIDEO_CODEC_H265),
       dimensions(d),
       frameRate(f),
       bitrate(b),
@@ -1883,7 +1888,7 @@ struct VideoEncoderConfiguration {
       mirrorMode(mirror),
       advanceOptions(PREFER_AUTO, PREFER_LOW_LATENCY) {}
   VideoEncoderConfiguration(int width, int height, int f, int b, ORIENTATION_MODE m, VIDEO_MIRROR_MODE_TYPE mirror = VIDEO_MIRROR_MODE_DISABLED)
-    : codecType(VIDEO_CODEC_H264),
+    : codecType(VIDEO_CODEC_H265),
       dimensions(width, height),
       frameRate(f),
       bitrate(b),
@@ -1903,7 +1908,7 @@ struct VideoEncoderConfiguration {
       mirrorMode(config.mirrorMode),
       advanceOptions(config.advanceOptions) {}
   VideoEncoderConfiguration()
-    : codecType(VIDEO_CODEC_H264),
+    : codecType(VIDEO_CODEC_H265),
       dimensions(FRAME_WIDTH_960, FRAME_HEIGHT_540),
       frameRate(FRAME_RATE_FPS_15),
       bitrate(STANDARD_BITRATE),
@@ -3040,7 +3045,7 @@ enum REMOTE_USER_STATE {
 struct VideoTrackInfo {
   VideoTrackInfo()
   : isLocal(false), ownerUid(0), trackId(0), channelId(OPTIONAL_NULLPTR)
-  , streamType(VIDEO_STREAM_HIGH), codecType(VIDEO_CODEC_H264)
+  , streamType(VIDEO_STREAM_HIGH), codecType(VIDEO_CODEC_H265)
   , encodedFrameOnly(false), sourceType(VIDEO_SOURCE_CAMERA_PRIMARY)
   , observationPosition(agora::media::base::POSITION_POST_CAPTURER) {}
   /**
@@ -6121,6 +6126,8 @@ struct VideoLayout
    * 0 for normal video , 1 for placeholder image showed , 2 for black image.
   */ 
   uint32_t videoState; 
+
+  VideoLayout() : channelId(OPTIONAL_NULLPTR), uid(0), strUid(OPTIONAL_NULLPTR), x(0), y(0), width(0), height(0), videoState(0) {}
 };
 }  // namespace agora
 
