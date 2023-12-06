@@ -7,6 +7,7 @@
 #include "IAgoraRtcEngine.h"
 #include "IAgoraSpatialAudio.h"
 #include "IAudioDeviceManager.h"
+#include "IAgoraH265Transcoder.h"
 
 namespace agora {
 namespace rtc {
@@ -174,6 +175,10 @@ class IRtcEngine {
   // virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
   // AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
   virtual ILocalSpatialAudioEngine *getLocalSpatialAudioEngine() = 0;
+
+  // virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+  // AGORA_IID_H265_TRANSCODER = 16,
+  virtual IH265Transcoder *getH265Transcoder() = 0;
 
   // virtual bool onReadyToSendMetadata(Metadata &metadata, VIDEO_SOURCE_TYPE source_type) = 0;
   virtual int sendMetaData(const IMetadataObserver::Metadata &metadata,
