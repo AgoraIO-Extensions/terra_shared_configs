@@ -36,7 +36,7 @@ function fixEnumConstantValue(
       value = value.replace(it, TYPES_SIZE[it] as string);
     }
   });
-  if (!args.skipCalValue) {
+  if (!args?.skipCalValue) {
     if (!/^\d+$/.test(value)) {
       // 当前枚举值不是纯数字, 执行表达式计算，示例如下：
       // QUALITY_UNSUPPORTED = 1 << 4,
@@ -64,8 +64,10 @@ export function FixEnumConstantParser(
             // QUALITY_DETECTING,
             enumConstant.source = `${++lastEnumValue}`;
           }
-          lastEnumValue = parseInt(enumConstant.source);
-          if (isNaN(lastEnumValue)) {
+          if (!args?.skipCalValue) {
+            lastEnumValue = parseInt(enumConstant.source);
+          }
+          if (args?.skipCalValue || isNaN(lastEnumValue)) {
             enumConstant.value = fixEnumConstantValue(
               enumz,
               enumConstant,
