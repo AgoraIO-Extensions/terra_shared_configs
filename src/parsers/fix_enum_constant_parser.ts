@@ -57,24 +57,24 @@ export function FixEnumConstantParser(
       if (customNode.__TYPE === CXXTYPE.Enumz) {
         let enumz = customNode.asEnumz();
         let lastEnumValue = -1;
-        enumz.enum_constants.forEach((enumConstant) => {
+        enumz.enum_constants.forEach((enumConstant,index) => {
           if (enumConstant.source === '') {
             // 当前枚举source为空，需要Parser赋值，示例如下：
             // QUALITY_UNSUPPORTED = 7,
             // QUALITY_DETECTING,
             enumConstant.source = `${++lastEnumValue}`;
           }
-          if (!args?.skipCalValue) {
-            lastEnumValue = parseInt(enumConstant.source);
-          }
-          if (args?.skipCalValue || isNaN(lastEnumValue)) {
+          lastEnumValue = parseInt(enumConstant.source);
+          if (isNaN(lastEnumValue)) {
             enumConstant.value = fixEnumConstantValue(
               enumz,
               enumConstant,
               args
             );
           } else {
-            enumConstant.value = `${lastEnumValue}`;
+            enumConstant.value = !args?.skipCalValue
+              ? `${lastEnumValue}`
+              : enumConstant.source;
           }
         });
       }
