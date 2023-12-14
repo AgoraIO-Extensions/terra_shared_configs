@@ -57,7 +57,7 @@ export function FixEnumConstantParser(
       if (customNode.__TYPE === CXXTYPE.Enumz) {
         let enumz = customNode.asEnumz();
         let lastEnumValue = -1;
-        enumz.enum_constants.forEach((enumConstant,index) => {
+        enumz.enum_constants.forEach((enumConstant) => {
           if (enumConstant.source === '') {
             // 当前枚举source为空，需要Parser赋值，示例如下：
             // QUALITY_UNSUPPORTED = 7,
