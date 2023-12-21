@@ -855,7 +855,6 @@ enum INTERFACE_ID_TYPE {
   AGORA_IID_RTC_CONNECTION = 7,
   AGORA_IID_SIGNALING_ENGINE = 8,
   AGORA_IID_MEDIA_ENGINE_REGULATOR = 9,
-  AGORA_IID_CLOUD_SPATIAL_AUDIO = 10,
   AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
   AGORA_IID_STATE_SYNC = 13,
   AGORA_IID_META_SERVICE = 14,
@@ -5998,7 +5997,13 @@ struct LocalAccessPointConfiguration {
   /** Local proxy connection, advanced Config info.
    */
   AdvancedConfigInfo advancedConfig;
-  LocalAccessPointConfiguration() : ipList(NULL), ipListSize(0), domainList(NULL), domainListSize(0), verifyDomainName(NULL), mode(ConnectivityFirst) {}
+  /**
+    * Whether to disable vos-aut:
+    - true: (Default)disable vos-aut.
+    - false: not disable vos-aut
+  */
+  bool disableAut;
+  LocalAccessPointConfiguration() : ipList(NULL), ipListSize(0), domainList(NULL), domainListSize(0), verifyDomainName(NULL), mode(ConnectivityFirst), disableAut(true) {}
 };
 
 /**
