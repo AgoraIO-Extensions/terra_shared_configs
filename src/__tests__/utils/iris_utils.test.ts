@@ -16,9 +16,27 @@ describe('irisApiType', () => {
             ]
         } as MemberFunction;
 
-        let apiType = irisApiType(myClass, mf);
+        let apiType = irisApiType(myClass, mf,);
 
         expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
+    });
+
+    it('return full api type with hash code, toUpperCase = false', () => {
+        let myClass = { name: 'MyClass' } as Clazz;
+        let mf = {
+            name: 'MyFunc',
+            parameters: [
+                {
+                    type: {
+                        source: 'const char *'
+                    }
+                } as Variable
+            ]
+        } as MemberFunction;
+
+        let apiType = irisApiType(myClass, mf, { toUpperCase: false });
+
+        expect(apiType).toBe('MyClass_MyFunc_3766a1b9');
     });
 
     it('return hash code only', () => {
@@ -34,7 +52,7 @@ describe('irisApiType', () => {
             ]
         } as MemberFunction;
 
-        let apiType = irisApiType(myClass, mf, true);
+        let apiType = irisApiType(myClass, mf, { returnHashCodeOnly: true });
 
         expect(apiType).toBe('3766a1b9');
     });

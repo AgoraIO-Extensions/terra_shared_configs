@@ -3,15 +3,16 @@ import {
   MemberFunction,
   SimpleTypeKind,
 } from '@agoraio-extensions/cxx-parser';
+import { execSync } from 'child_process';
 
 /**
- * Return the API type schema `<Class Name Uppercase>_<Function Name Uppercase>_<Full API Type Hash Code>`.
+ * Return the API type schema `<Class Name [Uppercase]>_<Function Name [Uppercase]>_<Full API Type Hash Code>`.
  * @param clazz The `Clazz`
  * @param mf The `MemberFunction`
  * @param returnHashCodeOnly Only return the hash code string
  * @returns 
  */
-export function irisApiType(clazz: Clazz, mf: MemberFunction, returnHashCodeOnly = false): string {
+export function irisApiType(clazz: Clazz, mf: MemberFunction, options?: { returnHashCodeOnly?: boolean, toUpperCase?: boolean }): string {
   // Borrow from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
   function _stringHashCode(source: string): number {
     let length = source.length;
@@ -28,6 +29,8 @@ export function irisApiType(clazz: Clazz, mf: MemberFunction, returnHashCodeOnly
   const seperator = '__';
   const shortSeperator = '_';
 
+  let returnHashCodeOnly = options?.returnHashCodeOnly ?? false;
+  let toUpperCase = options?.toUpperCase ?? true;
 
   let ps = mf.parameters
     .map((param) => {
@@ -43,7 +46,15 @@ export function irisApiType(clazz: Clazz, mf: MemberFunction, returnHashCodeOnly
     return hc;
   }
 
+  let cn = clazz.name.trimNamespace();
+  let mn = mf.name;
+
+  if (toUpperCase) {
+    cn = cn.toUpperCase();
+    mn = mn.toUpperCase();
+  }
+
   // We use single one underscore `shortSeperator` for display purpose
-  // <Class Name Uppercase>_<Function Name Uppercase>_<Full API Type Hash Code>
-  return `${clazz.name.trimNamespace().toUpperCase()}${shortSeperator}${mf.name.toUpperCase()}${shortSeperator}${hc}`;
+  // <Class Name [Uppercase]>_<Function Name [Uppercase]>_<Full API Type Hash Code>
+  return `${cn}${shortSeperator}${mn}${shortSeperator}${hc}`;
 }
