@@ -5,7 +5,7 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 
 /**
- * Return the API type schema `<Class Name>_<Function Name>_<Full API Type Hash Code>`.
+ * Return the API type schema `<Class Name Uppercase>_<Function Name Uppercase>_<Full API Type Hash Code>`.
  * @param clazz The `Clazz`
  * @param mf The `MemberFunction`
  * @param returnHashCodeOnly Only return the hash code string
@@ -44,6 +44,6 @@ export function irisApiType(clazz: Clazz, mf: MemberFunction, returnHashCodeOnly
   }
 
   // We use single one underscore `shortSeperator` for display purpose
-  // <Class Name>_<Function Name>_<Full API Type Hash Code>
-  return `${clazz.name.trimNamespace()}${shortSeperator}${mf.name}${shortSeperator}${hc}`;
+  // <Class Name Uppercase>_<Function Name Uppercase>_<Full API Type Hash Code>
+  return `${clazz.name.trimNamespace().toUpperCase()}${shortSeperator}${mf.name.toUpperCase}${shortSeperator}${hc}`;
 }

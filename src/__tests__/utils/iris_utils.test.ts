@@ -18,7 +18,7 @@ describe('irisApiType', () => {
 
         let apiType = irisApiType(myClass, mf);
 
-        expect(apiType).toBe('MyClass_MyFunc_3766a1b9');
+        expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
     });
 
     it('return hash code only', () => {
