@@ -45,5 +45,5 @@ export function irisApiType(clazz: Clazz, mf: MemberFunction, returnHashCodeOnly
 
   // We use single one underscore `shortSeperator` for display purpose
   // <Class Name Uppercase>_<Function Name Uppercase>_<Full API Type Hash Code>
-  return `${clazz.name.trimNamespace().toUpperCase()}${shortSeperator}${mf.name.toUpperCase}${shortSeperator}${hc}`;
+  return `${clazz.name.trimNamespace().toUpperCase()}${shortSeperator}${mf.name.toUpperCase()}${shortSeperator}${hc}`;
 }
