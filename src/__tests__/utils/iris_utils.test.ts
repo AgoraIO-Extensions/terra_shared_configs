@@ -21,6 +21,24 @@ describe('irisApiType', () => {
         expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
     });
 
+    it('return full api type with hash code with so long parameter type name', () => {
+        let myClass = { name: 'MyClass' } as Clazz;
+        let mf = {
+            name: 'MyFunc',
+            parameters: [
+                {
+                    type: {
+                        source: 'ThisIsASoLooooooooooooooooongNamespace1::ThisIsASoLooooooooooooooooongNamespace2::ThisIsASoLooooooooooooooooongNamespace3::ThisIsASoLooooooooooooooooongClass'
+                    }
+                } as Variable
+            ]
+        } as MemberFunction;
+
+        let apiType = irisApiType(myClass, mf,);
+
+        expect(apiType).toBe('MYCLASS_MYFUNC_67d36c93');
+    });
+
     it('return full api type with hash code, toUpperCase = false', () => {
         let myClass = { name: 'MyClass' } as Clazz;
         let mf = {
