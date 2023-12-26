@@ -7,7 +7,7 @@ import { Clazz, MemberFunction } from '@agoraio-extensions/cxx-parser';
  * @param returnHashCodeOnly Only return the hash code string
  * @returns
  */
-export function irisApiType(
+export function irisApiId(
   clazz: Clazz,
   mf: MemberFunction,
   options?: {

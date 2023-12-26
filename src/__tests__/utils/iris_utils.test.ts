@@ -4,9 +4,9 @@ import {
   Variable,
 } from '@agoraio-extensions/cxx-parser';
 
-import { irisApiType } from '../../index';
+import { irisApiId } from '../../index';
 
-describe('irisApiType', () => {
+describe('irisApiId', () => {
   it('return full api type with hash code', () => {
     let myClass = { name: 'MyClass' } as Clazz;
     let mf = {
@@ -20,7 +20,7 @@ describe('irisApiType', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiType(myClass, mf);
+    let apiType = irisApiId(myClass, mf);
 
     expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
   });
@@ -39,7 +39,7 @@ describe('irisApiType', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiType(myClass, mf);
+    let apiType = irisApiId(myClass, mf);
 
     expect(apiType).toBe('MYCLASS_MYFUNC_67d36c93');
   });
@@ -57,7 +57,7 @@ describe('irisApiType', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiType(myClass, mf, { toUpperCase: false });
+    let apiType = irisApiId(myClass, mf, { toUpperCase: false });
 
     expect(apiType).toBe('MyClass_MyFunc_3766a1b9');
   });
@@ -75,7 +75,7 @@ describe('irisApiType', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiType(myClass, mf, {
+    let apiType = irisApiId(myClass, mf, {
       withClassName: false,
       withFuncName: false,
     });
