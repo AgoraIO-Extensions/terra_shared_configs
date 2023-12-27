@@ -4,6 +4,8 @@ export * from './parsers/order_node_parser';
 export * from './parsers/pointer_to_array_parser';
 export * from './parsers/remove_node_parser';
 export * from './parsers/update_simple_type_parser';
+export * from './parsers/assign_simple_type_parser';
+export * from './parsers/merge_node_parser';
 export * from './parsers/pointer_marker_parser';
 export * from './renderers/mustache_renderer';
 export * from './renderers/iris_doc_renderer';

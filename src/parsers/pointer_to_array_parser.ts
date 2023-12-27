@@ -44,6 +44,11 @@ function markArray(
       if (regex.test(node.realName)) {
         // 满足正则表达式则标记为数组
         node.type.kind = SimpleTypeKind.array_t;
+        // 名字以buffer、data结尾的，且原类型为void*，则为字节数组
+        if (v === '^.*(buffer|data)$') {
+          node.type.name = 'uint8_t';
+          node.type.kind = SimpleTypeKind.pointer_t;
+        }
       }
     });
   });

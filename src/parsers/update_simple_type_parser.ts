@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
 import {
   ParseResult,
@@ -8,11 +6,22 @@ import {
 } from '@agoraio-extensions/terra-core';
 
 export type UpdateSimpleTypeParserArgs = {
-  configJson?: string;
-  configJsonFilePath?: string;
+  config: any;
 };
 
-export type UpdateNodeConfig = Record<string, string>;
+export type UpdateNodeConfig = Record<string, string | Function>;
+
+export function updateSimpleTypeName(
+  text: string,
+  configs: UpdateNodeConfig
+): string {
+  Object.entries(configs).forEach(([k, v]) => {
+    if (typeof v === 'string') {
+      text = text.replace(new RegExp(k), v);
+    }
+  });
+  return text;
+}
 
 function updateNode<T extends CXXTerraNode>(
   node: T[] | T,
@@ -25,7 +34,14 @@ function updateNode<T extends CXXTerraNode>(
   } else {
     const config = configs[node.fullName];
     if (config !== undefined) {
-      node.source = config;
+      if (typeof config === 'object') {
+        node.name = config['name'];
+        node.source = config['source'];
+        node.asSimpleType().is_const = config['is_const'];
+        node.asSimpleType().is_builtin_type = config['is_builtin_type'];
+      } else if (typeof config === 'string') {
+        node.source = config;
+      }
     }
     switch (node.__TYPE) {
       case CXXTYPE.MemberVariable:
@@ -39,10 +55,20 @@ function updateNode<T extends CXXTerraNode>(
         updateNode(node.asMemberFunction().parameters, configs);
         break;
       case CXXTYPE.SimpleType:
-        Object.entries(configs).forEach(([k, v]) => {
-          node.name = node.name.replace(new RegExp(k), v);
-          node.source = node.source.replace(new RegExp(k), v);
-        });
+        if (
+          configs.hasOwnProperty('customHandle') &&
+          typeof configs['customHandle'] === 'function'
+        ) {
+          node.source = (configs as any)['customHandle'](
+            node.asSimpleType(),
+            configs
+          );
+        } else {
+          node.source = updateSimpleTypeName(
+            node.asSimpleType().source,
+            configs
+          );
+        }
     }
   }
 }
@@ -52,13 +78,8 @@ export function UpdateSimpleTypeParser(
   args: UpdateSimpleTypeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  if (args.configJson === undefined) {
-    args.configJson = readFileSync(
-      resolvePath(args.configJsonFilePath!, terraContext.configDir)
-      // getAbsolutePath(parseConfig.rootDir, args.configJsonFilePath)
-    ).toString();
-  }
-  let configs = JSON.parse(args.configJson!);
+  let configPath = resolvePath(args.config, terraContext.configDir);
+  let configs = require(configPath);
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
     updateNode(file.nodes, configs);
