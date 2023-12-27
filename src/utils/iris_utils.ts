@@ -1,11 +1,17 @@
 import { Clazz, MemberFunction } from '@agoraio-extensions/cxx-parser';
 
 /**
- * Return the API type schema `<Class Name [Uppercase]>_<Function Name [Uppercase]>_<Full API Type Hash Code>`.
- * @param clazz The `Clazz`
- * @param mf The `MemberFunction`
- * @param returnHashCodeOnly Only return the hash code string
- * @returns
+ * Generates an API type schema for a given class and member function.
+ * The schema follows the format `<Class Name>_<Function Name>[_<Full API Type Hash Code>]`.
+ * If the member function is an overload, the hash code will be appended to the end of the schema.
+ *
+ * @param clazz - The class object.
+ * @param mf - The member function object.
+ * @param options - Optional configuration options.
+ * @param options.withClassName - Whether to include the class name in the schema. Default is `true`.
+ * @param options.withFuncName - Whether to include the function name in the schema. Default is `true`.
+ * @param options.toUpperCase - Whether to convert the class and function names to uppercase. Default is `true`.
+ * @returns The generated API type schema.
  */
 export function irisApiId(
   clazz: Clazz,
@@ -31,25 +37,16 @@ export function irisApiId(
     return hash;
   }
 
+  function _isOverload(cls: Clazz, f: MemberFunction): boolean {
+    return (cls.methods ?? []).filter((m) => m.name === f.name).length > 1;
+  }
+
   const seperator = '__';
   const shortSeperator = '_';
 
   let toUpperCase = options?.toUpperCase ?? true;
   let withClassName = options?.withClassName ?? true;
   let withFuncName = options?.withFuncName ?? true;
-
-  let ps = mf.parameters
-    .map((param) => {
-      return param.type.source;
-    })
-    .join(seperator);
-
-  // <Class Name>__<Function Name>__<Param Type1>__<Param Type2>__<...>
-  let apiType = `${clazz.name.trimNamespace()}${seperator}${
-    mf.name
-  }${seperator}${ps}`;
-  // Convert to hex string
-  let hc = _stringHashCode(apiType).toString(16);
 
   let cn = clazz.name.trimNamespace();
   let mn = mf.name;
@@ -59,15 +56,36 @@ export function irisApiId(
     mn = mn.toUpperCase();
   }
 
-  let output = hc;
-
+  let output = '';
+  let isOverload = _isOverload(clazz, mf);
   // We use single one underscore `shortSeperator` for display purpose
-  // <Class Name [Uppercase]>_<Function Name [Uppercase]>_<Full API Type Hash Code>
-  if (withFuncName) {
-    output = `${mn}${shortSeperator}${hc}`;
-  }
+  // <Class Name [Uppercase]>_<Function Name [Uppercase]>[_<Full API Type Hash Code>]
   if (withClassName) {
-    output = `${cn}${shortSeperator}${output}`;
+    output = cn;
+  }
+
+  if (withFuncName) {
+    if (withClassName) {
+      output += shortSeperator;
+    }
+    output = `${output}${mn}`;
+  }
+
+  if (isOverload) {
+    let ps = mf.parameters
+      .map((param) => {
+        return param.type.source;
+      })
+      .join(seperator);
+
+    // <Class Name>__<Function Name>__<Param Type1>__<Param Type2>__<...>
+    let apiType = `${clazz.name.trimNamespace()}${seperator}${
+      mf.name
+    }${seperator}${ps}`;
+    // Convert to hex string
+    let hc = _stringHashCode(apiType).toString(16);
+
+    output = `${output}${shortSeperator}${hc}`;
   }
 
   return output;
