@@ -20,6 +20,7 @@ export function irisApiId(
     withClassName?: boolean;
     withFuncName?: boolean;
     toUpperCase?: boolean;
+    trimPrefix?: string; // default is "I"
   }
 ): string {
   // Borrow from https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
@@ -47,6 +48,7 @@ export function irisApiId(
   let toUpperCase = options?.toUpperCase ?? true;
   let withClassName = options?.withClassName ?? true;
   let withFuncName = options?.withFuncName ?? true;
+  let trimPrefix = options?.trimPrefix ?? 'I';
 
   let cn = clazz.name.trimNamespace();
   let mn = mf.name;
@@ -86,6 +88,10 @@ export function irisApiId(
     let hc = _stringHashCode(apiType).toString(16);
 
     output = `${output}${shortSeperator}${hc}`;
+  }
+
+  if (trimPrefix.length > 0 && output.startsWith(trimPrefix)) {
+    output = output.replace(trimPrefix, '');
   }
 
   return output;
