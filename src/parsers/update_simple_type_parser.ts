@@ -69,6 +69,7 @@ function updateNode<T extends CXXTerraNode>(
             configs
           );
         }
+        node.name = node.source;
     }
   }
 }
