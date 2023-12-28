@@ -181,4 +181,64 @@ describe('irisApiId', () => {
 
     expect(apiType).toBe('');
   });
+
+  it('api id trim prefix "I"', () => {
+    let myClass = { name: 'IMyClass' } as Clazz;
+    let mf = {
+      name: 'MyFunc',
+      parameters: [
+        {
+          type: {
+            source: 'const char *',
+          },
+        } as Variable,
+      ],
+    } as MemberFunction;
+
+    let apiType = irisApiId(myClass, mf, { toUpperCase: false });
+
+    expect(apiType).toBe('MyClass_MyFunc');
+  });
+
+  it('api id trim prefix other prefix', () => {
+    let myClass = { name: 'MyClass' } as Clazz;
+    let mf = {
+      name: 'MyFunc',
+      parameters: [
+        {
+          type: {
+            source: 'const char *',
+          },
+        } as Variable,
+      ],
+    } as MemberFunction;
+
+    let apiType = irisApiId(myClass, mf, {
+      toUpperCase: false,
+      trimPrefix: 'My',
+    });
+
+    expect(apiType).toBe('Class_MyFunc');
+  });
+
+  it('api id trim prefix empty', () => {
+    let myClass = { name: 'MyClass' } as Clazz;
+    let mf = {
+      name: 'MyFunc',
+      parameters: [
+        {
+          type: {
+            source: 'const char *',
+          },
+        } as Variable,
+      ],
+    } as MemberFunction;
+
+    let apiType = irisApiId(myClass, mf, {
+      toUpperCase: false,
+      trimPrefix: '',
+    });
+
+    expect(apiType).toBe('MyClass_MyFunc');
+  });
 });
