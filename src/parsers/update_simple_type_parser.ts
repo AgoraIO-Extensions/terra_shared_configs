@@ -59,17 +59,13 @@ function updateNode<T extends CXXTerraNode>(
           configs.hasOwnProperty('customHandle') &&
           typeof configs['customHandle'] === 'function'
         ) {
-          node.source = (configs as any)['customHandle'](
+          node.name = (configs as any)['customHandle'](
             node.asSimpleType(),
             configs
           );
         } else {
-          node.source = updateSimpleTypeName(
-            node.asSimpleType().source,
-            configs
-          );
+          node.name = updateSimpleTypeName(node.asSimpleType().source, configs);
         }
-        node.name = node.source;
     }
   }
 }

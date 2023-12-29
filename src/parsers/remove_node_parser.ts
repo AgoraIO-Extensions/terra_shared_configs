@@ -63,6 +63,13 @@ export function RemoveNodeParser(
           regex_configs
         );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
+        node.asClazz().base_clazzs = filterNode(
+          node.asClazz().base_clazzs.map((v) => {
+            return { fullName: v } as CXXTerraNode;
+          }),
+          name_configs,
+          regex_configs
+        ).map((v) => v.fullName);
         node.asClazz().member_variables = filterNode(
           node.asClazz().member_variables,
           name_configs,

@@ -31,7 +31,7 @@ function markArray(
     }
 
     const config = name_configs.find(
-      (v) => v === `${parentNode.fullName}.${node.realName}`
+      (v) => v === `${parentNode.fullName}.${node.name}`
     );
     if (config) {
       // 配置表中配置了该变量则标记为数组
@@ -41,16 +41,20 @@ function markArray(
 
     regex_configs.forEach((v) => {
       const regex = new RegExp(v);
-      if (regex.test(node.realName)) {
+      if (regex.test(node.name)) {
         // 满足正则表达式则标记为数组
         node.type.kind = SimpleTypeKind.array_t;
-        // 名字以buffer、data结尾的，且原类型为void*，则为字节数组
-        if (v === '^.*(buffer|data)$') {
-          node.type.name = 'uint8_t';
-          node.type.kind = SimpleTypeKind.pointer_t;
-        }
       }
     });
+
+    // 名字以buffer、data结尾的，且原类型为void*，则为字节数组
+    if (
+      new RegExp('^.*(buffer|data)$', 'i').test(node.name) &&
+      node.type.name === 'void'
+    ) {
+      node.type.name = 'uint8_t';
+      node.type.kind = SimpleTypeKind.pointer_t;
+    }
   });
 }
 
