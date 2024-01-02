@@ -16,6 +16,8 @@ import {
 
 export type PointerToArrayParserArgs = {
   configJson?: string;
+  handleSameName: string;
+  ignoreDefaultRegex: boolean;
   configJsonFilePath?: string;
 };
 
@@ -23,7 +25,8 @@ function markArray(
   nodes: (Variable | MemberVariable)[],
   parentNode: CXXTerraNode,
   name_configs: string[],
-  regex_configs: string[] = []
+  regex_configs: string[] = [],
+  args: PointerToArrayParserArgs
 ) {
   nodes.forEach((node) => {
     if (node.type.kind !== SimpleTypeKind.pointer_t) {
@@ -37,6 +40,18 @@ function markArray(
       // 配置表中配置了该变量则标记为数组
       node.type.kind = SimpleTypeKind.array_t;
       return;
+    }
+
+    if (args.handleSameName) {
+      if (
+        node.parent?.__TYPE === CXXTYPE.MemberFunction &&
+        node.__TYPE === CXXTYPE.Variable &&
+        nodes.some(
+          (n) => n.name === node.name + 'Count' || n.name === node.name + 'Size'
+        )
+      ) {
+        node.type.kind = SimpleTypeKind.array_t;
+      }
     }
 
     regex_configs.forEach((v) => {
@@ -84,17 +99,31 @@ export function PointerToArrayParser(
           node.asStruct().member_variables,
           node,
           name_configs,
-          regex_configs
+          args.ignoreDefaultRegex
+            ? regex_configs
+            : regex_configs.concat('^.*(s|list|array|List)$'),
+          args
         );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
         markArray(
           node.asClazz().member_variables,
           node,
           name_configs,
-          regex_configs
+          args.ignoreDefaultRegex
+            ? regex_configs
+            : regex_configs.concat('^.*(list|array|List)$'),
+          args
         );
         node.asClazz().methods.forEach((method) => {
-          markArray(method.parameters, method, name_configs, regex_configs);
+          markArray(
+            method.parameters,
+            method,
+            name_configs,
+            args.ignoreDefaultRegex
+              ? regex_configs
+              : regex_configs.concat('^.*(list|array|List)$'),
+            args
+          );
         });
       }
     });
