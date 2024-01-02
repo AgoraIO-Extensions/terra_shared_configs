@@ -64,7 +64,7 @@ function updateNode<T extends CXXTerraNode>(
             configs
           );
         } else {
-          node.name = updateSimpleTypeName(node.asSimpleType().source, configs);
+          node.name = updateSimpleTypeName(node.asSimpleType().name, configs);
         }
     }
   }

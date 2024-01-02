@@ -1,7 +1,6 @@
 import {
   CXXFile,
   CXXTYPE,
-  CXXTerraNode,
   SimpleTypeKind,
 } from '@agoraio-extensions/cxx-parser';
 import {
@@ -14,34 +13,6 @@ export type ReturnTypeParserArgs = {
   convertReturnToVoid: boolean;
   config: string;
 };
-
-function assignNode<T extends CXXTerraNode>(
-  node: T[] | T,
-  configs: Record<string, string>
-) {
-  if (Array.isArray(node)) {
-    node.forEach((it) => {
-      assignNode(it, configs);
-    });
-  } else {
-    switch (node.__TYPE) {
-      case CXXTYPE.MemberVariable:
-        assignNode(node.asMemberVariable().type, configs);
-        break;
-      case CXXTYPE.Variable:
-        assignNode(node.asVariable().type, configs);
-        break;
-      case CXXTYPE.MemberFunction:
-        assignNode(node.asMemberFunction().return_type, configs);
-        assignNode(node.asMemberFunction().parameters, configs);
-        break;
-      case CXXTYPE.SimpleType:
-        if (configs[node.asSimpleType().fullName]) {
-          node = Object.assign(node, configs[node.fullName]);
-        }
-    }
-  }
-}
 
 export function ReturnTypeParser(
   terraContext: TerraContext,
@@ -56,9 +27,6 @@ export function ReturnTypeParser(
       if (node.__TYPE === CXXTYPE.Clazz) {
         for (let i = 0; i < node.asClazz().methods.length; i++) {
           let method = node.asClazz().methods[i];
-          if (method.name === 'getDuration') {
-            debugger;
-          }
           if (configs[method.fullName]) {
             method.return_type = Object.assign(
               method.return_type,
