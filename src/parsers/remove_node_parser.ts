@@ -46,6 +46,13 @@ export function RemoveNodeParser(
     ).toString();
   }
   const configs: string[] = JSON.parse(args.configJson!);
+  //remove file with .h
+  let file_configs = configs.filter((v) => v.endsWith('.h'));
+  if (file_configs?.length > 0 && preParseResult?.nodes) {
+    preParseResult.nodes = preParseResult.nodes.filter((f) => {
+      return !file_configs.includes((f as CXXTerraNode).fileName);
+    });
+  }
   let name_configs = configs.filter(
     (v) => !v.startsWith('^') && !v.endsWith('$')
   );
