@@ -38,6 +38,7 @@ function updateNode<T extends CXXTerraNode>(
         node.name = config['name'];
         node.source = config['source'];
         node.asSimpleType().is_const = config['is_const'];
+        node.asSimpleType().kind = config['kind'];
         node.asSimpleType().is_builtin_type = config['is_builtin_type'];
       } else if (typeof config === 'string') {
         node.source = config;
