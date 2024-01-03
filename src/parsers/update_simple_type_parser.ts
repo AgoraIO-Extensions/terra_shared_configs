@@ -7,6 +7,7 @@ import {
 
 export type UpdateSimpleTypeParserArgs = {
   config: any;
+  parserDefaultValue: boolean;
 };
 
 export type UpdateNodeConfig = Record<string, string | Function>;
@@ -25,11 +26,12 @@ export function updateSimpleTypeName(
 
 function updateNode<T extends CXXTerraNode>(
   node: T[] | T,
-  configs: UpdateNodeConfig
+  configs: UpdateNodeConfig,
+  args: UpdateSimpleTypeParserArgs
 ) {
   if (Array.isArray(node)) {
     node.forEach((it) => {
-      updateNode(it, configs);
+      updateNode(it, configs, args);
     });
   } else {
     const config = configs[node.fullName];
@@ -46,14 +48,20 @@ function updateNode<T extends CXXTerraNode>(
     }
     switch (node.__TYPE) {
       case CXXTYPE.MemberVariable:
-        updateNode(node.asMemberVariable().type, configs);
+        updateNode(node.asMemberVariable().type, configs, args);
         break;
       case CXXTYPE.Variable:
-        updateNode(node.asVariable().type, configs);
+        updateNode(node.asVariable().type, configs, args);
+        if (args.parserDefaultValue) {
+          node.asVariable().default_value = updateSimpleTypeName(
+            node.asVariable().default_value,
+            configs
+          );
+        }
         break;
       case CXXTYPE.MemberFunction:
-        updateNode(node.asMemberFunction().return_type, configs);
-        updateNode(node.asMemberFunction().parameters, configs);
+        updateNode(node.asMemberFunction().return_type, configs, args);
+        updateNode(node.asMemberFunction().parameters, configs, args);
         break;
       case CXXTYPE.SimpleType:
         if (
@@ -80,13 +88,13 @@ export function UpdateSimpleTypeParser(
   let configs = require(configPath);
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
-    updateNode(file.nodes, configs);
+    updateNode(file.nodes, configs, args);
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
-        updateNode(node.asStruct().member_variables, configs);
+        updateNode(node.asStruct().member_variables, configs, args);
       } else if (node.__TYPE === CXXTYPE.Clazz) {
-        updateNode(node.asClazz().member_variables, configs);
-        updateNode(node.asClazz().methods, configs);
+        updateNode(node.asClazz().member_variables, configs, args);
+        updateNode(node.asClazz().methods, configs, args);
       }
     });
   });

@@ -9,6 +9,8 @@ import {
   resolvePath,
 } from '@agoraio-extensions/terra-core';
 
+import { getVariableIsOutput } from '../utils/extension_platform_utils';
+
 export type ReturnTypeParserArgs = {
   convertReturnToVoid: boolean;
   config: string;
@@ -63,12 +65,7 @@ export function ReturnTypeParser(
               method.user_data = param;
               break;
             } else {
-              if (
-                (param.type.kind === SimpleTypeKind.pointer_t ||
-                  param.type.kind === SimpleTypeKind.array_t ||
-                  param.type.kind === SimpleTypeKind.reference_t) &&
-                !param.type.is_const
-              ) {
+              if (getVariableIsOutput(param)) {
                 param.is_output = true;
               }
             }
