@@ -12,7 +12,7 @@ const TYPES_SIZE: Record<string, string> = {
 };
 
 export type FixEnumConstantParserArgs = CXXParserConfigs & {
-  skipCalValue?: boolean;
+  skipCalValue?: boolean; // no need normally
 };
 
 function fixEnumConstantValue(

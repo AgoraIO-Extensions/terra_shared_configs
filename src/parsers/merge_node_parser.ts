@@ -1,35 +1,27 @@
-import { readFileSync } from 'fs';
+import { CXXFile, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import {
-  CXXFile,
-  CXXTYPE,
-  CXXTerraNode,
-  Clazz,
-} from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { MergeNodeConfig } from '../../configs/rtc/merge_node_list';
 
-export type MergeNodeParserArgs = {
-  config: string;
-};
+import { getConfigs } from '../utils/parser_utils';
 
-export type MergeNodeConfig = {
-  source: string;
-  target: string;
-  deleteSource: boolean;
-  user_data: any;
-};
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/merge_node_list.ts');
 
 export function MergeNodeParser(
   terraContext: TerraContext,
-  args: MergeNodeParserArgs,
+  args: BaseParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let configPath = resolvePath(args.config, terraContext.configDir);
-  let configs = require(configPath);
+  const configs: MergeNodeConfig[] = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
+
   if (preParseResult) {
     for (let config of configs) {
       let sourceClazz: CXXTerraNode | undefined = undefined;
@@ -43,7 +35,6 @@ export function MergeNodeParser(
         if (!sourceClazz) {
           for (let index = 0; index < file.nodes.length; index++) {
             if (file.nodes[index]?.fullName === config.source) {
-              // debugger;
               sourceClazz = file.nodes[index];
 
               //根据deleteSource来决定找到后是否删除source

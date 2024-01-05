@@ -1,3 +1,6 @@
+export * from './obj_utils';
+export * from './iris_utils';
+
 import { SimpleTypeKind, Variable } from '@agoraio-extensions/cxx-parser';
 
 export function getVariableIsOutput(node: Variable): boolean {

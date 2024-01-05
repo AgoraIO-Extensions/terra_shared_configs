@@ -1,5 +1,3 @@
-import { readFileSync } from 'fs';
-
 import {
   CXXFile,
   CXXTYPE,
@@ -8,25 +6,19 @@ import {
   SimpleTypeKind,
   Variable,
 } from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-export type PointerToArrayParserArgs = {
-  configJson?: string;
-  handleSameName: string;
-  ignoreDefaultRegex: boolean;
-  configJsonFilePath?: string;
-};
+import { getConfigs } from '../utils/parser_utils';
+
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/pointer_to_array');
 
 function markArray(
   nodes: (Variable | MemberVariable)[],
   parentNode: CXXTerraNode,
   name_configs: string[],
-  regex_configs: string[] = [],
-  args: PointerToArrayParserArgs
+  regex_configs: string[] = []
 ) {
   nodes.forEach((node) => {
     if (node.type.kind !== SimpleTypeKind.pointer_t) {
@@ -42,16 +34,14 @@ function markArray(
       return;
     }
 
-    if (args.handleSameName) {
-      if (
-        node.parent?.__TYPE === CXXTYPE.MemberFunction &&
-        node.__TYPE === CXXTYPE.Variable &&
-        nodes.some(
-          (n) => n.name === node.name + 'Count' || n.name === node.name + 'Size'
-        )
-      ) {
-        node.type.kind = SimpleTypeKind.array_t;
-      }
+    if (
+      node.parent?.__TYPE === CXXTYPE.MemberFunction &&
+      node.__TYPE === CXXTYPE.Variable &&
+      nodes.some(
+        (n) => n.name === node.name + 'Count' || n.name === node.name + 'Size'
+      )
+    ) {
+      node.type.kind = SimpleTypeKind.array_t;
     }
 
     regex_configs.forEach((v) => {
@@ -75,21 +65,21 @@ function markArray(
 
 export function PointerToArrayParser(
   terraContext: TerraContext,
-  args: PointerToArrayParserArgs,
+  args: BaseParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  if (args.configJson === undefined) {
-    args.configJson = readFileSync(
-      resolvePath(args.configJsonFilePath!, terraContext.configDir)
-      // getAbsolutePath(parseConfig.rootDir, args.configJsonFilePath)
-    ).toString();
-  }
-  const configs: string[] = JSON.parse(args.configJson!);
+  const configs = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
   let name_configs = configs.filter(
-    (v) => !v.startsWith('^') && !v.endsWith('$')
+    (v: string) => !v.startsWith('^') && !v.endsWith('$')
   );
   let regex_configs = configs.filter(
-    (v) => v.startsWith('^') || v.endsWith('$')
+    (v: string) => v.startsWith('^') || v.endsWith('$')
   );
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
@@ -99,30 +89,21 @@ export function PointerToArrayParser(
           node.asStruct().member_variables,
           node,
           name_configs,
-          args.ignoreDefaultRegex
-            ? regex_configs
-            : regex_configs.concat('^.*(s|list|array|List)$'),
-          args
+          regex_configs.concat('^.*(s|list|array|List)$')
         );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
         markArray(
           node.asClazz().member_variables,
           node,
           name_configs,
-          args.ignoreDefaultRegex
-            ? regex_configs
-            : regex_configs.concat('^.*(list|array|List)$'),
-          args
+          regex_configs.concat('^.*(list|array|List)$')
         );
         node.asClazz().methods.forEach((method) => {
           markArray(
             method.parameters,
             method,
             name_configs,
-            args.ignoreDefaultRegex
-              ? regex_configs
-              : regex_configs.concat('^.*(list|array|List)$'),
-            args
+            regex_configs.concat('^.*(list|array|List)$')
           );
         });
       }

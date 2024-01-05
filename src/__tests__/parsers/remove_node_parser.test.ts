@@ -49,7 +49,7 @@ describe('RemoveNodeParser', () => {
       RemoveNodeParser(
         new TerraContext(),
         {
-          configJson: JSON.stringify(['test::TestClazz.test.test']),
+          config: JSON.stringify(['test::TestClazz.test.test']),
         },
         preParseResult
       )?.nodes[0] as CXXFile
@@ -106,7 +106,7 @@ describe('RemoveNodeParser', () => {
       RemoveNodeParser(
         new TerraContext(),
         {
-          configJson: JSON.stringify(['^test\\d*']),
+          config: JSON.stringify(['^test\\d*']),
         },
         preParseResult
       )?.nodes[0] as CXXFile

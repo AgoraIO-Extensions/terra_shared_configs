@@ -3,17 +3,17 @@ import {
   CXXTYPE,
   SimpleTypeKind,
 } from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { getVariableIsOutput } from '../utils/extension_platform_utils';
+import { getVariableIsOutput } from '../utils';
+import { getConfigs } from '../utils/parser_utils';
 
-export type ReturnTypeParserArgs = {
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/fixed_return_type_list.ts');
+
+export type ReturnTypeParserArgs = BaseParserArgs & {
   convertReturnToVoid: boolean;
-  config: string;
 };
 
 export function ReturnTypeParser(
@@ -21,8 +21,13 @@ export function ReturnTypeParser(
   args: ReturnTypeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let configPath = resolvePath(args.config, terraContext.configDir);
-  let configs = require(configPath);
+  const configs = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
     file.nodes.forEach((node) => {

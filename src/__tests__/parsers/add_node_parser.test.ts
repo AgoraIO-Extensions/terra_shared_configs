@@ -16,11 +16,10 @@ import { TerraContext } from '@agoraio-extensions/terra-core';
 
 const customPrefix = 'test';
 const parseConfig: CXXParserConfigs = {
-  customHeaders: ['/my/path/test.h'],
   includeHeaderDirs: [],
   definesMacros: [],
   parseFiles: {
-    include: [],
+    include: ['/my/path/test.h'],
     exclude: [],
   },
 };
@@ -45,20 +44,8 @@ describe('AddNodeParser', () => {
       ...parseConfig,
       customHeaderFileNamePrefix: customPrefix,
     });
-    expect(parseMock.mock.lastCall[1].customHeaders).toStrictEqual(
-      parseConfig.customHeaders
-    );
-  });
-
-  it('parse with AddNodeParserArgs', () => {
-    const customHeaders = ['/my/path/test2.h'];
-    AddNodeParser(new TerraContext(), {
-      ...parseConfig,
-      customHeaders,
-      customHeaderFileNamePrefix: customPrefix,
-    });
-    expect(parseMock.mock.lastCall[1].customHeaders).toStrictEqual(
-      customHeaders
+    expect(parseMock.mock.lastCall[1].parseFiles.include[0]).toStrictEqual(
+      parseConfig.parseFiles.include[0]
     );
   });
 

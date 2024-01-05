@@ -1,13 +1,14 @@
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-export type UpdateSimpleTypeParserArgs = {
-  config: any;
-  parserDefaultValue: boolean;
+import { getConfigs } from '../utils/parser_utils';
+
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/rename_member_function_param_type_list.ts');
+
+export type UpdateSimpleTypeParserArgs = BaseParserArgs & {
+  parserDefaultValue?: boolean; // if default_value is a simple type node, can be deleted
 };
 
 export type UpdateNodeConfig = Record<string, string | Function>;
@@ -52,7 +53,7 @@ function updateNode<T extends CXXTerraNode>(
         break;
       case CXXTYPE.Variable:
         updateNode(node.asVariable().type, configs, args);
-        if (args.parserDefaultValue) {
+        if (args?.parserDefaultValue) {
           node.asVariable().default_value = updateSimpleTypeName(
             node.asVariable().default_value,
             configs
@@ -65,10 +66,10 @@ function updateNode<T extends CXXTerraNode>(
         break;
       case CXXTYPE.SimpleType:
         if (
-          configs.hasOwnProperty('customHandle') &&
-          typeof configs['customHandle'] === 'function'
+          configs.hasOwnProperty('customHook') &&
+          typeof configs['customHook'] === 'function'
         ) {
-          node.name = (configs as any)['customHandle'](
+          node.name = (configs as any)['customHook'](
             node.asSimpleType(),
             configs
           );
@@ -84,8 +85,13 @@ export function UpdateSimpleTypeParser(
   args: UpdateSimpleTypeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let configPath = resolvePath(args.config, terraContext.configDir);
-  let configs = require(configPath);
+  const configs = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
     updateNode(file.nodes, configs, args);

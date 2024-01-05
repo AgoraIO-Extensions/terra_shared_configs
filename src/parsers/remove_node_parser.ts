@@ -1,16 +1,11 @@
-import { readFileSync } from 'fs';
-
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-export type RemoveNodeParserArgs = {
-  configJson?: string;
-  configJsonFilePath?: string;
-};
+import { getConfigs } from '../utils/parser_utils';
+
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/remove_node_list');
 
 function filterNode<T extends CXXTerraNode>(
   nodes: T[],
@@ -36,28 +31,28 @@ function filterNode<T extends CXXTerraNode>(
 
 export function RemoveNodeParser(
   terraContext: TerraContext,
-  args: RemoveNodeParserArgs,
+  args: BaseParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  if (args.configJson === undefined) {
-    args.configJson = readFileSync(
-      resolvePath(args.configJsonFilePath!, terraContext.configDir)
-      // getAbsolutePath(parseConfig.rootDir, args.configJsonFilePath)
-    ).toString();
-  }
-  const configs: string[] = JSON.parse(args.configJson!);
+  const configs = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
   //remove file with .h
-  let file_configs = configs.filter((v) => v.endsWith('.h'));
+  let file_configs = configs.filter((v: string) => v.endsWith('.h'));
   if (file_configs?.length > 0 && preParseResult?.nodes) {
     preParseResult.nodes = preParseResult.nodes.filter((f) => {
       return !file_configs.includes((f as CXXTerraNode).fileName);
     });
   }
   let name_configs = configs.filter(
-    (v) => !v.startsWith('^') && !v.endsWith('$')
+    (v: string) => !v.startsWith('^') && !v.endsWith('$')
   );
   let regex_configs = configs.filter(
-    (v) => v.startsWith('^') || v.endsWith('$')
+    (v: string) => v.startsWith('^') || v.endsWith('$')
   );
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
