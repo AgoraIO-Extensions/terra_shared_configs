@@ -5,7 +5,7 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { getVariableIsOutput } from '../utils';
+import { isOutputVariable } from '../utils';
 import { getConfigs } from '../utils/parser_utils';
 
 import { BaseParserArgs } from './index';
@@ -70,7 +70,7 @@ export function ReturnTypeParser(
               method.user_data = param;
               break;
             } else {
-              if (getVariableIsOutput(param)) {
+              if (isOutputVariable(param)) {
                 param.is_output = true;
               }
             }
