@@ -6,12 +6,6 @@ export function getConfigs(args: BaseParserArgs, terraContext: TerraContext) {
   if (args.ignoreDefaultConfig) {
     args.defaultConfig = null;
   }
-  if (
-    args.configFilePath ===
-    '../__tests__/parsers/update_simple_type_parser.mock.ts'
-  ) {
-    debugger;
-  }
   let configs = args.defaultConfig;
   if (args.config) {
     configs = JSON.parse(args.config);
