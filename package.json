@@ -12,6 +12,7 @@
   "files": [
     "dist",
     "headers",
+    "configs",
     "src",
     "!**/__tests__",
     "!**/__fixtures__",
