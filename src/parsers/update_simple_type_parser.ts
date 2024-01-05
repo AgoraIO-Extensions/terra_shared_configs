@@ -1,48 +1,81 @@
-import { readFileSync } from 'fs';
-
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
-import {
-  ParseResult,
-  TerraContext,
-  resolvePath,
-} from '@agoraio-extensions/terra-core';
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-export type UpdateSimpleTypeParserArgs = {
-  configJson?: string;
-  configJsonFilePath?: string;
+import { getConfigs } from '../utils/parser_utils';
+
+import { BaseParserArgs } from './index';
+
+const defaultConfig = require('../../configs/rtc/rename_member_function_param_type_list.ts');
+
+export type UpdateSimpleTypeParserArgs = BaseParserArgs & {
+  parserDefaultValue?: boolean; // if default_value is a simple type node, can be deleted
 };
 
-export type UpdateNodeConfig = Record<string, string>;
+export type UpdateNodeConfig = Record<string, string | Function>;
+
+export function updateSimpleTypeName(
+  text: string,
+  configs: UpdateNodeConfig
+): string {
+  Object.entries(configs).forEach(([k, v]) => {
+    if (typeof v === 'string') {
+      text = text.replace(new RegExp(k), v);
+    }
+  });
+  return text;
+}
 
 function updateNode<T extends CXXTerraNode>(
   node: T[] | T,
-  configs: UpdateNodeConfig
+  configs: UpdateNodeConfig,
+  args: UpdateSimpleTypeParserArgs
 ) {
   if (Array.isArray(node)) {
     node.forEach((it) => {
-      updateNode(it, configs);
+      updateNode(it, configs, args);
     });
   } else {
     const config = configs[node.fullName];
     if (config !== undefined) {
-      node.source = config;
+      if (typeof config === 'object') {
+        node.name = config['name'];
+        node.source = config['source'];
+        node.asSimpleType().is_const = config['is_const'];
+        node.asSimpleType().kind = config['kind'];
+        node.asSimpleType().is_builtin_type = config['is_builtin_type'];
+      } else if (typeof config === 'string') {
+        node.source = config;
+      }
     }
     switch (node.__TYPE) {
       case CXXTYPE.MemberVariable:
-        updateNode(node.asMemberVariable().type, configs);
+        updateNode(node.asMemberVariable().type, configs, args);
         break;
       case CXXTYPE.Variable:
-        updateNode(node.asVariable().type, configs);
+        updateNode(node.asVariable().type, configs, args);
+        if (args?.parserDefaultValue) {
+          node.asVariable().default_value = updateSimpleTypeName(
+            node.asVariable().default_value,
+            configs
+          );
+        }
         break;
       case CXXTYPE.MemberFunction:
-        updateNode(node.asMemberFunction().return_type, configs);
-        updateNode(node.asMemberFunction().parameters, configs);
+        updateNode(node.asMemberFunction().return_type, configs, args);
+        updateNode(node.asMemberFunction().parameters, configs, args);
         break;
       case CXXTYPE.SimpleType:
-        Object.entries(configs).forEach(([k, v]) => {
-          node.name = node.name.replace(new RegExp(k), v);
-          node.source = node.source.replace(new RegExp(k), v);
-        });
+        if (
+          configs.hasOwnProperty('customHook') &&
+          typeof configs['customHook'] === 'function'
+        ) {
+          node.name = (configs as any)['customHook'](
+            node.asSimpleType(),
+            configs
+          );
+        } else {
+          node.name = updateSimpleTypeName(node.asSimpleType().name, configs);
+        }
     }
   }
 }
@@ -52,22 +85,22 @@ export function UpdateSimpleTypeParser(
   args: UpdateSimpleTypeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  if (args.configJson === undefined) {
-    args.configJson = readFileSync(
-      resolvePath(args.configJsonFilePath!, terraContext.configDir)
-      // getAbsolutePath(parseConfig.rootDir, args.configJsonFilePath)
-    ).toString();
-  }
-  let configs = JSON.parse(args.configJson!);
+  const configs = getConfigs(
+    {
+      ...args,
+      defaultConfig: defaultConfig,
+    },
+    terraContext
+  );
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
-    updateNode(file.nodes, configs);
+    updateNode(file.nodes, configs, args);
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
-        updateNode(node.asStruct().member_variables, configs);
+        updateNode(node.asStruct().member_variables, configs, args);
       } else if (node.__TYPE === CXXTYPE.Clazz) {
-        updateNode(node.asClazz().member_variables, configs);
-        updateNode(node.asClazz().methods, configs);
+        updateNode(node.asClazz().member_variables, configs, args);
+        updateNode(node.asClazz().methods, configs, args);
       }
     });
   });

@@ -1,5 +1,6 @@
 import {
   CXXFile,
+  CXXParserConfigs,
   CXXTYPE,
   EnumConstant,
   Enumz,
@@ -10,7 +11,15 @@ const TYPES_SIZE: Record<string, string> = {
   'sizeof(int16_t)': '2',
 };
 
-function fixEnumConstantValue(enumz: Enumz, constant: EnumConstant): string {
+export type FixEnumConstantParserArgs = CXXParserConfigs & {
+  skipCalValue?: boolean; // no need normally
+};
+
+function fixEnumConstantValue(
+  enumz: Enumz,
+  constant: EnumConstant,
+  args: FixEnumConstantParserArgs
+): string {
   let value = constant.source;
   enumz.enum_constants.forEach((it) => {
     if (value.includes(it.name)) {
@@ -27,10 +36,12 @@ function fixEnumConstantValue(enumz: Enumz, constant: EnumConstant): string {
       value = value.replace(it, TYPES_SIZE[it] as string);
     }
   });
-  if (!/^\d+$/.test(value)) {
-    // 当前枚举值不是纯数字, 执行表达式计算，示例如下：
-    // QUALITY_UNSUPPORTED = 1 << 4,
-    return `${eval(`${value}`)}`;
+  if (!args?.skipCalValue) {
+    if (!/^\d+$/.test(value)) {
+      // 当前枚举值不是纯数字, 执行表达式计算，示例如下：
+      // QUALITY_UNSUPPORTED = 1 << 4,
+      return `${eval(`${value}`)}`;
+    }
   }
   // 当前枚举值是纯数字, 直接返回
   return `${value}`;
@@ -38,7 +49,7 @@ function fixEnumConstantValue(enumz: Enumz, constant: EnumConstant): string {
 
 export function FixEnumConstantParser(
   terraContext: TerraContext,
-  args: any,
+  args: FixEnumConstantParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
   preParseResult?.nodes.forEach((file) => {
@@ -55,9 +66,15 @@ export function FixEnumConstantParser(
           }
           lastEnumValue = parseInt(enumConstant.source);
           if (isNaN(lastEnumValue)) {
-            enumConstant.value = fixEnumConstantValue(enumz, enumConstant);
+            enumConstant.value = fixEnumConstantValue(
+              enumz,
+              enumConstant,
+              args
+            );
           } else {
-            enumConstant.value = `${lastEnumValue}`;
+            enumConstant.value = !args?.skipCalValue
+              ? `${lastEnumValue}`
+              : enumConstant.source;
           }
         });
       }
