@@ -1,7 +1,7 @@
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { BaseParserArgs, LANGUAGE } from './index';
+import { BaseParserArgs } from '../index';
 
 /**
  * useage for mustache template:
@@ -18,23 +18,19 @@ function formatComment<T extends CXXTerraNode>(
       formatComment(it, args);
     });
   } else {
-    if (args.language === LANGUAGE.TS) {
-      node.comment = node.comment
-        .replace(/^\n/, '* ')
-        .replace(/\n$/, '')
-        .replace(/\n/g, '\n* ');
-      if (node.comment.length > 0) {
-        node.comment = `/**\n${node.comment}\n*/`;
-      } else {
-        node.comment = '';
-      }
+    node.comment = node.comment
+      .replace(/^\n/, '* ')
+      .replace(/\n$/, '')
+      .replace(/\n/g, '\n* ');
+    if (node.comment.length > 0) {
+      node.comment = `/**\n${node.comment}\n*/`;
     } else {
-      return node.comment;
+      node.comment = '';
     }
   }
 }
 
-export function CommentParser(
+export function TsCommentParser(
   terraContext: TerraContext,
   args: BaseParserArgs,
   preParseResult?: ParseResult
