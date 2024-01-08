@@ -1,10 +1,14 @@
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import {
-  UpdateSimpleTypeParserArgs,
-  updateSimpleTypeName,
-} from './update_simple_type_parser';
+import { UpdateSimpleTypeParserArgs } from './update_simple_type_parser';
+
+/**
+ * useage for mustache template:
+ *    {{#comment}}
+      {{{comment}}}
+      {{/comment}}
+ */
 
 function formatComment<T extends CXXTerraNode>(node: T[] | T) {
   if (Array.isArray(node)) {

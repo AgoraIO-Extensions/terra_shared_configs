@@ -8,7 +8,7 @@ import { TerraContext } from '@agoraio-extensions/terra-core';
 
 import { ReturnTypeParser } from '../..';
 
-describe('RemoveNodeParser', () => {
+describe('ReturnTypeParser', () => {
   it('can change MemberFunction return_type', () => {
     const json = JSON.stringify([
       {
