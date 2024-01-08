@@ -1,7 +1,7 @@
 import { CXXFile, CXXTYPE, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { UpdateSimpleTypeParserArgs } from './update_simple_type_parser';
+import { BaseParserArgs, LANGUAGE } from './index';
 
 /**
  * useage for mustache template:
@@ -9,43 +9,49 @@ import { UpdateSimpleTypeParserArgs } from './update_simple_type_parser';
       {{{comment}}}
       {{/comment}}
  */
-
-function formatComment<T extends CXXTerraNode>(node: T[] | T) {
+function formatComment<T extends CXXTerraNode>(
+  node: T[] | T,
+  args: BaseParserArgs
+) {
   if (Array.isArray(node)) {
     node.forEach((it) => {
-      formatComment(it);
+      formatComment(it, args);
     });
   } else {
-    node.comment = node.comment
-      .replace(/^\n/, '* ')
-      .replace(/\n$/, '')
-      .replace(/\n/g, '\n* ');
-    if (node.comment.length > 0) {
-      node.comment = `/**\n${node.comment}\n*/`;
+    if (args.language === LANGUAGE.TS) {
+      node.comment = node.comment
+        .replace(/^\n/, '* ')
+        .replace(/\n$/, '')
+        .replace(/\n/g, '\n* ');
+      if (node.comment.length > 0) {
+        node.comment = `/**\n${node.comment}\n*/`;
+      } else {
+        node.comment = '';
+      }
     } else {
-      node.comment = '';
+      return node.comment;
     }
   }
 }
 
 export function CommentParser(
   terraContext: TerraContext,
-  args: UpdateSimpleTypeParserArgs,
+  args: BaseParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
   preParseResult?.nodes.forEach((f) => {
     let file = f as CXXFile;
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
-        formatComment(node.asStruct());
-        formatComment(node.asStruct().member_variables);
+        formatComment(node.asStruct(), args);
+        formatComment(node.asStruct().member_variables, args);
       } else if (node.__TYPE === CXXTYPE.Clazz) {
-        formatComment(node.asClazz());
-        formatComment(node.asClazz().member_variables);
-        formatComment(node.asClazz().methods);
+        formatComment(node.asClazz(), args);
+        formatComment(node.asClazz().member_variables, args);
+        formatComment(node.asClazz().methods, args);
       } else if (node.__TYPE === CXXTYPE.Enumz) {
-        formatComment(node.asEnumz());
-        formatComment(node.asEnumz().enum_constants);
+        formatComment(node.asEnumz(), args);
+        formatComment(node.asEnumz().enum_constants, args);
       }
     });
   });

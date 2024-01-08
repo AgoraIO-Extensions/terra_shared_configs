@@ -9,7 +9,13 @@ export * from './merge_node_parser';
 export * from './pointer_marker_parser';
 export * from './comment_parser';
 
+export enum LANGUAGE {
+  TS = 'ts',
+  DART = 'dart',
+}
+
 export type BaseParserArgs = {
+  language?: LANGUAGE;
   config?: string;
   configFilePath?: string;
   defaultConfig?: any;

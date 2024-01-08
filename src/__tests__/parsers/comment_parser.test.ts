@@ -4,10 +4,10 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { TerraContext } from '@agoraio-extensions/terra-core';
 
-import { CommentParser } from '../..';
+import { CommentParser, LANGUAGE } from '../..';
 
 describe('CommentParser', () => {
-  it('swap order', () => {
+  it('parser with TS', () => {
     let json = `
 [
     {
@@ -64,8 +64,13 @@ describe('CommentParser', () => {
 `;
     let preParseResult = genParseResultFromJson(json);
 
-    const result = CommentParser(new TerraContext(), {}, preParseResult)
-      ?.nodes[0] as CXXFile;
+    const result = CommentParser(
+      new TerraContext(),
+      {
+        language: LANGUAGE.TS,
+      },
+      preParseResult
+    )?.nodes[0] as CXXFile;
     expect(result?.nodes[0].comment).toEqual(`/**
 Clazz.
 */`);
