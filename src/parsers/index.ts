@@ -7,6 +7,7 @@ export * from './update_simple_type_parser';
 export * from './return_type_parser';
 export * from './merge_node_parser';
 export * from './pointer_marker_parser';
+export * from './comment_parser';
 
 export type BaseParserArgs = {
   config?: string;
