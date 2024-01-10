@@ -39,7 +39,7 @@ export function MergeNodeParser(
 
               //根据deleteSource来决定找到后是否删除source
               if (config.deleteSource) {
-                delete file.nodes[index];
+                file.nodes.splice(index, 1);
               }
               break;
             }
