@@ -8,6 +8,7 @@ export * from './return_type_parser';
 export * from './merge_node_parser';
 export * from './pointer_marker_parser';
 export * from './ts/ts_comment_parser';
+export * from './rtc_parser';
 
 export enum LANGUAGE {
   TS = 'ts',

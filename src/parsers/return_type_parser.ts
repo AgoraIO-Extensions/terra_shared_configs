@@ -13,7 +13,7 @@ import { BaseParserArgs } from './index';
 const defaultConfig = require('../../configs/rtc/fixed_return_type_list.ts');
 
 export type ReturnTypeParserArgs = BaseParserArgs & {
-  convertReturnToVoid: boolean;
+  convertReturnToVoid?: boolean;
 };
 
 export function ReturnTypeParser(
@@ -46,7 +46,7 @@ export function ReturnTypeParser(
           if (!new RegExp(pattern).test(method.name)) {
             let pattern2 = '^(register|unregister)(.*)(Observer|EventHandler)$';
             if (new RegExp(pattern2).test(method.name)) {
-              if (args.convertReturnToVoid) {
+              if (args?.convertReturnToVoid) {
                 method.return_type.name = 'void';
                 method.return_type.source = 'void';
                 method.return_type.kind = SimpleTypeKind.value_t;
@@ -55,7 +55,7 @@ export function ReturnTypeParser(
               }
               continue;
             }
-            if (method.return_type.name == 'int' && args.convertReturnToVoid) {
+            if (method.return_type.name == 'int' && args?.convertReturnToVoid) {
               method.return_type.name = 'void';
               method.return_type.source = 'void';
               method.return_type.kind = SimpleTypeKind.value_t;
@@ -65,7 +65,7 @@ export function ReturnTypeParser(
           }
           for (let p in method.asMemberFunction().parameters) {
             let param = method.asMemberFunction().parameters[p];
-            if (args.convertReturnToVoid) {
+            if (args?.convertReturnToVoid) {
               method.return_type = param.type;
               method.user_data = param;
               break;

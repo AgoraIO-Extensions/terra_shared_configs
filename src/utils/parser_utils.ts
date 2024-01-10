@@ -1,6 +1,18 @@
-import { TerraContext, resolvePath } from '@agoraio-extensions/terra-core';
+import { CXXParser, CXXParserConfigs } from '@agoraio-extensions/cxx-parser';
+import {
+  ParseResult,
+  TerraContext,
+  resolvePath,
+} from '@agoraio-extensions/terra-core';
 
 import { BaseParserArgs } from '../parsers';
+
+export const generateNodes = (
+  parseConfig: TerraContext,
+  cxxParserConfigs: CXXParserConfigs
+): ParseResult | undefined => {
+  return CXXParser(parseConfig, cxxParserConfigs, undefined);
+};
 
 export function getConfigs(args: BaseParserArgs, terraContext: TerraContext) {
   if (args.ignoreDefaultConfig) {

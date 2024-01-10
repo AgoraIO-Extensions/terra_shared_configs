@@ -2,23 +2,16 @@ import path from 'path';
 
 import {
   CXXFile,
-  CXXParser,
   CXXParserConfigs,
   CXXTYPE,
   Clazz,
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
+import { generateNodes } from '../utils/parser_utils';
+
 export type AddNodeParserArgs = CXXParserConfigs & {
   customHeaderFileNamePrefix?: string;
-};
-
-export const generateCustomNodes = (
-  parseConfig: TerraContext,
-  cxxParserConfigs: CXXParserConfigs
-): ParseResult | undefined => {
-  const customParser = CXXParser;
-  return customParser(parseConfig, cxxParserConfigs, undefined);
 };
 
 export const AddNodeParser = (
@@ -26,7 +19,7 @@ export const AddNodeParser = (
   args: AddNodeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined => {
-  const customNodes = generateCustomNodes(terraContext, args);
+  const customNodes = generateNodes(terraContext, args);
   customNodes?.nodes.forEach((f) => {
     let file = f as CXXFile;
     // find file which has same name after remove custrom prefix

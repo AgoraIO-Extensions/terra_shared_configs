@@ -235,7 +235,7 @@ describe('FixEnumConstantParser', () => {
       FixEnumConstantParser(
         new TerraContext(),
         {
-          skipCalValue: true,
+          skipCalEnumValue: true,
         } as FixEnumConstantParserArgs,
         preParseResult
       )?.nodes[0] as CXXFile
