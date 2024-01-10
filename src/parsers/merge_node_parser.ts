@@ -5,7 +5,7 @@ import { MergeNodeConfig } from '../../configs/rtc/merge_node_list';
 
 import { getConfigs } from '../utils/parser_utils';
 
-import { BaseParserArgs } from './index';
+import { BaseParserArgs, applyIrisApiId } from './index';
 
 const defaultConfig = require('../../configs/rtc/merge_node_list.ts');
 
@@ -39,7 +39,8 @@ export function MergeNodeParser(
 
               //根据deleteSource来决定找到后是否删除source
               if (config.deleteSource) {
-                delete file.nodes[index];
+                // delete file.nodes[index];
+                file.nodes.splice(index, 1);
               }
               break;
             }
@@ -58,15 +59,41 @@ export function MergeNodeParser(
         }
       }
       if (sourceClazz && targetClazz) {
-        //move agora::rtc::IRtcEngineEventHandlerEx method to agora::rtc::IRtcEngineEventHandler
-        targetClazz!.asClazz().methods.map((tar_method, tar_index) => {
-          for (let i = 0; i < sourceClazz!.asClazz().methods.length; i++) {
-            let sou_method = sourceClazz!.asClazz().methods[i];
-            if (tar_method.name === sou_method.name) {
-              targetClazz!.asClazz().methods[tar_index] = sou_method;
-              break;
+        let isFilterOverloadFunctions =
+          config.isFilterOverloadFunctions ?? true;
+        if (isFilterOverloadFunctions) {
+          targetClazz!.asClazz().methods.map((tar_method, tar_index) => {
+            for (let i = 0; i < sourceClazz!.asClazz().methods.length; i++) {
+              let sou_method = sourceClazz!.asClazz().methods[i];
+              if (tar_method.name === sou_method.name) {
+                let tarMethodParent = tar_method.parent;
+                let tarMethodParentName = tar_method.parent_name;
+                targetClazz!.asClazz().methods[tar_index] = sou_method;
+                // Fix the relationship.
+                targetClazz!.asClazz().methods[tar_index].parent =
+                  tarMethodParent;
+                targetClazz!.asClazz().methods[tar_index].parent_name =
+                  tarMethodParentName;
+                break;
+              }
             }
-          }
+          });
+        } else {
+          targetClazz!.asClazz().methods = [
+            ...targetClazz!.asClazz().methods,
+            ...sourceClazz!.asClazz().methods,
+          ].map((it) => {
+            // Fix the relationship.
+            it.parent = targetClazz;
+            it.parent_name = targetClazz?.fullName ?? '';
+
+            return it;
+          });
+        }
+
+        // Re-apply the iris api id after merging.
+        targetClazz!.asClazz().methods.forEach((it) => {
+          applyIrisApiId(preParseResult, targetClazz!.asClazz(), it);
         });
       }
     }

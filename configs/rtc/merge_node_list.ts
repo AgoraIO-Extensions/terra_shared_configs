@@ -2,6 +2,7 @@ export type MergeNodeConfig = {
   source: string;
   target: string;
   deleteSource: boolean;
+  isFilterOverloadFunctions?: boolean;
 };
 
 module.exports = [
