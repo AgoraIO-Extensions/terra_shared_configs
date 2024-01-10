@@ -4,6 +4,8 @@ import {
   Variable,
 } from '@agoraio-extensions/cxx-parser';
 
+import { ParseResult } from '@agoraio-extensions/terra-core';
+
 import { irisApiId } from '../../index';
 
 describe('irisApiId', () => {
@@ -35,7 +37,14 @@ describe('irisApiId', () => {
     } as MemberFunction;
     let myClass = { name: 'MyClass', methods: [mf1, mf2] } as Clazz;
 
-    let apiType = irisApiId(myClass, mf1);
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf1);
 
     expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
   });
@@ -68,8 +77,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
     let myClass = { name: 'MyClass', methods: [mf1, mf2] } as Clazz;
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
 
-    let apiType = irisApiId(myClass, mf1);
+    let apiType = irisApiId(parseResult, myClass, mf1);
 
     expect(apiType).toBe('MYCLASS_MYFUNC_67d36c93');
   });
@@ -101,8 +116,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
     let myClass = { name: 'MyClass', methods: [mf1, mf2] } as Clazz;
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
 
-    let apiType = irisApiId(myClass, mf1, { toUpperCase: false });
+    let apiType = irisApiId(parseResult, myClass, mf1, { toUpperCase: false });
 
     expect(apiType).toBe('MyClass_MyFunc_3766a1b9');
   });
@@ -120,7 +141,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf);
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf);
 
     expect(apiType).toBe('MYCLASS_MYFUNC');
   });
@@ -138,7 +166,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, { withClassName: false });
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, { withClassName: false });
 
     expect(apiType).toBe('MYFUNC');
   });
@@ -156,7 +191,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, { withFuncName: false });
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, { withFuncName: false });
 
     expect(apiType).toBe('MYCLASS');
   });
@@ -174,7 +216,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, {
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, {
       withClassName: false,
       withFuncName: false,
     });
@@ -195,7 +244,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, { toUpperCase: false });
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, { toUpperCase: false });
 
     expect(apiType).toBe('MyClass_MyFunc');
   });
@@ -213,7 +269,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, {
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, {
       toUpperCase: false,
       trimPrefix: 'My',
     });
@@ -234,7 +297,14 @@ describe('irisApiId', () => {
       ],
     } as MemberFunction;
 
-    let apiType = irisApiId(myClass, mf, {
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(parseResult, myClass, mf, {
       toUpperCase: false,
       trimPrefix: '',
     });

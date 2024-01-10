@@ -46,16 +46,15 @@ export function irisApiId(
     f: MemberFunction,
     includeBaseClassMethods: boolean
   ): boolean {
-    let allMethods = cls.methods;
+    let allMethods = cls.methods ?? [];
     if (includeBaseClassMethods) {
       let baseClassMethods = cls.base_clazzs
         .map((it) => {
           return parseResult.resolveNodeByName(it);
         })
-        .map((it) => {
-          return it?.asClazz().methods ?? [];
+        .flatMap((it) => {
+          return it?.asClazz()?.methods ?? [];
         })
-        .flat()
         .filter((it) => !it.is_overriding); // filter out overriding methods
 
       allMethods = [...baseClassMethods, ...allMethods];
