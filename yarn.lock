@@ -14,19 +14,19 @@ __metadata:
 
 "@agoraio-extensions/cxx-parser@git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=cxx-parser":
   version: 0.1.9
-  resolution: "@agoraio-extensions/cxx-parser@git@github.com:AgoraIO-Extensions/terra.git#workspace=cxx-parser&commit=c08bdcfe1db124c0624b5765aa36f2a1cd059f49"
+  resolution: "@agoraio-extensions/cxx-parser@git@github.com:AgoraIO-Extensions/terra.git#workspace=cxx-parser&commit=e86dee96d3da161ea66f96161e9f2fb99f144bc2"
   dependencies:
     glob: "npm:^10.3.4"
     yaml: "npm:^2.1.3"
   peerDependencies:
     "@agoraio-extensions/terra-core": "*"
-  checksum: 6be7f2b679f33cef7ff3ddb4ad6b88ae91f3c109dc406002bd3789ec0a6c37cdc1662bc7750b893dd1981c1393cbb6e1aa0229c580ad94218273fa13904b9b6c
+  checksum: c922cdb60293fd647a3a2ff7cd4da09c47045fab80bfacf587379778eb8a68bda8d0e8734bfdfeb3568702483c1569d7dac16d4eaa7d62cf9575f39a7ffb2d45
   languageName: node
   linkType: hard
 
 "@agoraio-extensions/terra-core@git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=terra-core":
   version: 0.1.5
-  resolution: "@agoraio-extensions/terra-core@git@github.com:AgoraIO-Extensions/terra.git#workspace=terra-core&commit=c08bdcfe1db124c0624b5765aa36f2a1cd059f49"
+  resolution: "@agoraio-extensions/terra-core@git@github.com:AgoraIO-Extensions/terra.git#workspace=terra-core&commit=e86dee96d3da161ea66f96161e9f2fb99f144bc2"
   checksum: d7113225ab004b2ff09de3c3718262925dc335f5ffb8ac2800bb96bfb2ad67a307063a425bd14654356d804586a785efe3856462e1087472463eb233a6793e44
   languageName: node
   linkType: hard
