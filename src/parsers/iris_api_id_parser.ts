@@ -13,16 +13,16 @@ import {
 
 import { irisApiId } from '../utils/iris_utils';
 
-export const defaultFuncNeedCheckWithBaseClasses = [
-  'agora::media::IAudioFrameObserver',
-  'agora::rtc::IRtcEngineEventHandlerEx',
-];
-function isNeedCheckWithBaseClasses(
-  clazz: Clazz,
-  funcNeedCheckWithBaseClasses: string[]
-): boolean {
-  return funcNeedCheckWithBaseClasses.includes(clazz.fullName);
-}
+// export const defaultFuncNeedCheckWithBaseClasses = [
+//   'agora::media::IAudioFrameObserver',
+//   'agora::rtc::IRtcEngineEventHandlerEx',
+// ];
+// function isNeedCheckWithBaseClasses(
+//   clazz: Clazz,
+//   funcNeedCheckWithBaseClasses: string[]
+// ): boolean {
+//   return funcNeedCheckWithBaseClasses.includes(clazz.fullName);
+// }
 
 export interface IrisApiIdParserArgs {
   configPath: string;
@@ -33,30 +33,21 @@ export function IrisApiIdParser(
   args: IrisApiIdParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
-  let funcNeedCheckWithBaseClasses: string[];
-  if (args && args.configPath) {
-    let configPath = resolvePath(args.configPath, terraContext.configDir);
-    funcNeedCheckWithBaseClasses = require(configPath) as string[];
-  } else {
-    funcNeedCheckWithBaseClasses = defaultFuncNeedCheckWithBaseClasses;
-  }
+  // let funcNeedCheckWithBaseClasses: string[];
+  // if (args && args.configPath) {
+  //   let configPath = resolvePath(args.configPath, terraContext.configDir);
+  //   funcNeedCheckWithBaseClasses = require(configPath) as string[];
+  // } else {
+  //   funcNeedCheckWithBaseClasses = defaultFuncNeedCheckWithBaseClasses;
+  // }
 
   let cxxFiles = preParseResult!.nodes as CXXFile[];
   cxxFiles.forEach((cxxFile: CXXFile) => {
     cxxFile.nodes.forEach((node) => {
       if (node.__TYPE == CXXTYPE.Clazz) {
         let clazz = node as Clazz;
-        let needCheckWithBaseClasses = isNeedCheckWithBaseClasses(
-          clazz,
-          funcNeedCheckWithBaseClasses
-        );
         clazz.methods.forEach((method) => {
-          applyIrisApiId(
-            preParseResult!,
-            clazz,
-            method,
-            needCheckWithBaseClasses
-          );
+          applyIrisApiId(clazz, method);
         });
       }
     });
@@ -65,22 +56,15 @@ export function IrisApiIdParser(
   return preParseResult;
 }
 
-export function applyIrisApiId(
-  parseResult: ParseResult,
-  clazz: Clazz,
-  method: MemberFunction,
-  includeBaseClassMethods: boolean = false
-) {
+export function applyIrisApiId(clazz: Clazz, method: MemberFunction) {
   method.user_data ??= {};
   method.user_data!['IrisApiIdParser'] = {
-    key: irisApiId(parseResult, clazz, method, {
+    key: irisApiId(clazz, method, {
       trimPrefix: '',
       toUpperCase: true,
-      includeBaseClassMethods: includeBaseClassMethods,
     }),
-    value: irisApiId(parseResult, clazz, method, {
+    value: irisApiId(clazz, method, {
       toUpperCase: false,
-      includeBaseClassMethods: includeBaseClassMethods,
     }),
   };
 }
