@@ -29,6 +29,8 @@ parsers:
     package: '@agoraio-extensions/terra_shared_configs'
   - name: PointerToArrayParser
     package: '@agoraio-extensions/terra_shared_configs'
+  - name: IrisApiIdParser
+    package: '@agoraio-extensions/terra_shared_configs'
   - name: UpdateSimpleTypeParser
     package: '@agoraio-extensions/terra_shared_configs'
   - name: ReturnTypeParser

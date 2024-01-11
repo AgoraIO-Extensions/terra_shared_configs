@@ -28,6 +28,10 @@ export interface IrisApiIdParserArgs {
   configPath: string;
 }
 
+export interface IrisApiIdParserUserData {
+  IrisApiIdParser: { key: string; value: string };
+}
+
 export function IrisApiIdParser(
   terraContext: TerraContext,
   args: IrisApiIdParserArgs,
@@ -72,7 +76,7 @@ export function applyIrisApiId(
   includeBaseClassMethods: boolean = false
 ) {
   method.user_data ??= {};
-  method.user_data!['IrisApiIdParser'] = {
+  (method.user_data as IrisApiIdParserUserData).IrisApiIdParser = {
     key: irisApiId(parseResult, clazz, method, {
       trimPrefix: '',
       toUpperCase: true,
@@ -86,7 +90,9 @@ export function applyIrisApiId(
 }
 
 export function getIrisApiIdKey(node: CXXTerraNode): string {
-  return node.user_data?.['IrisApiIdParser']?.key ?? '';
+  return (
+    (node.user_data as IrisApiIdParserUserData)?.IrisApiIdParser?.key ?? ''
+  );
 }
 
 export function getIrisApiIdValue(
@@ -95,12 +101,12 @@ export function getIrisApiIdValue(
 ): string {
   let value: string | undefined;
   if (noClassPrefix) {
-    value = node.user_data?.['IrisApiIdParser']?.value
+    value = (node.user_data as IrisApiIdParserUserData)?.IrisApiIdParser?.value
       ?.split('_')
       ?.slice(1)
       ?.join('_');
   } else {
-    value = node.user_data?.['IrisApiIdParser']?.value;
+    value = (node.user_data as IrisApiIdParserUserData)?.IrisApiIdParser?.value;
   }
   return value ?? '';
 }
@@ -112,7 +118,7 @@ export function adjustIrisApiIdKeyIfNeeded(
   let key = getIrisApiIdKey(node);
   if (key.length) {
     key = [clazz.name.toUpperCase(), ...key.split('_').slice(1)].join('_');
-    node.user_data!['IrisApiIdParser'].key = key;
+    (node.user_data as IrisApiIdParserUserData)!.IrisApiIdParser.key = key;
   }
 }
 
@@ -125,6 +131,6 @@ export function adjustIrisApiIdValueIfNeeded(
     value = [clazz.name.replace('I', ''), ...value.split('_').slice(1)].join(
       '_'
     );
-    node.user_data!['IrisApiIdParser'].value = value;
+    (node.user_data as IrisApiIdParserUserData).IrisApiIdParser!.value = value;
   }
 }

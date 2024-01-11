@@ -51,13 +51,11 @@ export function formatCXXParserConfig(
   return cxxParserArgs;
 }
 
-export function mergeArgs(parserArgs: any, args: any) {
-  for (let key in parserArgs) {
-    if (args[key] != undefined) {
-      parserArgs[key] = args[key];
-    }
+export function mergeArgs(parser: any, args: any): RtcParserArgs {
+  if (args[parser.name] !== undefined) {
+    parser.args = { ...parser.args, ...args[parser.name] };
   }
-  return parserArgs;
+  return parser.args;
 }
 
 export function RTCParser(
@@ -93,7 +91,7 @@ export function RTCParser(
     } else {
       preParseResult = (Parsers as any)[parser.name](
         terraContext,
-        mergeArgs(parser.args, args),
+        mergeArgs(parser, args),
         preParseResult
       );
     }
