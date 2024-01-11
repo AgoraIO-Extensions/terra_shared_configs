@@ -44,9 +44,8 @@ export function IrisApiIdParser(
   } else {
     funcNeedCheckWithBaseClasses = defaultFuncNeedCheckWithBaseClasses;
   }
-
-  let cxxFiles = preParseResult!.nodes as CXXFile[];
-  cxxFiles.forEach((cxxFile: CXXFile) => {
+  let cxxFiles = preParseResult?.nodes as CXXFile[];
+  cxxFiles?.forEach((cxxFile: CXXFile) => {
     cxxFile.nodes.forEach((node) => {
       if (node.__TYPE == CXXTYPE.Clazz) {
         let clazz = node as Clazz;
