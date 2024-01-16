@@ -73,7 +73,7 @@ export function irisApiId(
   let apiType = ps;
   let hc = apiType.length > 0 ? _stringHashCode(apiType) : '';
 
-  if (hc.length) {
+  if (hc.length && (withClassName || withFuncName)) {
     output = `${output}${shortSeperator}${hc}`;
   }
 

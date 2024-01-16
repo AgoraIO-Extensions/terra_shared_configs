@@ -44,9 +44,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf1);
+    let apiType = irisApiId(myClass, mf1);
 
-    expect(apiType).toBe('MYCLASS_MYFUNC_3766a1b9');
+    expect(apiType).toBe('MYCLASS_MYFUNC_56658dc');
   });
 
   it('full api type for overload function with hash code with so long parameter type name', () => {
@@ -84,9 +84,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf1);
+    let apiType = irisApiId(myClass, mf1);
 
-    expect(apiType).toBe('MYCLASS_MYFUNC_67d36c93');
+    expect(apiType).toBe('MYCLASS_MYFUNC_026cad0');
   });
 
   it('full api type for overload function with hash code, toUpperCase = false', () => {
@@ -123,9 +123,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf1, { toUpperCase: false });
+    let apiType = irisApiId(myClass, mf1, { toUpperCase: false });
 
-    expect(apiType).toBe('MyClass_MyFunc_3766a1b9');
+    expect(apiType).toBe('MyClass_MyFunc_56658dc');
   });
 
   it('api id for non overload function', () => {
@@ -148,9 +148,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf);
+    let apiType = irisApiId(myClass, mf);
 
-    expect(apiType).toBe('MYCLASS_MYFUNC');
+    expect(apiType).toBe('MYCLASS_MYFUNC_56658dc');
   });
 
   it('api id for non overload function without class name', () => {
@@ -173,9 +173,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, { withClassName: false });
+    let apiType = irisApiId(myClass, mf, { withClassName: false });
 
-    expect(apiType).toBe('MYFUNC');
+    expect(apiType).toBe('MYFUNC_56658dc');
   });
 
   it('api id for non overload function without function name', () => {
@@ -198,9 +198,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, { withFuncName: false });
+    let apiType = irisApiId(myClass, mf, { withFuncName: false });
 
-    expect(apiType).toBe('MYCLASS');
+    expect(apiType).toBe('MYCLASS_56658dc');
   });
 
   it('empty api id for non overload function', () => {
@@ -223,7 +223,7 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, {
+    let apiType = irisApiId(myClass, mf, {
       withClassName: false,
       withFuncName: false,
     });
@@ -251,9 +251,9 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, { toUpperCase: false });
+    let apiType = irisApiId(myClass, mf, { toUpperCase: false });
 
-    expect(apiType).toBe('MyClass_MyFunc');
+    expect(apiType).toBe('MyClass_MyFunc_56658dc');
   });
 
   it('api id trim prefix other prefix', () => {
@@ -276,12 +276,12 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, {
+    let apiType = irisApiId(myClass, mf, {
       toUpperCase: false,
       trimPrefix: 'My',
     });
 
-    expect(apiType).toBe('Class_MyFunc');
+    expect(apiType).toBe('Class_MyFunc_56658dc');
   });
 
   it('api id trim prefix empty', () => {
@@ -304,11 +304,11 @@ describe('irisApiId', () => {
       },
     ];
 
-    let apiType = irisApiId(parseResult, myClass, mf, {
+    let apiType = irisApiId(myClass, mf, {
       toUpperCase: false,
       trimPrefix: '',
     });
 
-    expect(apiType).toBe('MyClass_MyFunc');
+    expect(apiType).toBe('MyClass_MyFunc_56658dc');
   });
 });
