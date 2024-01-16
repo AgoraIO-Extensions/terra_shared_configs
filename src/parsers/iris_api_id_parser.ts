@@ -39,7 +39,7 @@ export function IrisApiIdParser(
 
 export function applyIrisApiId(clazz: Clazz, method: MemberFunction) {
   method.user_data ??= {};
-(method.user_data as IrisApiIdParserUserData).IrisApiIdParser = {
+  (method.user_data as IrisApiIdParserUserData).IrisApiIdParser = {
     key: irisApiId(clazz, method, {
       trimPrefix: '',
       toUpperCase: true,

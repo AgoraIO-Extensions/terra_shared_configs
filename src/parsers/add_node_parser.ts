@@ -5,6 +5,7 @@ import {
   CXXParserConfigs,
   CXXTYPE,
   Clazz,
+  MemberFunction,
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
@@ -13,6 +14,10 @@ import { generateNodes } from '../utils/parser_utils';
 export type AddNodeParserArgs = CXXParserConfigs & {
   customHeaderFileNamePrefix?: string;
 };
+
+export interface AddNodeParserUserData {
+  AddNodeParser: MemberFunction;
+}
 
 export const AddNodeParser = (
   terraContext: TerraContext,
@@ -69,15 +74,15 @@ export const AddNodeParser = (
         }
 
         // mark method as custom
-        customMethod.user_data = foundClass.methods[foundMethodIndex];
+        customMethod.user_data = {
+          ...customMethod.user_data,
+          AddNodeParser: foundClass.methods[foundMethodIndex],
+        };
         // replace method with custom method
         foundClass.methods[foundMethodIndex] = customMethod;
         // remove overload function unless it has been marked as custom
         foundClass.methods = foundClass.methods.filter(
-          (it) =>
-            it.name !== customMethod.name ||
-            (it.user_data !== undefined &&
-              !it.user_data.hasOwnProperty('IrisApiIdParser'))
+          (it) => it.name !== customMethod.name || it.user_data.AddNodeParser
         );
       });
     });
