@@ -89,12 +89,11 @@ export function MergeNodeParser(
 
             return it;
           });
-
-          // Re-apply the iris api id after merging.
-          targetClazz!.asClazz().methods.forEach((it) => {
-            applyIrisApiId(targetClazz!.asClazz(), it);
-          });
         }
+        // Re-apply the iris api id after merging.
+        targetClazz!.asClazz().methods.forEach((it) => {
+          applyIrisApiId(targetClazz!.asClazz(), it);
+        });
       }
     }
   }
