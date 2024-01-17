@@ -82,7 +82,7 @@ export const AddNodeParser = (
         foundClass.methods[foundMethodIndex] = customMethod;
         // remove overload function unless it has been marked as custom
         foundClass.methods = foundClass.methods.filter(
-          (it) => it.name !== customMethod.name || it.user_data.AddNodeParser
+          (it) => it.name !== customMethod.name || it.user_data?.AddNodeParser
         );
       });
     });
