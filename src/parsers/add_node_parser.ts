@@ -2,31 +2,29 @@ import path from 'path';
 
 import {
   CXXFile,
-  CXXParser,
   CXXParserConfigs,
   CXXTYPE,
   Clazz,
+  MemberFunction,
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
+
+import { generateNodes } from '../utils/parser_utils';
 
 export type AddNodeParserArgs = CXXParserConfigs & {
   customHeaderFileNamePrefix?: string;
 };
 
-export const generateCustomNodes = (
-  parseConfig: TerraContext,
-  cxxParserConfigs: CXXParserConfigs
-): ParseResult | undefined => {
-  const customParser = CXXParser;
-  return customParser(parseConfig, cxxParserConfigs, undefined);
-};
+export interface AddNodeParserUserData {
+  AddNodeParser: MemberFunction;
+}
 
 export const AddNodeParser = (
   terraContext: TerraContext,
   args: AddNodeParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined => {
-  const customNodes = generateCustomNodes(terraContext, args);
+  const customNodes = generateNodes(terraContext, args);
   customNodes?.nodes.forEach((f) => {
     let file = f as CXXFile;
     // find file which has same name after remove custrom prefix
@@ -76,12 +74,15 @@ export const AddNodeParser = (
         }
 
         // mark method as custom
-        customMethod.user_data = foundClass.methods[foundMethodIndex];
+        customMethod.user_data = {
+          ...customMethod.user_data,
+          AddNodeParser: foundClass.methods[foundMethodIndex],
+        };
         // replace method with custom method
         foundClass.methods[foundMethodIndex] = customMethod;
         // remove overload function unless it has been marked as custom
         foundClass.methods = foundClass.methods.filter(
-          (it) => it.name !== customMethod.name || it.user_data !== undefined
+          (it) => it.name !== customMethod.name || it.user_data?.AddNodeParser
         );
       });
     });

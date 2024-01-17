@@ -12,7 +12,7 @@ const TYPES_SIZE: Record<string, string> = {
 };
 
 export type FixEnumConstantParserArgs = CXXParserConfigs & {
-  skipCalValue?: boolean; // no need normally
+  skipCalEnumValue?: boolean; // no need normally
 };
 
 function fixEnumConstantValue(
@@ -36,7 +36,7 @@ function fixEnumConstantValue(
       value = value.replace(it, TYPES_SIZE[it] as string);
     }
   });
-  if (!args?.skipCalValue) {
+  if (!args?.skipCalEnumValue) {
     if (!/^\d+$/.test(value)) {
       // 当前枚举值不是纯数字, 执行表达式计算，示例如下：
       // QUALITY_UNSUPPORTED = 1 << 4,
@@ -72,7 +72,7 @@ export function FixEnumConstantParser(
               args
             );
           } else {
-            enumConstant.value = !args?.skipCalValue
+            enumConstant.value = !args?.skipCalEnumValue
               ? `${lastEnumValue}`
               : enumConstant.source;
           }

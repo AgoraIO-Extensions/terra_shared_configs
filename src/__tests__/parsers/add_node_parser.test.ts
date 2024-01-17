@@ -1,9 +1,5 @@
 // eslint-disable-next-line import/order
-import {
-  AddNodeParser,
-  generateCustomNodesMock,
-  parseMock,
-} from './add_node_parser.mock';
+import { AddNodeParser, generateNodesMock, parseMock } from './cxx_parser.mock';
 
 import {
   CXXFile,
@@ -23,7 +19,10 @@ const parseConfig: CXXParserConfigs = {
     exclude: [],
   },
 };
-const genParseResultFromNode = (nodes: any[] = [], custom: boolean = false) => {
+export const genParseResultFromNode = (
+  nodes: any[] = [],
+  custom: boolean = false
+) => {
   const filePath = `/my/path/${custom ? customPrefix : ''}IAgoraRtcEngine.h`;
   const json = [
     {
@@ -49,20 +48,20 @@ describe('AddNodeParser', () => {
     );
   });
 
-  it('generateCustomNodes', () => {
+  it('generateNodes', () => {
     const preParseResult = genParseResultFromNode();
     const config = {
       ...parseConfig,
       customHeaderFileNamePrefix: customPrefix,
     };
     const result = AddNodeParser(new TerraContext(), config, preParseResult);
-    expect(generateCustomNodesMock.mock.lastCall![1]).toStrictEqual(config);
+    expect(generateNodesMock.mock.lastCall![1]).toStrictEqual(config);
     expect(result).toEqual(preParseResult);
   });
 
   it('add custom struct', () => {
     const preParseResult = genParseResultFromNode();
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -91,7 +90,7 @@ describe('AddNodeParser', () => {
 
   it('add custom enum', () => {
     const preParseResult = genParseResultFromNode();
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -120,7 +119,7 @@ describe('AddNodeParser', () => {
 
   it('add custom class', () => {
     const preParseResult = genParseResultFromNode();
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -149,7 +148,7 @@ describe('AddNodeParser', () => {
 
   it('add custom class and struct', () => {
     const preParseResult = genParseResultFromNode();
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -188,7 +187,7 @@ describe('AddNodeParser', () => {
 
   it('only process enum struct class', () => {
     const preParseResult = genParseResultFromNode();
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -221,7 +220,7 @@ describe('AddNodeParser', () => {
       ],
       false
     );
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {
@@ -286,7 +285,7 @@ describe('AddNodeParser', () => {
       ],
       false
     );
-    generateCustomNodesMock.mockImplementation(() => {
+    generateNodesMock.mockImplementation(() => {
       return genParseResultFromNode(
         [
           {

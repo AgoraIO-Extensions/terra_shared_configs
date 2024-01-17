@@ -1,5 +1,5 @@
 export const parseMock = jest.fn();
-// export const generateCustomNodesMock = jest.fn();
+// export const generateNodesMock = jest.fn();
 jest.mock('@agoraio-extensions/cxx-parser', () => {
   const originalModule = jest.requireActual('@agoraio-extensions/cxx-parser');
   return {
@@ -9,10 +9,9 @@ jest.mock('@agoraio-extensions/cxx-parser', () => {
   };
 });
 
-import * as Tester from '../../parsers/add_node_parser';
+import * as Tester from '../../parsers/index';
+import * as FUN from '../../utils/parser_utils';
 
-export const generateCustomNodesMock = jest.spyOn(
-  Tester,
-  'generateCustomNodes'
-);
+export const generateNodesMock = jest.spyOn(FUN, 'generateNodes');
+export const RTCParser = Tester.RTCParser;
 export const AddNodeParser = Tester.AddNodeParser;

@@ -10,6 +10,7 @@ export * from './pointer_marker_parser';
 export * from './iris_api_id_parser';
 // TS's parsers
 export * from './ts/ts_comment_parser';
+export * from './rtc_parser';
 
 export enum LANGUAGE {
   TS = 'ts',
