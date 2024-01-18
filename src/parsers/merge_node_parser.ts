@@ -5,7 +5,7 @@ import { MergeNodeConfig } from '../../configs/rtc/merge_node_list';
 
 import { getConfigs } from '../utils/parser_utils';
 
-import { BaseParserArgs, applyIrisApiId } from './index';
+import { BaseParserArgs, adjustIrisApiIdKeyIfNeeded, adjustIrisApiIdValueIfNeeded, applyIrisApiId } from './index';
 
 const defaultConfig = require('../../configs/rtc/merge_node_list.ts');
 
@@ -74,6 +74,9 @@ export function MergeNodeParser(
                   tarMethodParent;
                 targetClazz!.asClazz().methods[tar_index].parent_name =
                   tarMethodParentName;
+
+                adjustIrisApiIdKeyIfNeeded(targetClazz!.asClazz(), targetClazz!.asClazz().methods[tar_index]);
+                adjustIrisApiIdValueIfNeeded(targetClazz!.asClazz(), targetClazz!.asClazz().methods[tar_index]);
                 break;
               }
             }
@@ -86,14 +89,12 @@ export function MergeNodeParser(
             // Fix the relationship.
             it.parent = targetClazz;
             it.parent_name = targetClazz?.fullName ?? '';
+            adjustIrisApiIdKeyIfNeeded(targetClazz!.asClazz(), it);
+            adjustIrisApiIdValueIfNeeded(targetClazz!.asClazz(), it);
 
             return it;
           });
         }
-        // Re-apply the iris api id after merging.
-        targetClazz!.asClazz().methods.forEach((it) => {
-          applyIrisApiId(targetClazz!.asClazz(), it);
-        });
       }
     }
   }
