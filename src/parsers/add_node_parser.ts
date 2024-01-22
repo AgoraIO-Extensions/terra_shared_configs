@@ -78,19 +78,16 @@ export const AddNodeParser = (
         for (let config of configs) {
           switch (config.key) {
             case CommentConfigKey.SOURCE:
-              // find method which has same name and signature
+              // find method which has same name
               foundMethodIndex = foundClass.methods.findIndex(
                 (it) => it.name === customMethod.name
               );
               break;
             case CommentConfigKey.IRIS_API_ID:
-              // find method which has same name and signature
+              // get iris api id from comment key IRIS_API_ID
               irisApiIdValue = config.value;
               break;
           }
-        }
-        if (customMethod.name === 'joinChannelWithUserAccount') {
-          debugger;
         }
         if (foundMethodIndex == -1) {
           // add method if not found
