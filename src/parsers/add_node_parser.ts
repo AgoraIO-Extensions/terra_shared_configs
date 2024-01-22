@@ -9,16 +9,7 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { irisApiId } from '../utils';
-import {
-  CommentAction,
-  CommentConfig,
-  CommentConfigKey,
-  generateNodes,
-  getConfigsFromComments,
-} from '../utils/parser_utils';
-
-import { IrisApiIdParserUserData } from './iris_api_id_parser';
+import { generateNodes } from '../utils/parser_utils';
 
 export type AddNodeParserArgs = CXXParserConfigs & {
   customHeaderFileNamePrefix?: string;
@@ -72,26 +63,10 @@ export const AddNodeParser = (
       }
 
       (customNode as Clazz).methods.forEach((customMethod) => {
-        let configs: CommentConfig[] = getConfigsFromComments(customMethod);
-        let foundMethodIndex = -1;
-        let irisApiIdValue = '';
-        for (let config of configs) {
-          switch (config.key) {
-            case CommentConfigKey.SOURCE:
-              // find method which has same name and signature
-              foundMethodIndex = foundClass.methods.findIndex(
-                (it) => it.name === customMethod.name
-              );
-              break;
-            case CommentConfigKey.IRIS_API_ID:
-              // find method which has same name and signature
-              irisApiIdValue = config.value;
-              break;
-          }
-        }
-        if (customMethod.name === 'joinChannelWithUserAccount') {
-          debugger;
-        }
+        // find method which has same name
+        const foundMethodIndex = foundClass.methods.findIndex(
+          (it) => it.name === customMethod.name
+        );
         if (foundMethodIndex == -1) {
           // add method if not found
           foundClass.methods.push(customMethod);
@@ -99,13 +74,6 @@ export const AddNodeParser = (
         }
 
         // mark method as custom
-        // iris use nativeSDK origin cpp api signature, so we need call applyIrisApiId to add iris api id by foundClass.methods[foundMethodIndex]
-        customMethod.user_data ??= {};
-        (customMethod.user_data as IrisApiIdParserUserData).IrisApiIdParser = {
-          key: '',
-          value: irisApiIdValue,
-        };
-
         customMethod.user_data = {
           ...customMethod.user_data,
           AddNodeParser: foundClass.methods[foundMethodIndex],

@@ -102,10 +102,8 @@ class IRtcEngine {
   virtual int addVideoWatermark(const char *watermarkUrl,
                                 const WatermarkOptions &options) = 0;
 
-  /**
-   * @iris_api_id: RtcEngine_joinChannelWithUserAccount_4685af9
-   * @source: virtual int joinChannelWithUserAccount(const char* token, const char* channelId, const char* userAccount, const ChannelMediaOptions& options) = 0;
-   */
+  // virtual int joinChannelWithUserAccount(const char* token, const char* channelId,
+  //                                        const char* userAccount, const ChannelMediaOptions& options) = 0;
   virtual int
   joinChannelWithUserAccount(const char *token, const char *channelId,
                              const char *userAccount,

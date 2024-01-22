@@ -1,8 +1,4 @@
-import {
-  CXXParser,
-  CXXParserConfigs,
-  CXXTerraNode,
-} from '@agoraio-extensions/cxx-parser';
+import { CXXParser, CXXParserConfigs } from '@agoraio-extensions/cxx-parser';
 import {
   ParseResult,
   TerraContext,
@@ -39,30 +35,3 @@ export function getConfigs(args: BaseParserArgs, terraContext: TerraContext) {
   }
   return configs;
 }
-
-export enum CommentConfigKey {
-  SOURCE = 'source',
-  ACTION = 'action',
-  IRIS_API_ID = 'iris_api_id',
-}
-
-export enum CommentAction {
-  ADD = 'add',
-  REPLACE = 'replace',
-  REMOVE = 'remove',
-}
-
-export type CommentConfig = { key: CommentConfigKey; value: string };
-
-export const getConfigsFromComments = (node: CXXTerraNode) => {
-  const regex = /@(\w+):(.+?)(?=@|$)/gs;
-  const matches = [...node.comment.matchAll(regex)];
-  const configs: CommentConfig[] = matches.map((match) => {
-    return {
-      key: match[1] as CommentConfigKey,
-      value: match[2].trim(),
-    };
-  });
-  node.comment = '';
-  return configs;
-};
