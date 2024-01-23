@@ -15,14 +15,22 @@ class IMediaPlayerVideoFrameObserver {
 class IMediaPlayer {
   // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
 
-  // virtual int setPlayerOption(const char* key, int value) = 0;
+  /**
+   * @iris_api_id: MediaPlayer_setPlayerOption_4d05d29
+   * @source: virtual int setPlayerOption(const char* key, int value) = 0;
+   */
   virtual int setPlayerOptionInInt(const char *key, int value) = 0;
 
-  // virtual int setPlayerOption(const char* key, const char* value) = 0;
+  /**
+   * @iris_api_id: MediaPlayer_setPlayerOption_ccad422
+   * @source: virtual int setPlayerOption(const char* key, char* value) = 0;
+   */
   virtual int setPlayerOptionInString(const char *key, const char *value) = 0;
 
-  // virtual int registerAudioFrameObserver(media::IAudioPcmFrameSink* observer,
-  //                                       RAW_AUDIO_FRAME_OP_MODE_TYPE mode) = 0;
+  /**
+   * @iris_api_id: MediaPlayer_registerAudioFrameObserver_a5b510b
+   * @source: virtual int registerAudioFrameObserver(media::IAudioPcmFrameSink* observer, RAW_AUDIO_FRAME_OP_MODE_TYPE mode) = 0;
+   */
   virtual int
   registerAudioFrameObserver(media::IAudioPcmFrameSink* observer,
                              RAW_AUDIO_FRAME_OP_MODE_TYPE mode = RAW_AUDIO_FRAME_OP_MODE_TYPE::RAW_AUDIO_FRAME_OP_MODE_READ_ONLY) = 0;
@@ -31,11 +39,17 @@ class IMediaPlayer {
 
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
 
-  // virtual int registerVideoFrameObserver(media::base::IVideoFrameObserver* observer) = 0;
+  /**
+   * @iris_api_id: MediaPlayer_registerVideoFrameObserver_833bd8d
+   * @source: virtual int registerVideoFrameObserver(media::base::IVideoFrameObserver* observer) = 0;
+   */
   virtual int
   registerVideoFrameObserver(IMediaPlayerVideoFrameObserver *observer) = 0;
 
-  // virtual int unregisterVideoFrameObserver(agora::media::base::IVideoFrameObserver* observer) = 0;
+  /**
+   * @iris_api_id: MediaPlayer_unregisterVideoFrameObserver_5165d4c
+   * @source: virtual int unregisterVideoFrameObserver(agora::media::base::IVideoFrameObserver* observer) = 0;
+   */
   virtual int
   unregisterVideoFrameObserver(IMediaPlayerVideoFrameObserver *observer) = 0;
 
