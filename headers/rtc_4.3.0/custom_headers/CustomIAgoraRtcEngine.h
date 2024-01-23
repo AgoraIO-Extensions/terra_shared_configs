@@ -271,7 +271,7 @@ class IRtcEngine {
                            VIDEO_SOURCE_TYPE source_type) = 0;
 
   /**
-   * @iris_api_id: MetadataObserver_getMaxMetadataSize
+   * @iris_api_id: RtcEngine_setMaxMetadataSize
    * @source: virtual int getMaxMetadataSize() { return DEFAULT_METADATA_SIZE_IN_BYTE; }
    */
   virtual int setMaxMetadataSize(int size) = 0;
