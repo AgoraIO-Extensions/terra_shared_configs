@@ -263,6 +263,8 @@ describe('AddNodeParser', () => {
             {
               __TYPE: 'MemberFunction',
               name: 'getCount',
+              comment:
+                '@iris_api_id: MediaEngine_IScreenCaptureSourceList @source: getCount',
               parameters: [
                 {
                   __TYPE: 'Variable',
@@ -273,6 +275,8 @@ describe('AddNodeParser', () => {
             {
               __TYPE: 'MemberFunction',
               name: 'getCount',
+              comment:
+                '@iris_api_id: MediaEngine_IScreenCaptureSourceList @source: getCount',
               parameters: [
                 {
                   __TYPE: 'Variable',
@@ -295,6 +299,8 @@ describe('AddNodeParser', () => {
               {
                 __TYPE: 'MemberFunction',
                 name: 'getCount',
+                comment:
+                  '@iris_api_id: MediaEngine_IScreenCaptureSourceList @source: getCount',
                 parameters: [
                   {
                     __TYPE: 'Variable',
@@ -319,6 +325,7 @@ describe('AddNodeParser', () => {
     const clazz = (result?.nodes[0] as CXXFile).nodes[0] as Clazz;
     expect(clazz.methods.length).toBe(1);
     expect(clazz.methods[0].name).toBe('getCount');
+    expect(clazz.methods[0].comment).toBe('');
     expect(clazz.methods[0].parameters[0].name).toBe('c');
   });
 });
