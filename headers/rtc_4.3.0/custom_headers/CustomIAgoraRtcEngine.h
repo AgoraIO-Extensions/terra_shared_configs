@@ -224,43 +224,43 @@ class IRtcEngine {
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_AUDIO_DEVICE_MANAGER = 1,
    */
-  // AGORA_IID_AUDIO_DEVICE_MANAGER = 1,
   virtual IAudioDeviceManager *getAudioDeviceManager() = 0;
 
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_VIDEO_DEVICE_MANAGER = 2,
    */
-  // AGORA_IID_VIDEO_DEVICE_MANAGER = 2,
   virtual IVideoDeviceManager *getVideoDeviceManager() = 0;
 
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_MUSIC_CONTENT_CENTER = 15,
    */
-  // AGORA_IID_MUSIC_CONTENT_CENTER = 15,
   virtual IMusicContentCenter *getMusicContentCenter() = 0;
 
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_MEDIA_ENGINE = 4,
    */
-  // AGORA_IID_MEDIA_ENGINE = 4,
   virtual agora::media::IMediaEngine *getMediaEngine() = 0;
 
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
    */
-  // AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
   virtual ILocalSpatialAudioEngine *getLocalSpatialAudioEngine() = 0;
 
   /**
    * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
+   * AGORA_IID_H265_TRANSCODER = 16,
    */
-  // AGORA_IID_H265_TRANSCODER = 16,
   virtual IH265Transcoder *getH265Transcoder() = 0;
 
   /**
@@ -292,16 +292,16 @@ class IRtcEngine {
   /**
    * @iris_api_id: RtcEngine_unregisterAudioEncodedFrameObserver
    * @source: virtual int registerAudioEncodedFrameObserver(const AudioEncodedFrameObserverConfig& config,  IAudioEncodedFrameObserver *observer) = 0;
+   * add for registerAudioEncodedFrameObserver
    */
-  // add for registerAudioEncodedFrameObserver
   virtual int
   unregisterAudioEncodedFrameObserver(IAudioEncodedFrameObserver *observer) = 0;
 
   /**
    * @iris_api_id: RtcEngine_getNativeHandle
    * @source: AGORA_API agora::rtc::IRtcEngine* AGORA_CALL createAgoraRtcEngine();
+   * add for createAgoraRtcEngine
    */
-  // add for createAgoraRtcEngine
   virtual intptr_t getNativeHandle() = 0;
 
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------

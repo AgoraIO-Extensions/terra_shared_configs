@@ -1,7 +1,9 @@
 import {
   CXXFile,
   CXXTYPE,
+  CXXTerraNode,
   SimpleTypeKind,
+  Variable,
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
@@ -63,15 +65,36 @@ export function ReturnTypeParser(
               method.return_type.is_builtin_type = true;
             }
           }
-          for (let p in method.asMemberFunction().parameters) {
+          for (
+            let p = 0;
+            p < method.asMemberFunction().parameters.length;
+            p++
+          ) {
             let param = method.asMemberFunction().parameters[p];
-            if (args?.convertReturnToVoid) {
+            if (isOutputVariable(param) && args?.convertReturnToVoid) {
               method.return_type = param.type;
-              method.user_data = param;
+              method.user_data = {
+                ...method.user_data,
+                ReturnTypeParser: {
+                  is_overrided_return_type: true,
+                  outVariable: param,
+                },
+              };
+
+              // Remove output variable from parameter list
+              method.asMemberFunction().parameters.splice(p, 1);
               break;
             } else {
               if (isOutputVariable(param)) {
+                // TODO(littlegnal): Remove the `is_output` in the future
                 param.is_output = true;
+                param.user_data = {
+                  ...param.user_data,
+                  ReturnTypeParser: {
+                    is_overrided_return_type: true,
+                    outVariable: param,
+                  },
+                };
               }
             }
           }
@@ -80,4 +103,12 @@ export function ReturnTypeParser(
     });
   });
   return preParseResult;
+}
+
+export function isOverridedReturnType(node: CXXTerraNode): boolean {
+  return node.user_data?.ReturnTypeParser?.is_overrided_return_type ?? false;
+}
+
+export function getOutVariable(node: CXXTerraNode): Variable | undefined {
+  return node.user_data?.ReturnTypeParser?.outVariable;
 }

@@ -15,7 +15,14 @@ export const generateNodes = (
   parseConfig: TerraContext,
   cxxParserConfigs: CXXParserConfigs
 ): ParseResult | undefined => {
-  return CXXParser(parseConfig, cxxParserConfigs, undefined);
+  return CXXParser(
+    parseConfig,
+    {
+      ...cxxParserConfigs,
+      buildDirNamePrefix: 'addnode',
+    } as CXXParserConfigs,
+    undefined
+  );
 };
 
 export function getConfigs(args: BaseParserArgs, terraContext: TerraContext) {
