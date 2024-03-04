@@ -9,9 +9,7 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
-import { irisApiId } from '../utils';
 import {
-  CommentAction,
   CommentConfig,
   CommentConfigKey,
   generateNodes,
@@ -90,6 +88,15 @@ export const AddNodeParser = (
           }
         }
         if (foundMethodIndex == -1) {
+          // mark method as custom
+          // iris use nativeSDK origin cpp api signature, so we need call applyIrisApiId to add iris api id by foundClass.methods[foundMethodIndex]
+          customMethod.user_data ??= {};
+          (customMethod.user_data as IrisApiIdParserUserData).IrisApiIdParser =
+            {
+              key: '',
+              value: irisApiIdValue,
+            };
+
           // add method if not found
           foundClass.methods.push(customMethod);
           return;
