@@ -99,18 +99,19 @@ describe('IrisDocRenderer', () => {
     let fmtConfigPath = path.join(irisDocDir, 'fmt_config', 'fmt_dart.yaml');
     let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=https://exampe.com`;
     // - 1 time for git clone
+    // - 1 time for dart format
     // - 1 time for python install requirements.txt
     // - 1 time for iris-doc.py
-    expect(execSync).toBeCalledTimes(3);
+    expect(execSync).toBeCalledTimes(4);
     expect(execSync).toHaveBeenNthCalledWith(
-      2,
+      3,
       `python3 -m pip install -r ${path.join(irisDocDir, 'requirements.txt')}`,
       {
         encoding: 'utf8',
         stdio: 'inherit',
       }
     );
-    expect(execSync).toHaveBeenNthCalledWith(3, irisDocCommand, {
+    expect(execSync).toHaveBeenNthCalledWith(4, irisDocCommand, {
       encoding: 'utf8',
       stdio: 'inherit',
     });
