@@ -50,6 +50,20 @@ function irisDocScript(
 
   exportFilePath = path.resolve(exportFilePath);
 
+  if (language === 'dart') {
+    // TODO(littlegnal): Maybe move to the `iris_doc.py` script.
+    // The `iris_doc.py` script relies on the formatted file, we format the files before running the script to ensure the script run correctly.
+    try {
+      execSync(`dart format ${path.dirname(exportFilePath)}`, {
+        encoding: 'utf8',
+        stdio: 'inherit',
+      });
+    } catch (e) {
+      // Allow failed.
+      console.log(e);
+    }
+  }
+
   let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
   let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`;
 
