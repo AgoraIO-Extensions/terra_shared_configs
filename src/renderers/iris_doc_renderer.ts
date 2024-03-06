@@ -38,16 +38,6 @@ function irisDocScript(
   exportFilePath: string,
   templateUrl: string
 ) {
-  let requirementsPath = path.join(irisDocDir, 'requirements.txt');
-  let installRequirements = `python3 -m pip install -r ${requirementsPath}`;
-  const installRequirementsOut = execSync(installRequirements, {
-    encoding: 'utf8',
-    stdio: 'inherit',
-  });
-  console.log(installRequirementsOut);
-
-  let fmtConfigPath = path.join(irisDocDir, 'fmt_config', fmtConfig);
-
   exportFilePath = path.resolve(exportFilePath);
 
   if (language === 'dart') {
@@ -63,6 +53,16 @@ function irisDocScript(
       console.log(e);
     }
   }
+
+  let requirementsPath = path.join(irisDocDir, 'requirements.txt');
+  let installRequirements = `python3 -m pip install -r ${requirementsPath}`;
+  const installRequirementsOut = execSync(installRequirements, {
+    encoding: 'utf8',
+    stdio: 'inherit',
+  });
+  console.log(installRequirementsOut);
+
+  let fmtConfigPath = path.join(irisDocDir, 'fmt_config', fmtConfig);
 
   let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
   let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`;
