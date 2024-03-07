@@ -3404,6 +3404,53 @@ struct DirectCdnStreamingMediaOptions {
    */
   Optional<video_track_id_t> customVideoTrackId;
 
+#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+  /**
+   * Whether to publish the captured video from the screen:
+   * This parameter is for macOS and Windows only.
+   * - `true`: Publish the captured video from the screen.
+   * - `false`: (Default) Do not publish the captured video from the screen.
+   */
+  Optional<bool> publishScreenTrack;
+  /**
+   * Whether to publish the captured video from the secondary screen:
+   * This parameter is for macOS and Windows only.
+   * - true: Publish the captured video from the secondary screen.
+   * - false: (Default) Do not publish the captured video from the secondary screen.
+   */
+  Optional<bool> publishSecondaryScreenTrack;
+  /**
+   * Whether to publish the captured video from the third screen:
+   * This parameter is for macOS and Windows only.
+   * - true: Publish the captured video from the third screen.
+   * - false: (Default) Do not publish the captured video from the third screen.
+   */
+  Optional<bool> publishThirdScreenTrack;
+  /**
+   * Whether to publish the captured video from the fourth screen:
+   * This parameter is for macOS and Windows only.
+   * - true: Publish the captured video from the fourth screen.
+   * - false: (Default) Do not publish the captured video from the fourth screen.
+   */
+  Optional<bool> publishFourthScreenTrack;
+
+  /**
+  * Whether to publish the audio played by the local loopback device.
+  * This parameter is for macOS and Windows only.
+  * - `true`: Publish the audio track of local loopback track.
+  * - `false`: (Default) Do not publish the local loopback track.
+  */
+  Optional<bool> publishLoopbackAudioTrack;
+
+  /**
+  * Pointer to the device name of the sound card. The default value is NULL (the default sound card).
+  * - This parameter is for macOS and Windows only.
+  * - macOS does not support loopback capturing of the default sound card. If you need to use this method,
+  * please use a virtual sound card and pass its name to the publishLoopbackDeviceName. Agora has tested and recommends using soundflower.
+  */
+  Optional<const char*> publishLoopbackDeviceName;
+#endif
+
   DirectCdnStreamingMediaOptions() {}
   ~DirectCdnStreamingMediaOptions() {}
 
@@ -3416,6 +3463,14 @@ struct DirectCdnStreamingMediaOptions {
       SET_FROM(publishMediaPlayerAudioTrack);
       SET_FROM(publishMediaPlayerId);
       SET_FROM(customVideoTrackId);
+#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+      SET_FROM(publishScreenTrack);
+      SET_FROM(publishSecondaryScreenTrack);
+      SET_FROM(publishThirdScreenTrack);
+      SET_FROM(publishFourthScreenTrack);
+      SET_FROM(publishLoopbackAudioTrack);
+      SET_FROM(publishLoopbackDeviceName);
+#endif
 #undef SET_FROM
   }
 
@@ -3432,6 +3487,14 @@ struct DirectCdnStreamingMediaOptions {
       ADD_COMPARE(publishMediaPlayerAudioTrack);
       ADD_COMPARE(customVideoTrackId);
       ADD_COMPARE(publishMediaPlayerId);
+#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+      ADD_COMPARE(publishScreenTrack);
+      ADD_COMPARE(publishSecondaryScreenTrack);
+      ADD_COMPARE(publishThirdScreenTrack);
+      ADD_COMPARE(publishFourthScreenTrack);
+      ADD_COMPARE(publishLoopbackAudioTrack);
+      ADD_COMPARE(publishLoopbackDeviceName);
+#endif
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -3451,6 +3514,14 @@ struct DirectCdnStreamingMediaOptions {
         REPLACE_BY(publishMediaPlayerAudioTrack);
         REPLACE_BY(customVideoTrackId);
         REPLACE_BY(publishMediaPlayerId);
+#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+        REPLACE_BY(publishScreenTrack);
+        REPLACE_BY(publishSecondaryScreenTrack);
+        REPLACE_BY(publishThirdScreenTrack);
+        REPLACE_BY(publishFourthScreenTrack);
+        REPLACE_BY(publishLoopbackAudioTrack);
+        REPLACE_BY(publishLoopbackDeviceName);
+#endif
 #undef REPLACE_BY
     }
     return *this;
