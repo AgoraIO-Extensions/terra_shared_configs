@@ -29,6 +29,12 @@ class IMediaEngine {
   virtual int
   unregisterVideoEncodedFrameObserver(IVideoEncodedFrameObserver *observer) = 0;
 
+  /**
+   * @iris_api_id: MediaEngine_unregisterFaceInfoObserver
+   * @source: virtual int registerFaceInfoObserver(IFaceInfoObserver* observer) = 0;
+   */
+  virtual int unregisterFaceInfoObserver(IFaceInfoObserver* observer) = 0;
+
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
