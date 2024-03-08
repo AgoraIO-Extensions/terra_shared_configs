@@ -183,6 +183,13 @@ module.exports = {
     is_const: false,
     is_builtin_type: true,
   },
+  'agora::media::IFaceInfoObserver.onFaceInfo': {
+    name: 'void',
+    source: 'void',
+    kind: SimpleTypeKind.value_t,
+    is_const: false,
+    is_builtin_type: true,
+  },
   'agora::media::IAudioSpectrumObserver.onLocalAudioSpectrum': {
     name: 'void',
     source: 'void',

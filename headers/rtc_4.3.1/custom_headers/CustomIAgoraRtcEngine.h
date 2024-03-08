@@ -28,10 +28,11 @@ struct VideoDeviceInfo {
 };
 
 // IAudioDeviceCollection
-// virtual int getDevice(int index, char deviceName[MAX_DEVICE_ID_LENGTH],
-//                        char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
+// virtual int getDevice(int index, char deviceName[MAX_DEVICE_ID_LENGTH], char deviceTypeName[MAX_DEVICE_ID_LENGTH],
+//                       char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 struct AudioDeviceInfo {
   const char *deviceId;
+  const char *deviceTypeName;
   const char *deviceName;
 };
 
