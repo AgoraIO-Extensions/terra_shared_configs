@@ -18,7 +18,7 @@ on:
         required: true
 
 jobs:
-  test:
+  update-headers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
