@@ -36,7 +36,7 @@ temp_file="${destination}/temp_file.zip"
 curl -L -o "$temp_file" "$url"
 
 # # 解压文件
-unzip -o "$temp_file" -d "$destination"
+unzip -o "$temp_file" -d "$destination" > /dev/null
 
 # # 删除临时文件
 rm "$temp_file"
@@ -49,7 +49,7 @@ nativeSDK="$destination/Agora_Native_SDK_for_Windows_FULL"
 mkdir -p $nativeSDK
 
 # # 将文件移动到目标位置
-mv "$nativeSDK/sdk/high_level_api/include" "$destination"
+mv "$nativeSDK/sdk/high_level_api/include" "$destination/include"
 
 # # 删除解压后的文件
 rm -rf "$nativeSDK"
