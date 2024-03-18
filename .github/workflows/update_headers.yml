@@ -7,10 +7,7 @@ on:
         description: 'rtc or rtm'
         default: 'rtc'
         required: true
-        type: choice
-        options:
-          - rtc
-          - rtm
+        type: 'string'
       version:
         description: 'version of the native headers'
         type: 'string'
