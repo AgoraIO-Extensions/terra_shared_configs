@@ -5,9 +5,12 @@ on:
     inputs:
       type:
         description: 'rtc or rtm'
-        type: 'string'
         default: 'rtc'
         required: true
+        type: choice
+        options:
+          - rtc
+          - rtm
       version:
         description: 'version of the native headers'
         type: 'string'
@@ -44,4 +47,4 @@ jobs:
             ${{ inputs.type }}${{ inputs.version }}
             native source:
             ${{ inputs.url }}
-          add-paths: headers/${{ input.type }}_${{ inputs.version }}
+          add-paths: headers/${{ inputs.type }}_${{ inputs.version }}
