@@ -1,0 +1,47 @@
+name: Update native headers
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        description: 'rtc or rtm'
+        type: 'string'
+        default: 'rtc'
+        required: true
+      version:
+        description: 'version of the native headers'
+        type: 'string'
+        required: true
+      url:
+        description: 'URL of the native headers'
+        type: 'string'
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Update headers
+        run: |
+          sh scripts/update_headers.sh ${{ inputs.type }} ${{ inputs.version }} ${{ inputs.url }}
+        shell: bash
+
+      - name: Create pull request
+        uses: AgoraIO-Extensions/actions/.github/actions/pr@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          target-repo: ${{ github.workspace }}
+          target-branch: ${{ github.ref_name }}
+          target-branch-name-surffix: doc-update
+          pull-request-title: |
+            [AUTO] Update native headers
+          pull-request-body: |
+            sdk:
+            ${{ inputs.type }}${{ inputs.version }}
+            native source:
+            ${{ inputs.url }}
+          add-paths: ts
