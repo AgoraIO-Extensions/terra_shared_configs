@@ -53,3 +53,5 @@ mv "$nativeSDK/sdk/high_level_api/include" "$destination/include"
 
 # # 删除解压后的文件
 rm -rf "$nativeSDK"
+
+git add "$destination"
