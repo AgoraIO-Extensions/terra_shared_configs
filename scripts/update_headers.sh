@@ -19,10 +19,6 @@ version=${url#*${type}_}; version=${version%_*headers.zip}
 # 构造目标目录路径
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
 
-# 删除目标目录
-rm -rf "$destination/include"
-
-
 # 如果目标目录不存在，则复制最相似的一个文件夹并重命名
 if [ ! -d "$destination" ]; then
     # 找到最后一个文件夹
@@ -32,12 +28,15 @@ if [ ! -d "$destination" ]; then
     cp -r "$last_folder" "$destination"
 fi
 
+# 删除include目录
+rm -rf "$destination/include"
+
 # 使用临时文件名下载文件
 temp_file="${destination}/temp_file.zip"
 curl -L -o "$temp_file" "$url"
 
 # 解压文件
-unzip -o "$temp_file" -d "$destination"
+unzip -o "$temp_file" -d "$destination" > /dev/null
 
 # 删除临时文件
 rm "$temp_file"

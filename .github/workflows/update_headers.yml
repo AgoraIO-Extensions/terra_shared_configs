@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  test:
+  update-headers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,12 +27,10 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           target-repo: ${{ github.workspace }}
           target-branch: ${{ github.ref_name }}
-          target-branch-name-surffix: doc-update
+          target-branch-name-surffix: headers-update
           pull-request-title: |
             [AUTO] Update native headers
           pull-request-body: |
-            sdk:
-            ${{ inputs.type }}${{ inputs.version }}
-            native source:
+            native headers source:
             ${{ inputs.url }}
-          add-paths: ts
+          add-paths: headers/*
