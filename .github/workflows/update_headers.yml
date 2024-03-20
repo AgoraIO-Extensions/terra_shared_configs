@@ -31,8 +31,6 @@ jobs:
           pull-request-title: |
             [AUTO] Update native headers
           pull-request-body: |
-            sdk:
-            ${{ inputs.type }}_${{ inputs.version }}
-            native source:
+            native headers source:
             ${{ inputs.url }}
           add-paths: headers/*
