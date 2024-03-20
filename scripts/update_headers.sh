@@ -19,10 +19,6 @@ version=${url#*${type}_}; version=${version%_*headers.zip}
 # 构造目标目录路径
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
 
-# 删除目标目录
-rm -rf "$destination/include"
-
-
 # 如果目标目录不存在，则复制最相似的一个文件夹并重命名
 if [ ! -d "$destination" ]; then
     # 找到最后一个文件夹
@@ -31,6 +27,9 @@ if [ ! -d "$destination" ]; then
     echo "Copying $last_folder to $destination"
     cp -r "$last_folder" "$destination"
 fi
+
+# 删除include目录
+rm -rf "$destination/include"
 
 # 使用临时文件名下载文件
 temp_file="${destination}/temp_file.zip"
@@ -50,7 +49,7 @@ nativeSDK="$destination/Agora_Native_SDK_for_Windows_FULL"
 mkdir -p $nativeSDK
 
 # 将文件移动到目标位置
-mv "$nativeSDK/sdk/high_level_api/include" "$destination/include"
+mv "$nativeSDK/sdk/high_level_api/include" "$destination"
 
 # 删除解压后的文件
 rm -rf "$nativeSDK"
