@@ -1,6 +1,8 @@
 name: Update native headers
 
 on:
+  repository_dispatch:
+    types: [update_headers]
   workflow_dispatch:
     inputs:
       url:
