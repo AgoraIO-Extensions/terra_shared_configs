@@ -35,4 +35,4 @@ jobs:
             ${{ inputs.type }}_${{ inputs.version }}
             native source:
             ${{ inputs.url }}
-          add-paths: headers/${{ inputs.type }}_${{ inputs.version }}
+          add-paths: headers/*
