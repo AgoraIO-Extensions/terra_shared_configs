@@ -3,15 +3,6 @@ name: Update native headers
 on:
   workflow_dispatch:
     inputs:
-      type:
-        description: 'rtc or rtm'
-        type: 'string'
-        default: 'rtc'
-        required: true
-      version:
-        description: 'version of the native headers'
-        type: 'string'
-        required: true
       url:
         description: 'URL of the native headers'
         type: 'string'
@@ -27,7 +18,7 @@ jobs:
 
       - name: Update headers
         run: |
-          sh scripts/update_headers.sh ${{ inputs.type }} ${{ inputs.version }} ${{ inputs.url }}
+          sh scripts/update_headers.sh ${{ inputs.url }}
         shell: bash
 
       - name: Create pull request
