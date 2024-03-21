@@ -24,10 +24,13 @@
   "dependencies": {
     "@agoraio-extensions/cxx-parser": "git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=cxx-parser",
     "@agoraio-extensions/terra-core": "git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=terra-core",
-    "mustache": "^4.2.0"
+    "lodash": "^4.17.21",
+    "mustache": "^4.2.0",
+    "openai": "^4.29.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",
+    "@types/lodash": "^4.17.0",
     "@types/mustache": "^4.2.2",
     "@types/node": "^20.5.9",
     "@typescript-eslint/eslint-plugin": "^5.30.5",

@@ -1,5 +1,6 @@
 export * from './obj_utils';
 export * from './iris_utils';
+export * from './gpt_utils';
 
 import { SimpleTypeKind, Variable } from '@agoraio-extensions/cxx-parser';
 
