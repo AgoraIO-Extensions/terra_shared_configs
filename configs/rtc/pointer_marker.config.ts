@@ -78,21 +78,8 @@ module.exports = {
       },
       pointerArrayNameMappings: [
         {
-          ptrName: 'serverConfig',
+          ptrName: 'modules',
           lengthName: 'moduleCount',
-        },
-      ],
-    },
-    {
-      node: {
-        __TYPE: CXXTYPE.Struct,
-        name: 'ExternalVideoFrame',
-        namespaces: ['agora', 'media', 'base'],
-      },
-      pointerArrayNameMappings: [
-        {
-          ptrName: 'metadata_buffer',
-          lengthName: 'metadata_size',
         },
       ],
     },
@@ -106,23 +93,6 @@ module.exports = {
         {
           ptrName: 'audioSpectrumData',
           lengthName: 'dataLength',
-        },
-      ],
-    },
-    {
-      node: {
-        __TYPE: CXXTYPE.Struct,
-        name: 'MediaSource',
-        namespaces: ['agora', 'media', 'base'],
-      },
-      pointerArrayNameMappings: [
-        {
-          ptrName: 'url',
-          lengthName: 'uri',
-        },
-        {
-          ptrName: 'provider',
-          lengthName: 'url',
         },
       ],
     },

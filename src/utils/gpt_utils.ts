@@ -1,6 +1,12 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI();
+let _openAIClient: OpenAI | undefined = undefined;
+function openAIClient(): OpenAI {
+    if (_openAIClient === undefined) {
+        _openAIClient = new OpenAI();
+    }
+    return _openAIClient;
+}
 
 /// Make sure you add the following environment variables before you call this function
 /// - OPENAI_API_KEY
@@ -9,7 +15,7 @@ export async function askGPT(prompt: string): Promise<string> {
     console.log(`prompt:`);
     console.log(prompt);
 
-    const completion: OpenAI.Chat.ChatCompletion = (await openai.chat.completions.create({
+    const completion: OpenAI.Chat.ChatCompletion = (await openAIClient().chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,

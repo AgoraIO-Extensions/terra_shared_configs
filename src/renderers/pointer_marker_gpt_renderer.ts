@@ -1,21 +1,33 @@
-import { strict as assert } from 'assert';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import path from 'path';
+import _ from 'lodash';
 
 import {
     ParseResult,
     RenderResult,
     TerraContext,
 } from '@agoraio-extensions/terra-core';
-import OpenAI from 'openai';
-import { CXXFile, CXXTYPE, CXXTerraNode, SimpleTypeKind, Struct } from '@agoraio-extensions/cxx-parser';
 import { askGPT } from '../utils/gpt_utils';
 import { PointerArrayNameMapping, PointerMarkerParserConfigMarker } from '../parsers/pointer_marker_parser';
+import { CXXFile, SimpleTypeKind, Struct } from '@agoraio-extensions/cxx-parser';
+
+export interface PointerMarkerGPTRenderer {
+    configPath?: string
+}
+
+export function PointerMarkerGPTRenderer(
+    terraContext: TerraContext,
+    args?: PointerMarkerGPTRenderer,
+    parseResult?: ParseResult
+): RenderResult[] {
+    processGPT(parseResult!, args?.configPath);
+    return [];
+}
 
 const prompt = `
-You are an AI experienced in parsing and analyzing C++ code. Your task is to identify "pointer field-length field" pairs within a given C++ struct. 
-Exclude any pair where the pointer field's name is "buffer" or the pointer field type is "uint8_t *". Additionally, disregard any pointer without a direct length field counterpart. 
+You are a C++ Code Inspector. Your task is to identify "pointer field-length field" pairs within a given C++ struct. 
+Exclude any pair where the pointer field's name is "buffer" or the pointer field type is "uint8_t" pointer. Additionally, disregard any pointer without a direct length field counterpart. 
 Your output should be in JSON format, returning an empty array [] if no valid pairs are found, or [{"ptrName": "pointer_name", "lengthName": "length_field_name"}] for each valid pair found. 
 The response MUST contains only the JSON result without any additional explanations.
 
@@ -25,7 +37,11 @@ Given struct:
 \`\`\`
 `;
 
-async function processGPT(parseResult: ParseResult) {
+const defualtConfigPath = path.resolve(`${__dirname}/../../configs/rtc/pointer_marker.config.ts`);
+async function processGPT(parseResult: ParseResult, configPath?: string) {
+    let originalConfigPath = configPath ?? defualtConfigPath;
+    let originalMarkers = require(originalConfigPath).markers as PointerMarkerParserConfigMarker[];
+
     let structs = parseResult.nodes
         .flatMap((node) => (node as CXXFile).nodes)
         .filter((node) => node.isStruct())
@@ -50,15 +66,32 @@ async function processGPT(parseResult: ParseResult) {
             if (jsonArray.length === 0) {
                 continue;
             }
-            let pointerArrayNameMappings = (jsonArray as PointerArrayNameMapping[]).map((entry: any) => {
-                return `
+
+            // let newJsonArray = jsonArray as PointerArrayNameMapping[];
+            let newJsonArray: PointerArrayNameMapping[] = [];
+            let originalMarker = originalMarkers.find((entry: any) => _.isMatch(struct, entry.node));
+            if (originalMarker) {
+                for (let om of (jsonArray as PointerArrayNameMapping[])) {
+                    if (om.lengthName.length === 0) {
+                        continue;
+                    }
+                    let found = originalMarker.pointerArrayNameMappings?.find((entry) => entry.ptrName === om.ptrName);
+                    // Only add the ptrName if it's not found in the original marker
+                    let toAdd = found ? found : om;
+                    newJsonArray.push(toAdd);
+                }
+            }
+
+            if (newJsonArray.length > 0) {
+                let pointerArrayNameMappings = newJsonArray.map((entry: any) => {
+                    return `
 {
     ptrName: "${entry.ptrName}",
     lengthName: "${entry.lengthName}",
 }`.trim();
-            });
+                });
 
-            let marker = `
+                let marker = `
 {
     node: {
         __TYPE: CXXTYPE.Struct,
@@ -69,7 +102,8 @@ async function processGPT(parseResult: ParseResult) {
         ${pointerArrayNameMappings.join(',\n')}
     ],
 }`.trim();
-            markers.push(marker);
+                markers.push(marker);
+            }
         }
     }
     console.log(markers);
@@ -84,24 +118,12 @@ module.exports = {
 };
 `.trim();
 
-    let configPath = path.resolve(`${__dirname}/../../configs/rtc/pointer_marker.config.ts`);
-    fs.writeFileSync(configPath, output);
+    fs.writeFileSync(originalConfigPath, output);
 
     // Reformat the file
-    execSync(`yarn prettier ${configPath} --write`, {
+    execSync(`yarn prettier ${originalConfigPath} --write`, {
         cwd: path.resolve(__dirname, '../../'),
     });
-}
-
-export function PointerMarkerGPTRenderer(
-    terraContext: TerraContext,
-    args: any,
-    parseResult?: ParseResult
-): RenderResult[] {
-
-    processGPT(parseResult!);
-
-    return [];
 }
 
 function structToSource(struct: Struct): string {
