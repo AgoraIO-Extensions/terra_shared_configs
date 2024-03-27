@@ -14,6 +14,7 @@ fi
 url=$1
 type=${url#*Preview_}; type=${type%%_*}
 version=${url#*${type}_}; version=${version%_*headers.zip}
+latest_version="${version%.*}"
 
 # 构造目标目录路径
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
