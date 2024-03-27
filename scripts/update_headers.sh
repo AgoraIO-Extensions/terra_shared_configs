@@ -15,9 +15,6 @@ url=$1
 type=${url#*Preview_}; type=${type%%_*}
 version=${url#*${type}_}; version=${version%_*headers.zip}
 
-latest_version="${version%.*}"
-echo "Latest version is: $latest_version"
-
 # 构造目标目录路径
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
 
@@ -28,6 +25,9 @@ if [ ! -d "$destination" ]; then
     # 复制最后一个文件夹并重命名
     echo "Copying $last_folder to $destination"
     cp -r "$last_folder" "$destination"
+else
+    # 如果目标目录已经存在，输出一条消息
+    echo "The directory $destination already exists. no need to copy."
 fi
 
 # 删除include目录
