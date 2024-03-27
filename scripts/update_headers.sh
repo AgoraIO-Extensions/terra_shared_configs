@@ -15,6 +15,8 @@ url=$1
 type=${url#*Preview_}; type=${type%%_*}
 version=${url#*${type}_}; version=${version%_*headers.zip}
 
+latest_version="${version%.*}"
+echo "Latest version is: $latest_version"
 
 # 构造目标目录路径
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
@@ -22,7 +24,7 @@ destination=${PROJECT_ROOT}"/headers/${type}_${version}"
 # 如果目标目录不存在，则复制最相似的一个文件夹并重命名
 if [ ! -d "$destination" ]; then
     # 找到最后一个文件夹
-    last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_* | sort | tail -n 1)
+    last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_${latest_version}* | sort | tail -n 1)
     # 复制最后一个文件夹并重命名
     echo "Copying $last_folder to $destination"
     cp -r "$last_folder" "$destination"
