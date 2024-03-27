@@ -1,0 +1,32 @@
+include_header_dirs:
+  - include
+  - ../system
+  - /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+
+visit_headers:
+  - include/AgoraBase.h
+  - include/AgoraMediaBase.h
+  - include/AgoraMediaPlayerTypes.h
+  - include/AgoraOptional.h
+  - include/AgoraRefPtr.h
+  - include/IAgoraLog.h
+  - include/IAgoraMediaEngine.h
+  - include/IAgoraMediaPlayer.h
+  - include/IAgoraMediaPlayerSource.h
+  - include/IAgoraMediaRecorder.h
+  - include/IAgoraMediaStreamingSource.h
+  - include/IAgoraMusicContentCenter.h
+  - include/IAgoraParameter.h
+  - include/IAgoraRhythmPlayer.h
+  - include/IAgoraRtcEngine.h
+  - include/IAgoraRtcEngineEx.h
+  - include/IAgoraSpatialAudio.h
+  - include/IAudioDeviceManager.h
+
+custom_headers:
+  - custom_headers/CustomIAgoraMediaEngine.h
+  - custom_headers/CustomIAgoraRtcEngine.h
+  - custom_headers/CustomIAgoraMediaPlayer.h
+  - custom_headers/CustomIAgoraRtcEngineEx.h
+  - custom_headers/CustomIAgoraMusicContentCenter.h
+  - custom_headers/CustomIAudioDeviceManager.h
