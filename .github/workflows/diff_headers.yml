@@ -1,0 +1,24 @@
+name: Diff headers
+
+on:
+  workflow_dispatch:
+    inputs:
+      base-version:
+        description: 'e.g., rtc_4.3.0'
+        type: 'string'
+        required: true
+      target-version:
+        description: 'e.g., rtc_4.3.1'
+        type: 'string'
+        required: true
+
+jobs:
+  diff-headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Diff headers
+        run: |
+          bash scripts/diff.sh ${{ inputs.base-version }} ${{ inputs.target-version }}
+        shell: bash
