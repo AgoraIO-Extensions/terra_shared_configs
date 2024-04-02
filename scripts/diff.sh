@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# set -e
 set -x
 
 BASE=$1
@@ -12,9 +11,7 @@ RESULT=$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})
 
 retVal=$?
 if [ $retVal -eq 1 ]; then
-    # SUMMARY=$(printf -v lines '%s\n%s' "$line1" "$line2")
     SUMMARY="\`\`\`diff"$'\n'$'\n'"${RESULT}"$'\n'"\`\`\`"
-    # echo "${SUMMARY}"
 
     # Output the github action summary.
     echo "${SUMMARY}" >> $GITHUB_STEP_SUMMARY
