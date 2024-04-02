@@ -1,0 +1,38 @@
+name: Diff headers
+
+on:
+  workflow_dispatch:
+    inputs:
+      base-version:
+        description: 'e.g., rtc_4.3.0'
+        type: 'string'
+        required: true
+      target-version:
+        description: 'e.g., rtc_4.3.1'
+        type: 'string'
+        required: true
+
+jobs:
+  diff-headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update headers
+        run: |
+          bash scripts/diff.sh ${{ inputs.base-version }} ${{ inputs.target-version }}
+        shell: bash
+
+      - name: Create pull request
+        uses: AgoraIO-Extensions/actions/.github/actions/pr@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          target-repo: ${{ github.workspace }}
+          target-branch: ${{ github.ref_name }}
+          target-branch-name-surffix: headers-update
+          pull-request-title: |
+            [AUTO] Update native headers
+          pull-request-body: |
+            native headers source:
+            ${{ inputs.url }}
+          add-paths: headers/*
