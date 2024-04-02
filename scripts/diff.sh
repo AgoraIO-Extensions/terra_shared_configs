@@ -8,11 +8,11 @@ TARGET=$2
 BASE_PATH=headers/${BASE}/include
 TARGET_PATH=headers/${TARGET}/include
 
-RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
+RESULT=$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})
 
 retVal=$?
 if [ $retVal -eq 1 ]; then
-    SUMMARY="\`\`\`diff"'\n'"${RESULT}""\`\`\`"
+    SUMMARY="\`\`\`"'\n'"${RESULT}""\`\`\`"
     echo "${SUMMARY}"
 
     # Output the github action summary.
