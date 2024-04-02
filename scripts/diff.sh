@@ -13,9 +13,10 @@ RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
 retVal=$?
 if [ $retVal -eq 1 ]; then
     SUMMARY="\`\`\`diff"'\n'"${RESULT}""\`\`\`"
+    echo "${SUMMARY}"
 
     # Output the github action summary.
-    echo "${RESULT}" >> $GITHUB_STEP_SUMMARY
+    echo ${SUMMARY} >> $GITHUB_STEP_SUMMARY
     exit 0;
 fi
 
