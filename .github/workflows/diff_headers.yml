@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Update headers
+      - name: Diff headers
         run: |
           bash scripts/diff.sh ${{ inputs.base-version }} ${{ inputs.target-version }}
         shell: bash

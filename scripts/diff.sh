@@ -12,7 +12,7 @@ RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
 
 retVal=$?
 if [ $retVal -eq 1 ]; then
-    SUMMARY="\`\`\`diff""\n""${RESULT}""\n""\`\`\`"
+    SUMMARY="\`\`\`diff"'\n'"${RESULT}"'\n'"\`\`\`"
 
     # Output the github action summary.
     echo "${SUMMARY}" >> $GITHUB_STEP_SUMMARY
@@ -20,6 +20,3 @@ if [ $retVal -eq 1 ]; then
 fi
 
 echo "No diff found between ${BASE} and ${TARGET} headers." >> $GITHUB_STEP_SUMMARY
-
-# diff -u -b -r ${BASE_PATH} ${TARGET_PATH}
-
