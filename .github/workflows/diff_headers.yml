@@ -1,6 +1,7 @@
 name: Diff headers
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       base-version:
