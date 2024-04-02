@@ -8,7 +8,9 @@ TARGET=$2
 BASE_PATH=headers/${BASE}/include
 TARGET_PATH=headers/${TARGET}/include
 
-RESULT=$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})
+# RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
+
+diff -u -b -r ${BASE_PATH} ${TARGET_PATH} > diff.txt
 
 # SUMMARY="\`\`\`diff""\n""${RESULT}""\n""\`\`\`"
 
