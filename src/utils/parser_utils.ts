@@ -13,13 +13,14 @@ import { BaseParserArgs } from '../parsers';
 
 export const generateNodes = (
   parseConfig: TerraContext,
-  cxxParserConfigs: CXXParserConfigs
+  cxxParserConfigs: CXXParserConfigs,
+  buildDirNamePrefix: string = 'addnode'
 ): ParseResult | undefined => {
   return CXXParser(
     parseConfig,
     {
       ...cxxParserConfigs,
-      buildDirNamePrefix: 'addnode',
+      buildDirNamePrefix: buildDirNamePrefix,
     } as CXXParserConfigs,
     undefined
   );
@@ -51,6 +52,7 @@ export enum CommentConfigKey {
   SOURCE = 'source',
   ACTION = 'action',
   IRIS_API_ID = 'iris_api_id',
+  GENERATE_IRIS_API_ID = 'generate_iris_api_id',
 }
 
 export enum CommentAction {
