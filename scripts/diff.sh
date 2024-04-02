@@ -15,7 +15,7 @@ if [ $retVal -eq 1 ]; then
     SUMMARY="\`\`\`diff"'\n'"${RESULT}""\`\`\`"
 
     # Output the github action summary.
-    echo "${SUMMARY}" >> $GITHUB_STEP_SUMMARY
+    echo "${RESULT}" >> $GITHUB_STEP_SUMMARY
     exit 0;
 fi
 
