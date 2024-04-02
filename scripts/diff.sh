@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+# set -e
 set -x
 
 BASE=$1
@@ -8,9 +8,16 @@ TARGET=$2
 BASE_PATH=headers/${BASE}/include
 TARGET_PATH=headers/${TARGET}/include
 
-# RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
+RESULT="$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})"
 
-diff -u -b -r ${BASE_PATH} ${TARGET_PATH}
+retVal=$?
+if [ $retVal -eq 1 ]; then
+    echo "${RESULT}"
+fi
+
+echo "${RESULT}"
+
+# diff -u -b -r ${BASE_PATH} ${TARGET_PATH}
 
 # SUMMARY="\`\`\`diff""\n""${RESULT}""\n""\`\`\`"
 
