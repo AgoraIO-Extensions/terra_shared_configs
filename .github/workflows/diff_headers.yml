@@ -27,7 +27,7 @@ jobs:
       - name: Notification
         run: |
           URL=https://github.com/AgoraIO-Extensions/terra_shared_configs/actions/runs/${{ github.run_id }}
-          MESSAGE="### Diff headers between ${{ inputs.base-version }} and ${{ inputs.target-version }}:\n[](${URL})"
+          MESSAGE="### Diff headers between ${{ inputs.base-version }} and ${{ inputs.target-version }}:\n[${URL}](${URL})"
 
           curl ${DIFF_BOT_NOTIFICATION_URL} \
             -H 'Content-Type: application/json' \
