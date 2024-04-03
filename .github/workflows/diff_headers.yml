@@ -33,8 +33,8 @@ jobs:
             -H 'Content-Type: application/json' \
             -d "
             {
-                  \"msgtype\": \"text\",
-                  \"text\": {
+                  \"msgtype\": \"markdown\",
+                  \"markdown\": {
                       \"content\": \"${MESSAGE}\"
                   }
             }"
