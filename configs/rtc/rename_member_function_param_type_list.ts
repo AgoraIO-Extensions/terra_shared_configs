@@ -565,4 +565,12 @@ module.exports = {
     is_const: true,
     is_builtin_type: false,
   },
+  'agora::rtc::IRtcEngine.queryCameraFocalLengthCapability.focalLengthInfos@type':
+    {
+      name: 'agora::rtc::FocalLengthInfo',
+      source: 'agora::rtc::FocalLengthInfo*',
+      kind: SimpleTypeKind.array_t,
+      is_const: false,
+      is_builtin_type: false,
+    },
 };
