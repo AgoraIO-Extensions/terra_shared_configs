@@ -619,7 +619,7 @@ class IRtmEventHandler {
    * @param users The subscribed user list.
    * @param errorCode The error code.
    */
-  virtual void onGetSubscribedUserListResult(const uint64_t requestId, const char* channelName, const char* topic, UserList* users, RTM_ERROR_CODE errorCode) {
+  virtual void onGetSubscribedUserListResult(const uint64_t requestId, const char* channelName, const char* topic, UserList users, RTM_ERROR_CODE errorCode) {
     (void)requestId;
     (void)channelName;
     (void)topic;
