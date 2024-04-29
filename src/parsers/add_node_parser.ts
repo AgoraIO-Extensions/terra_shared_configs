@@ -73,20 +73,29 @@ export const AddNodeParser = (
         let configs: CommentConfig[] = getConfigsFromComments(customMethod);
         let foundMethodIndex = -1;
         let irisApiIdValue = '';
-        for (let config of configs) {
-          switch (config.key) {
-            case CommentConfigKey.SOURCE:
-              // find method which has same name
-              foundMethodIndex = foundClass.methods.findIndex(
-                (it) => it.name === customMethod.name
-              );
-              break;
-            case CommentConfigKey.IRIS_API_ID:
-              // get iris api id from comment key IRIS_API_ID
-              irisApiIdValue = config.value;
-              break;
+        if (configs.length > 0) {
+          for (let config of configs) {
+            switch (config.key) {
+              case CommentConfigKey.SOURCE:
+                // find method which has same name
+                foundMethodIndex = foundClass.methods.findIndex(
+                  (it) => it.name === customMethod.name
+                );
+                break;
+              case CommentConfigKey.IRIS_API_ID:
+                // get iris api id from comment key IRIS_API_ID
+                irisApiIdValue = config.value;
+                break;
+            }
           }
+        } else {
+          // Compatible for the old custom header files, that do not have the comment configs
+          foundMethodIndex = foundClass.methods.findIndex(
+            (it) => it.name === customMethod.name
+          );
+          irisApiIdValue = `${(customNode as Clazz).name}_${customMethod.name}`;
         }
+
         if (foundMethodIndex == -1) {
           // mark method as custom
           // iris use nativeSDK origin cpp api signature, so we need call applyIrisApiId to add iris api id by foundClass.methods[foundMethodIndex]

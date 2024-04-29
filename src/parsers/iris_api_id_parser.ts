@@ -10,7 +10,7 @@ import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 import { irisApiId } from '../utils/iris_utils';
 
 export interface IrisApiIdParserArgs {
-  configPath: string;
+  trim_params_hash?: boolean;
 }
 
 export interface IrisApiIdParserUserData {
@@ -28,7 +28,7 @@ export function IrisApiIdParser(
       if (node.__TYPE == CXXTYPE.Clazz) {
         let clazz = node as Clazz;
         clazz.methods.forEach((method) => {
-          applyIrisApiId(clazz, method);
+          applyIrisApiId(clazz, method, args.trim_params_hash ?? false);
         });
       }
     });
@@ -37,7 +37,12 @@ export function IrisApiIdParser(
   return preParseResult;
 }
 
-export function applyIrisApiId(clazz: Clazz, method: MemberFunction) {
+export function applyIrisApiId(
+  clazz: Clazz,
+  method: MemberFunction,
+  trimParamsHash: boolean = false
+) {
+  let withParamsHash = !trimParamsHash;
   method.user_data ??= {};
   (method.user_data as IrisApiIdParserUserData).IrisApiIdParser = {
     key: irisApiId(clazz, method, {
@@ -46,6 +51,7 @@ export function applyIrisApiId(clazz: Clazz, method: MemberFunction) {
     }),
     value: irisApiId(clazz, method, {
       toUpperCase: false,
+      withParamsHash: withParamsHash,
     }),
   };
 }

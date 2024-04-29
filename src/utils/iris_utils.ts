@@ -21,6 +21,7 @@ export function irisApiId(
   options?: {
     withClassName?: boolean;
     withFuncName?: boolean;
+    withParamsHash?: boolean; // default is true
     toUpperCase?: boolean;
     trimPrefix?: string; // default is "I"
   }
@@ -40,6 +41,7 @@ export function irisApiId(
   let toUpperCase = options?.toUpperCase ?? true;
   let withClassName = options?.withClassName ?? true;
   let withFuncName = options?.withFuncName ?? true;
+  let withParamsHash = options?.withParamsHash ?? true;
   let trimPrefix = options?.trimPrefix ?? 'I';
 
   let cn = clazz.name.trimNamespace();
@@ -71,7 +73,7 @@ export function irisApiId(
     .join(seperator);
 
   let apiType = ps;
-  let hc = apiType.length > 0 ? _stringHashCode(apiType) : '';
+  let hc = apiType.length > 0 && withParamsHash ? _stringHashCode(apiType) : '';
 
   if (hc.length && (withClassName || withFuncName)) {
     output = `${output}${shortSeperator}${hc}`;

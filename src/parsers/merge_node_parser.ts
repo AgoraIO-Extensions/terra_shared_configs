@@ -1,13 +1,25 @@
-import { CXXFile, CXXTerraNode } from '@agoraio-extensions/cxx-parser';
+import {
+  CXXFile,
+  CXXTerraNode,
+  MemberFunction,
+} from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
 import { MergeNodeConfig } from '../../configs/rtc/merge_node_list';
 
 import { getConfigs } from '../utils/parser_utils';
 
-import { BaseParserArgs, adjustIrisApiIdKeyIfNeeded, adjustIrisApiIdValueIfNeeded, applyIrisApiId } from './index';
+import {
+  BaseParserArgs,
+  adjustIrisApiIdKeyIfNeeded,
+  adjustIrisApiIdValueIfNeeded,
+} from './index';
 
 const defaultConfig = require('../../configs/rtc/merge_node_list.ts');
+
+export interface MergeNodeParserUserData {
+  sourceClazzName: string;
+}
 
 export function MergeNodeParser(
   terraContext: TerraContext,
@@ -75,8 +87,19 @@ export function MergeNodeParser(
                 targetClazz!.asClazz().methods[tar_index].parent_name =
                   tarMethodParentName;
 
-                adjustIrisApiIdKeyIfNeeded(targetClazz!.asClazz(), targetClazz!.asClazz().methods[tar_index]);
-                adjustIrisApiIdValueIfNeeded(targetClazz!.asClazz(), targetClazz!.asClazz().methods[tar_index]);
+                adjustIrisApiIdKeyIfNeeded(
+                  targetClazz!.asClazz(),
+                  targetClazz!.asClazz().methods[tar_index]
+                );
+                adjustIrisApiIdValueIfNeeded(
+                  targetClazz!.asClazz(),
+                  targetClazz!.asClazz().methods[tar_index]
+                );
+
+                applyMergeNodeParserUserData(
+                  targetClazz!.asClazz().methods[tar_index],
+                  sourceClazz!.asClazz().name
+                );
                 break;
               }
             }
@@ -94,9 +117,31 @@ export function MergeNodeParser(
 
             return it;
           });
+
+          sourceClazz!.asClazz().methods.forEach((method) => {
+            applyMergeNodeParserUserData(method, sourceClazz!.asClazz().name);
+          });
         }
       }
     }
   }
   return preParseResult;
+}
+
+function applyMergeNodeParserUserData(
+  method: MemberFunction,
+  sourceClazzName: string
+) {
+  method.user_data ??= {};
+  method.user_data['MergeNodeParser'] = {
+    sourceClazzName: sourceClazzName,
+  } as MergeNodeParserUserData;
+}
+
+export function getMergeNodeParserUserData(
+  node: CXXTerraNode
+): MergeNodeParserUserData | undefined {
+  return node.user_data?.['MergeNodeParser'] as
+    | MergeNodeParserUserData
+    | undefined;
 }

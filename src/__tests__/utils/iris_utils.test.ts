@@ -311,4 +311,32 @@ describe('irisApiId', () => {
 
     expect(apiType).toBe('MyClass_MyFunc_56658dc');
   });
+
+  it('api id withParamsHash false', () => {
+    let myClass = { name: 'MyClass' } as Clazz;
+    let mf = {
+      name: 'MyFunc',
+      parameters: [
+        {
+          type: {
+            source: 'const char *',
+          },
+        } as Variable,
+      ],
+    } as MemberFunction;
+
+    let parseResult = new ParseResult();
+    parseResult.nodes = [
+      {
+        nodes: [myClass],
+      },
+    ];
+
+    let apiType = irisApiId(myClass, mf, {
+      toUpperCase: false,
+      withParamsHash: false,
+    });
+
+    expect(apiType).toBe('MyClass_MyFunc');
+  });
 });

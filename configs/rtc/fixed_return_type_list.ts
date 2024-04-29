@@ -232,4 +232,18 @@ module.exports = {
     is_const: false,
     is_builtin_type: true,
   },
+  'agora::rtc::IBaseSpatialAudioEngine.updateSelfPosition': {
+    name: 'void',
+    source: 'void',
+    kind: SimpleTypeKind.value_t,
+    is_const: false,
+    is_builtin_type: true,
+  },
+  'agora::rtc::IBaseSpatialAudioEngine.updateSelfPositionEx': {
+    name: 'void',
+    source: 'void',
+    kind: SimpleTypeKind.value_t,
+    is_const: false,
+    is_builtin_type: true,
+  },
 };
