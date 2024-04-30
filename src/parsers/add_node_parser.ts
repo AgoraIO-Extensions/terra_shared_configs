@@ -93,7 +93,9 @@ export const AddNodeParser = (
           foundMethodIndex = foundClass.methods.findIndex(
             (it) => it.name === customMethod.name
           );
-          irisApiIdValue = `${(customNode as Clazz).name}_${customMethod.name}`;
+          irisApiIdValue = `${(customNode as Clazz).name.replace('I', '')}_${
+            customMethod.name
+          }`;
         }
 
         if (foundMethodIndex == -1) {
