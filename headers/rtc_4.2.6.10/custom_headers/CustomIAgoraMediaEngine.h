@@ -23,6 +23,10 @@ class IMediaEngine {
   virtual int
   unregisterVideoEncodedFrameObserver(IVideoEncodedFrameObserver *observer) = 0;
 
+  // add for registerFaceInfoObserver
+  // virtual int registerFaceInfoObserver(IFaceInfoObserver* observer) = 0;
+  virtual int unregisterFaceInfoObserver(IFaceInfoObserver* observer) = 0;
+
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
