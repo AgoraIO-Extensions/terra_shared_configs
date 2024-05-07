@@ -1172,9 +1172,8 @@ enum VIDEO_CODEC_TYPE {
    */
   VIDEO_CODEC_GENERIC_H264 = 7,
   /**
-   * 12: AV1.
-   * @technical preview
-   */
+    * 12: AV1.
+    */
   VIDEO_CODEC_AV1 = 12,
   /**
    * 13: VP9.
@@ -1201,7 +1200,7 @@ enum CAMERA_FOCAL_LENGTH_TYPE {
   /**
    * Lens with focal length of less than 24mm.
    */
-  CAMERA_FOCAL_LENGTH_ULTRA_WIDE = 2,
+  CAMERA_FOCAL_LENGTH_URLTRA_WIDE = 2,
   /**
    * Telephoto lens.
    */
