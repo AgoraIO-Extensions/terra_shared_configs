@@ -9,6 +9,10 @@ on:
         description: 'URL of the native headers'
         type: 'string'
         required: true
+      version:
+        description: 'native headers version'
+        type: 'string'
+        required: false
 
 jobs:
   update-headers:
@@ -20,7 +24,7 @@ jobs:
 
       - name: Update headers
         run: |
-          sh scripts/update_headers.sh ${{ inputs.url }}
+          sh scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }}
         shell: bash
 
       - name: Create pull request
