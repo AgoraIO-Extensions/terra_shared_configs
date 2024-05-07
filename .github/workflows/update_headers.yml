@@ -24,7 +24,7 @@ jobs:
 
       - name: Update headers
         run: |
-          scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }}
+          bash scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }}
         shell: bash
 
       - name: Create pull request
