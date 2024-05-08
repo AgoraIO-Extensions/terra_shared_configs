@@ -19,16 +19,17 @@ export interface IrisApiIdParserUserData {
 
 export function IrisApiIdParser(
   terraContext: TerraContext,
-  args: IrisApiIdParserArgs,
+  args?: IrisApiIdParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
+  let trim_params_hash = args?.trim_params_hash ?? false;
   let cxxFiles = preParseResult?.nodes as CXXFile[];
   cxxFiles?.forEach((cxxFile: CXXFile) => {
     cxxFile.nodes.forEach((node) => {
       if (node.__TYPE == CXXTYPE.Clazz) {
         let clazz = node as Clazz;
         clazz.methods.forEach((method) => {
-          applyIrisApiId(clazz, method, args.trim_params_hash ?? false);
+          applyIrisApiId(clazz, method, trim_params_hash);
         });
       }
     });
