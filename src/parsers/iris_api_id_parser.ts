@@ -19,7 +19,7 @@ export interface IrisApiIdParserUserData {
 
 export function IrisApiIdParser(
   terraContext: TerraContext,
-  args: IrisApiIdParserArgs,
+  args?: IrisApiIdParserArgs,
   preParseResult?: ParseResult
 ): ParseResult | undefined {
   let trim_params_hash = args?.trim_params_hash ?? false;
