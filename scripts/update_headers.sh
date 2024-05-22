@@ -29,16 +29,20 @@ latest_version="${version%.*}"
 # Construct the target directory path
 destination=${PROJECT_ROOT}"/headers/${type}_${version}"
 
-# If the target directory does not exist, copy the most similar folder and rename it
-if [ ! -d "$destination" ]; then
-    # Find the last folder
-    last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_${latest_version}* | sort -V | tail -n 1)
+# If the target directory already exists, output a message
+if [ -d "$destination" ]; then
+    echo "The directory $destination already exists. no need to copy."
+else
+    # Check if third argument is provided, if so, use it as version
+    if [ "$#" -ge 3 ]; then
+        last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_$3)
+    else
+        # Find the last folder
+        last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_${latest_version}* | sort -V | tail -n 1)
+    fi
     # Copy the last folder and rename it
     echo "Copying $last_folder to $destination"
     cp -r "$last_folder" "$destination"
-else
-    # If the target directory already exists, output a message
-    echo "The directory $destination already exists. no need to copy."
 fi
 
 # Remove the include directory
