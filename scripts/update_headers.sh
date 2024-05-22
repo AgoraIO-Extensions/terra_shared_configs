@@ -50,8 +50,7 @@ rm -rf "$destination/include"
 
 # Download the file with a temporary filename
 temp_file="${destination}/temp_file.zip"
-# curl -L -o "$temp_file" "$url"
-curl -L -w "%{stdout}" -o "$temp_file" "$url"
+curl -L -o "$temp_file" "$url"
 
 # Unzip the file
 unzip -o "$temp_file" -d "$destination" > /dev/null
