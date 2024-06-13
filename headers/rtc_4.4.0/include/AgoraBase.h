@@ -1207,7 +1207,7 @@ enum CAMERA_FOCAL_LENGTH_TYPE {
   /**
    * Lens with focal length of less than 24mm.
    */
-  CAMERA_FOCAL_LENGTH_URLTRA_WIDE = 2,
+  CAMERA_FOCAL_LENGTH_ULTRA_WIDE = 2,
   /**
    * Telephoto lens.
    */
@@ -3033,7 +3033,7 @@ enum LOCAL_VIDEO_STREAM_REASON {
   /** 29: The screen capture is resumed. */
   LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_RESUMED = 29,
   /** 30: The shared display has been disconnected */
-  LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_DISPLAY_DISCNNECTED = 30,
+  LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_DISPLAY_DISCONNECTED = 30,
 
 };
 
