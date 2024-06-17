@@ -105,8 +105,7 @@ describe('IrisDocRenderer', () => {
     ].join(' && ');
     // - 1 time for git clone
     // - 1 time for dart format
-    // - 1 time for python install requirements.txt
-    // - 1 time for iris-doc.py
+    // - 1 time for python install requirements.txt && run iris-doc.py
     expect(execSync).toHaveBeenCalledTimes(3);
     expect(execSync).toHaveBeenNthCalledWith(3, irisDocCommand, {
       encoding: 'utf8',
