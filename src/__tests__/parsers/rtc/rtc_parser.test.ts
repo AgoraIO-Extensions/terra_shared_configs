@@ -23,6 +23,7 @@ describe('ReturnTypeParser', () => {
       parseFiles: {
         exclude: [
           '@agoraio-extensions/terra_shared_configs:headers/rtc_1.1.1/include/time_utils.h',
+          '@agoraio-extensions/terra_shared_configs:headers/rtc_1.1.1/include/rte_*.h',
           '@agoraio-extensions/terra_shared_configs:headers/rtc_1.1.1/include/IAgoraMediaComponentFactory.h',
         ],
         include: [
