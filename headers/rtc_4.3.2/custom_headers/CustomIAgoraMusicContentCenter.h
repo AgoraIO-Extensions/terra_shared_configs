@@ -12,6 +12,7 @@ class IMusicPlayer : public IMediaPlayer {
   /**
    * @iris_api_id: MusicPlayer_open_303b92e
    * @source: virtual int open(int64_t songCode, int64_t startPos = 0) = 0;
+   * @generate_iris_api_id: true
    */
   virtual int openWithSongCode(int64_t songCode, int64_t startPos = 0) = 0;
 

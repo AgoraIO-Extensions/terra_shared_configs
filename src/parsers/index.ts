@@ -9,6 +9,7 @@ export * from './merge_node_parser';
 export * from './pointer_marker_parser';
 export * from './iris_api_id_parser';
 export * from './cud_node_parser';
+export * from './override_node_parser';
 // TS's parsers
 export * from './ts/ts_comment_parser';
 export * from './rtc_parser';

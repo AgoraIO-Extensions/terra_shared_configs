@@ -6,11 +6,13 @@
 
 namespace agora {
 namespace rtc {
-namespace ext {
 
+// Put this class to the agora::rtc namespaces to avoid unecessary namespace trimming(trim the `ext` namespace).
 class IMediaPlayerVideoFrameObserver {
   virtual void onFrame(const agora::media::base::VideoFrame *frame) = 0;
 };
+
+namespace ext {
 
 class IMediaPlayer {
   // ----------------------------- 👇🏻overload API👇🏻 -----------------------------

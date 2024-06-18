@@ -19,10 +19,9 @@ class IRtcEngineEx {
 
   /**
    * @iris_api_id: RtcEngineEx_createDataStreamEx_9f641b6
-   * @source: virtual int createDataStreamEx(int* streamId, DataStreamConfig& config, const RtcConnection& connection) = 0;
+   * @source: virtual int createDataStreamEx(int* streamId, const DataStreamConfig& config, const RtcConnection& connection) = 0;
    */
-  virtual int createDataStreamEx(int *streamId, DataStreamConfig &config,
-                                 const RtcConnection &connection) = 0;
+  virtual int createDataStreamEx(int* streamId, const DataStreamConfig& config, const RtcConnection& connection) = 0;
 
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 };
