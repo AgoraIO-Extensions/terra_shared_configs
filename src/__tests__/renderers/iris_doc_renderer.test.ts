@@ -97,21 +97,17 @@ describe('IrisDocRenderer', () => {
 
     let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
     let fmtConfigPath = path.join(irisDocDir, 'fmt_config', 'fmt_dart.yaml');
-    let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=https://exampe.com`;
+    let irisDocCommand = [
+      `python3 -m venv ${path.join(irisDocDir, 'venv')}`,
+      `source ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`,
+      `python3 -m pip install -r ${path.join(irisDocDir, 'requirements.txt')}`,
+      `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=https://exampe.com`,
+    ].join(' && ');
     // - 1 time for git clone
     // - 1 time for dart format
-    // - 1 time for python install requirements.txt
-    // - 1 time for iris-doc.py
-    expect(execSync).toBeCalledTimes(4);
-    expect(execSync).toHaveBeenNthCalledWith(
-      3,
-      `python3 -m pip install -r ${path.join(irisDocDir, 'requirements.txt')}`,
-      {
-        encoding: 'utf8',
-        stdio: 'inherit',
-      }
-    );
-    expect(execSync).toHaveBeenNthCalledWith(4, irisDocCommand, {
+    // - 1 time for python install requirements.txt && run iris-doc.py
+    expect(execSync).toHaveBeenCalledTimes(3);
+    expect(execSync).toHaveBeenNthCalledWith(3, irisDocCommand, {
       encoding: 'utf8',
       stdio: 'inherit',
     });

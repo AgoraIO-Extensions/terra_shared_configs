@@ -55,17 +55,15 @@ function irisDocScript(
   }
 
   let requirementsPath = path.join(irisDocDir, 'requirements.txt');
-  let installRequirements = `python3 -m pip install -r ${requirementsPath}`;
-  const installRequirementsOut = execSync(installRequirements, {
-    encoding: 'utf8',
-    stdio: 'inherit',
-  });
-  console.log(installRequirementsOut);
-
   let fmtConfigPath = path.join(irisDocDir, 'fmt_config', fmtConfig);
-
   let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
-  let irisDocCommand = `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`;
+
+  let irisDocCommand = [
+    `python3 -m venv ${path.join(irisDocDir, 'venv')}`,
+    `source ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`,
+    `python3 -m pip install -r ${requirementsPath}`,
+    `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`,
+  ].join(' && ');
 
   execSync(irisDocCommand, { encoding: 'utf8', stdio: 'inherit' });
 }
