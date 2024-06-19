@@ -39,7 +39,7 @@ jobs:
           target-branch: ${{ github.ref_name }}
           target-branch-name-surffix: headers-update
           pull-request-title: |
-            [AUTO] Update native headers
+            [AUTO] Update native headers to ${{ inputs.version }}
           pull-request-body: |
             native headers source:
             ${{ inputs.url }}
