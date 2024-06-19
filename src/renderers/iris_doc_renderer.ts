@@ -2,6 +2,7 @@ import { strict as assert } from 'assert';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import path from 'path';
+import * as os from 'os';
 
 import {
   ParseResult,
@@ -58,9 +59,14 @@ function irisDocScript(
   let fmtConfigPath = path.join(irisDocDir, 'fmt_config', fmtConfig);
   let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
 
+  const isMacOS = os.platform() === 'darwin';
+  const activateCommand = isMacOS
+    ? `source ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`
+    : `. ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`;
+
   let irisDocCommand = [
     `python3 -m venv ${path.join(irisDocDir, 'venv')}`,
-    `source ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`,
+    activateCommand,
     `python3 -m pip install -r ${requirementsPath}`,
     `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=${language} --export-file-path=${exportFilePath} --template-url=${templateUrl}`,
   ].join(' && ');

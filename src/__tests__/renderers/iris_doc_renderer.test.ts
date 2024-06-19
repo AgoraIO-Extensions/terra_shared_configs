@@ -11,6 +11,13 @@ import {
 } from '../../renderers/iris_doc_renderer';
 
 jest.mock('child_process');
+jest.mock('os', () => {
+  const originalOs = jest.requireActual('os');
+  return {
+    ...originalOs,
+    platform: jest.fn(),
+  };
+});
 
 describe('IrisDocRenderer', () => {
   let tmpDir: string = '';
@@ -24,6 +31,8 @@ describe('IrisDocRenderer', () => {
 
     irisDocDir = path.join(tmpDir, 'iris_doc');
     exportFilePath = path.join(tmpDir, 'export_file.dart');
+
+    (os.platform as jest.Mock).mockReturnValue('darwin');
   });
 
   afterEach(() => {
@@ -100,6 +109,42 @@ describe('IrisDocRenderer', () => {
     let irisDocCommand = [
       `python3 -m venv ${path.join(irisDocDir, 'venv')}`,
       `source ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`,
+      `python3 -m pip install -r ${path.join(irisDocDir, 'requirements.txt')}`,
+      `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=https://exampe.com`,
+    ].join(' && ');
+    // - 1 time for git clone
+    // - 1 time for dart format
+    // - 1 time for python install requirements.txt && run iris-doc.py
+    expect(execSync).toHaveBeenCalledTimes(3);
+    expect(execSync).toHaveBeenNthCalledWith(3, irisDocCommand, {
+      encoding: 'utf8',
+      stdio: 'inherit',
+    });
+  });
+
+  it('can run the command of iris-doc.py on linux', () => {
+    (os.platform as jest.Mock).mockReturnValue('linux');
+
+    (execSync as jest.Mock).mockImplementation(() => {
+      return '';
+    });
+
+    IrisDocRenderer(
+      new TerraContext(tmpDir, '', '', true, false),
+      {
+        language: 'dart',
+        fmtConfig: 'fmt_dart.yaml',
+        exportFilePath: exportFilePath,
+        templateUrl: 'https://exampe.com',
+      },
+      undefined
+    );
+
+    let irisDocScriptPath = path.join(irisDocDir, 'iris_doc.py');
+    let fmtConfigPath = path.join(irisDocDir, 'fmt_config', 'fmt_dart.yaml');
+    let irisDocCommand = [
+      `python3 -m venv ${path.join(irisDocDir, 'venv')}`,
+      `. ${path.join(irisDocDir, 'venv', 'bin', 'activate')}`,
       `python3 -m pip install -r ${path.join(irisDocDir, 'requirements.txt')}`,
       `python3 ${irisDocScriptPath} --config=${fmtConfigPath} --language=dart --export-file-path=${exportFilePath} --template-url=https://exampe.com`,
     ].join(' && ');
