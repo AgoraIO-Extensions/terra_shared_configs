@@ -12,14 +12,14 @@ import { generateNodes } from '../utils/parser_utils';
 import * as Parsers from './index';
 
 import {
-  AddNodeParserArgs,
   FixEnumConstantParserArgs,
+  OverrideNodeParserArgs,
   ReturnTypeParserArgs,
   UpdateSimpleTypeParserArgs,
 } from './index';
 
 export type RtcParserArgs = ReturnTypeParserArgs &
-  AddNodeParserArgs &
+  OverrideNodeParserArgs &
   FixEnumConstantParserArgs &
   UpdateSimpleTypeParserArgs & {
     sdkVersion: string;
@@ -77,8 +77,8 @@ export function RTCParser(
         terraContext,
         formatCXXParserConfig(parser.args, args)
       );
-    } else if (parser.name === 'AddNodeParser') {
-      preParseResult = Parsers.AddNodeParser(
+    } else if (parser.name === 'OverrideNodeParser') {
+      preParseResult = Parsers.OverrideNodeParser(
         terraContext,
         {
           customHeaderFileNamePrefix:
