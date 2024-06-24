@@ -58,7 +58,6 @@ module.exports = [
   'agora::rtc::IRtcEngineEventHandlerEx.onFirstLocalVideoFrame',
   'agora::rtc::IRtcEngineEventHandlerEx.onFirstLocalVideoFramePublished',
   'agora::rtc::IRtcEngineEventHandlerEx.onLocalVideoStateChanged',
-  'agora::rtc::IRtcEngineEventHandlerEx.onLocalVideoStats',
   'agora::rtc::IMediaPlayer.initialize',
   'agora::rtc::IMediaPlayer.openWithCustomSource',
   'agora::rtc::IMetadataObserver.getMaxMetadataSize',
