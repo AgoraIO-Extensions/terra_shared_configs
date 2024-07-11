@@ -37,7 +37,7 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           target-repo: ${{ github.workspace }}
           target-branch: ${{ github.ref_name }}
-          target-branch-name-surffix: headers-update-${{ inputs.version }}
+          target-branch-name-surffix: headers-update
           pull-request-title: |
             [AUTO] Update native headers to ${{ inputs.version }}
           pull-request-body: |
