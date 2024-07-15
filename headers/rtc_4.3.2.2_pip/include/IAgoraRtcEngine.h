@@ -4136,7 +4136,7 @@ class IRtcEngine : public agora::base::IEngineBase {
 
 #if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
   virtual bool isPipSupported() = 0;
-  virtual int setupPip(const PipOptions&) = 0;
+  virtual int setupPip(const PipOptions& options) = 0;
   virtual int startPip() = 0;
 #if defined(__APPLE__) && TARGET_OS_IOS
   virtual int stopPip() = 0;
