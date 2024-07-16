@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AgoraBase.h"
+#include "AgoraMediaBase.h"
 #include "IAgoraMediaEngine.h"
 #include "IAgoraMediaRecorder.h"
 #include "IAgoraMusicContentCenter.h"
@@ -318,6 +319,18 @@ class IRtcEngine {
    * @source: virtual int preloadChannel(const char* token, const char* channelId, const char* userAccount) = 0;
    */
   virtual int preloadChannelWithUserAccount(const char* token, const char* channelId, const char* userAccount) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_takeSnapshot_1922dd1
+   * @source: virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
+   */
+  virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_takeSnapshot_5669ea6
+   * @source: virtual int takeSnapshot(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
+   */
+  virtual int takeSnapshotWithConfig(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
 };
 
 } // namespace ext
