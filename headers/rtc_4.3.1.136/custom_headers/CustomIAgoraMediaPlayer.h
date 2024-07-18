@@ -28,6 +28,18 @@ class IMediaPlayer {
   virtual int setPlayerOptionInString(const char *key, const char *value) = 0;
 
   /**
+   * @iris_api_id: MediaPlayer_getPlayerOption_ae3d0cf
+   * @source: virtual int getPlayerOption(const char* key, int& value) = 0;
+   */
+  virtual int getPlayerOptionInInt(const char *key, int &value) = 0;
+
+  /**
+   * @iris_api_id: MediaPlayer_getPlayerOption_f15226a
+   * @source: virtual int getPlayerOption(const char* key, agora::util::AString& value) = 0;
+   */
+  virtual int getPlayerOptionInString(const char *key, agora::util::AString &value) = 0;
+
+  /**
    * @iris_api_id: MediaPlayer_registerAudioFrameObserver_a5b510b
    * @source: virtual int registerAudioFrameObserver(media::IAudioPcmFrameSink* observer, RAW_AUDIO_FRAME_OP_MODE_TYPE mode) = 0;
    */
