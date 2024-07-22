@@ -217,6 +217,18 @@ class IRtcEngine {
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
 
   /**
+   * @iris_api_id: RtcEngine_getUserInfoByUid_0a0b913
+   * @source: virtual int getUserInfoByUid(const char* channelId, uid_t uid, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUidWithChannelId(const char *channelId, uid_t uid, rtc::UserInfo *userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_86c855f
+   * @source: virtual int getUserInfoByUserAccount(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUserAccountWithChannelId(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+  
+  /**
    * @iris_api_id: RtcEngine_startPreview
    * @source: virtual int startPreview() = 0;
    */
