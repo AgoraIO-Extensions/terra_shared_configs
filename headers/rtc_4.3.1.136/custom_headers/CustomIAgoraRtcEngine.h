@@ -213,10 +213,10 @@ class IRtcEngine {
   virtual void release(bool sync = false) = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getUserInfoByUid_0a0b913
-   * @source: virtual int stopScreenCapture() = 0;
+   * @iris_api_id: RtcEngine_getUserInfoByUid_6b7aee8
+   * @source: virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
    */
-  virtual int getUserInfoByUid(const char* channelId, uid_t uid, rtc::UserInfo* userInfo) = 0;
+  virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
 
   /**
    * @iris_api_id: RtcEngine_getUserInfoByUid_0a0b913
@@ -225,10 +225,10 @@ class IRtcEngine {
   virtual int getUserInfoByUidWithChannelId(const char *channelId, uid_t uid, rtc::UserInfo *userInfo) = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_86c855f
-   * @source: virtual int getUserInfoByUserAccount(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_c6a8f08
+   * @source: virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
    */
-  virtual int getUserInfoByUserAccount(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+  virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
 
   /**
    * @iris_api_id: RtcEngine_getUserInfoByUserAccount_86c855f
