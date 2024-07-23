@@ -78,6 +78,7 @@ module.exports = [
   'agora::media::IVideoFrameObserver.getObservedFramePosition',
   'agora::media::IVideoFrameObserver.isExternal',
   'agora::rtc::IMediaPlayer.setPlayerOption',
+  'agora::rtc::IMediaPlayer.getPlayerOption',
   'agora::rtc::IMusicPlayer.open',
   'agora::rtc::RtcEngineContext.context',
   'agora::rtc::RtcEngineContext.eventHandler',
