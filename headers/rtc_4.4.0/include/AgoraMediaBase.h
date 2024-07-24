@@ -820,14 +820,14 @@ struct ExternalVideoFrame {
         eglContext(NULL),
         eglType(EGL_CONTEXT10),
         textureId(0),
-        fence_object(0),
-        metadata_buffer(NULL),
-        metadata_size(0),
+        fenceObject(0),
+        metadataBuffer(NULL),
+        metadataSize(0),
         alphaBuffer(NULL),
         fillAlphaBuffer(false),
         alphaStitchMode(NO_ALPHA_STITCH),
-        d3d11_texture_2d(NULL),
-        texture_slice_index(0){}
+        d3d11Texture2d(NULL),
+        textureSliceIndex(0){}
 
    /**
    * The EGL context type.
@@ -933,7 +933,7 @@ struct ExternalVideoFrame {
    * [Texture related parameter] The fence object related to the textureId parameter, indicating the synchronization status of the video data in Texture format.
    * The default value is 0
    */
-  long long fence_object; 
+  long long fenceObject; 
   /**
    * [Texture related parameter] Incoming 4 &times; 4 transformational matrix. The typical value is a unit matrix.
    */
@@ -942,12 +942,12 @@ struct ExternalVideoFrame {
    * [Texture related parameter] The MetaData buffer.
    *  The default value is NULL
    */
-  uint8_t* metadata_buffer;
+  uint8_t* metadataBuffer;
   /**
    * [Texture related parameter] The MetaData size.
    *  The default value is 0
    */
-  int metadata_size;
+  int metadataSize;
   /**
    *  Indicates the alpha channel of current frame, which is consistent with the dimension of the video frame.
    *  The value range of each pixel is [0,255], where 0 represents the background; 255 represents the foreground.
@@ -973,12 +973,12 @@ struct ExternalVideoFrame {
   /**
    * [For Windows only] The pointer of ID3D11Texture2D used by the video frame.
    */
-  void *d3d11_texture_2d;
+  void *d3d11Texture2d;
 
   /**
    * [For Windows only] The index of ID3D11Texture2D array used by the video frame.
    */
-  int texture_slice_index;
+  int textureSliceIndex;
 
   /**
    * metadata info used for hdr video data
