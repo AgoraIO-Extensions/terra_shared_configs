@@ -8355,11 +8355,6 @@ enum MEDIA_DEVICE_STATE_TYPE {
   /** 2: The device is disabled.
    */
   MEDIA_DEVICE_STATE_DISABLED = 2,
-  
-  /** 3: The device is plugged in.
-   */
-  MEDIA_DEVICE_STATE_PLUGGED_IN = 3,
-  
   /** 4: The device is not present.
    */
   MEDIA_DEVICE_STATE_NOT_PRESENT = 4,
