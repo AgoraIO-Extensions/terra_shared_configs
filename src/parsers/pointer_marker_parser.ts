@@ -70,13 +70,13 @@ export type PointerMarkerParserConfig = {
 };
 
 /**
- * Gets the pointer array name mapping for a given pointer name and Struct.
- * @param ptrName The pointer name.
+ * Gets the pointer array name mapping for a given pointer name or length name and Struct.
+ * @param ptrNameOrLengthName The pointer name or length name.
  * @param node The CXXTerraNode.
  * @returns The pointer array name mapping or undefined.
  */
 export function getPointerArrayNameMapping(
-  ptrName: string,
+  ptrNameOrLengthName: string,
   node: CXXTerraNode
 ): readonly [string, string] | undefined {
   if (!node.user_data) {
@@ -90,7 +90,7 @@ export function getPointerArrayNameMapping(
 
   let pointerArrayNameMappings =
     parserData.pointerArrayNameMappings as PointerArrayNameMapping[];
-  let mapping = pointerArrayNameMappings.find((v) => v.ptrName === ptrName);
+  let mapping = pointerArrayNameMappings.find((v) => v.ptrName === ptrNameOrLengthName || v.lengthName === ptrNameOrLengthName);
   if (!mapping) {
     return undefined;
   }
