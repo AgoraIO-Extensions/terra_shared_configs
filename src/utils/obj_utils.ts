@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /**
  * Checks if a property in an object is equal to a given value.
  * If the value is a string, it performs a regular expression test.
@@ -10,7 +12,7 @@ export function checkPropertyEq(obj: any, key: string, value: any): boolean {
   function _arraysAreIdentical(arr1: any, arr2: any) {
     if (arr1.length !== arr2.length) return false;
     for (var i = 0, len = arr1.length; i < len; i++) {
-      if (arr1[i] !== arr2[i]) {
+      if (!_.isEqual(arr1[i], arr2[i])) {
         return false;
       }
     }

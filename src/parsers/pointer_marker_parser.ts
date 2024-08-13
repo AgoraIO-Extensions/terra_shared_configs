@@ -136,18 +136,31 @@ export function PointerMarkerParser(
   parseResult.nodes.forEach((it) => {
     let cxxFile = it as CXXFile;
     cxxFile.nodes.forEach((node) => {
-      for (let marker of config.markers) {
-        let markerNode = marker.node;
-        if (checkObjInclude(node, markerNode)) {
-          node.user_data ??= {};
-          node.user_data!['PointerMarkerParser'] = {
-            pointerArrayNameMappings: marker.pointerArrayNameMappings ?? [],
-            pointerNames: marker.pointerNames ?? [],
-          };
-        }
+      applyPointerMarkerParserUserDataIfNeeded(config.markers, node);
+
+      if (node.isClazz()) {
+        node.asClazz().methods.forEach((method) => {
+          applyPointerMarkerParserUserDataIfNeeded(config.markers, method);
+        });
       }
     });
   });
 
   return parseResult;
+}
+
+function applyPointerMarkerParserUserDataIfNeeded(
+  markers: PointerMarkerParserConfigMarker[],
+  node: CXXTerraNode
+) {
+  for (let marker of markers) {
+    let markerNode = marker.node;
+    if (checkObjInclude(node, markerNode)) {
+      node.user_data ??= {};
+      node.user_data!['PointerMarkerParser'] = {
+        pointerArrayNameMappings: marker.pointerArrayNameMappings ?? [],
+        pointerNames: marker.pointerNames ?? [],
+      };
+    }
+  }
 }
