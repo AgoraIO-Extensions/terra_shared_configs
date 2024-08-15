@@ -7241,6 +7241,25 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure..
    */
   virtual int queryCameraFocalLengthCapability(agora::rtc::FocalLengthInfo* focalLengthInfos, int& size) = 0;
+
+#if defined(__ANDROID__)
+  /**
+   * Set screen sharing MediaProjection.
+   *
+   * When screen capture stopped, the SDK will automatically release the MediaProjection internally.
+   *
+   * @param mediaProjection MediaProjection is an Android class that provides access to screen capture and recording capabiliies.
+   *
+   * @note
+   * It is mainly used in some specific scenarios, such as iot custom devices, or child process screen sharing. 
+   * MediaProjection is not easily obtained or for other reasons.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setExternalMediaProjection(void* mediaProjection) = 0;
+#endif
 #endif
 
 #if defined(_WIN32) || defined(__APPLE__) || defined(__ANDROID__)
