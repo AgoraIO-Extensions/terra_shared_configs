@@ -2244,8 +2244,12 @@ struct PipOptions {
   int contentWidth;
   int contentHeight;
 #if defined(__APPLE__) && TARGET_OS_IOS
-  bool autoEnterPip;
+  void* associatedView = nullptr; // required
+  bool autoEnterPip = false;
+  uid_t uid = 0;
+  VIDEO_SOURCE_TYPE sourceType = VIDEO_SOURCE_TYPE::VIDEO_SOURCE_UNKNOWN;
 #endif
+  PipOptions(): contentSource(NULL), contentWidth(0), contentHeight(0) {}
 };
 
 /**

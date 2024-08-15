@@ -397,6 +397,9 @@ struct AudioPcmFrame {
   /** The channel number.
    */
   size_t num_channels_;
+  /**  The audio track number. if mpk enableMultiAudioTrack, audio frame will have audio track number, eg 0 or 1.
+   */
+  int audio_track_number_;
   /** The number of bytes per sample.
    */
   rtc::BYTES_PER_SAMPLE bytes_per_sample;
@@ -413,6 +416,7 @@ struct AudioPcmFrame {
     this->sample_rate_hz_ = src.sample_rate_hz_;
     this->bytes_per_sample = src.bytes_per_sample;
     this->num_channels_ = src.num_channels_;
+    this->audio_track_number_ = src.audio_track_number_;
 
     size_t length = src.samples_per_channel_ * src.num_channels_;
     if (length > kMaxDataSizeSamples) {
@@ -429,6 +433,7 @@ struct AudioPcmFrame {
         samples_per_channel_(0),
         sample_rate_hz_(0),
         num_channels_(0),
+        audio_track_number_(0),
         bytes_per_sample(rtc::TWO_BYTES_PER_SAMPLE) {
     memset(data_, 0, sizeof(data_));
   }
@@ -438,6 +443,7 @@ struct AudioPcmFrame {
         samples_per_channel_(src.samples_per_channel_),
         sample_rate_hz_(src.sample_rate_hz_),
         num_channels_(src.num_channels_),
+        audio_track_number_(src.audio_track_number_),
         bytes_per_sample(src.bytes_per_sample) {
     size_t length = src.samples_per_channel_ * src.num_channels_;
     if (length > kMaxDataSizeSamples) {
