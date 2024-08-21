@@ -2233,25 +2233,6 @@ struct WatermarkOptions {
       mode(FIT_MODE_COVER_POSITION) {}
 };
 
-enum PIP_STATE {
-  PIP_STATE_STARTED = 0,
-  PIP_STATE_STOPPED = 1,
-  PIP_STATE_FAILED = 2,
-};
-
-struct PipOptions {
-  void* contentSource;
-  int contentWidth;
-  int contentHeight;
-#if defined(__APPLE__) && TARGET_OS_IOS
-  void* associatedView = nullptr; // required
-  bool autoEnterPip = false;
-  uid_t uid = 0;
-  VIDEO_SOURCE_TYPE sourceType = VIDEO_SOURCE_TYPE::VIDEO_SOURCE_UNKNOWN;
-#endif
-  PipOptions(): contentSource(NULL), contentWidth(0), contentHeight(0) {}
-};
-
 /**
  * The definition of the RtcStats struct.
  */
@@ -4519,6 +4500,23 @@ struct VideoCanvas {
     : uid(u), subviewUid(subu), view(v), backgroundColor(0x00000000), renderMode(m), mirrorMode(mt), setupMode(VIDEO_VIEW_SETUP_REPLACE),
       sourceType(VIDEO_SOURCE_CAMERA_PRIMARY), mediaPlayerId(-ERR_NOT_READY),
       cropArea(0, 0, 0, 0), enableAlphaMask(false), position(media::base::POSITION_POST_CAPTURER) {}
+};
+
+enum PIP_STATE {
+  PIP_STATE_STARTED = 0,
+  PIP_STATE_STOPPED = 1,
+  PIP_STATE_FAILED = 2,
+};
+
+struct PipOptions {
+  void* contentSource;
+  int contentWidth;
+  int contentHeight;
+#if defined(__APPLE__) && TARGET_OS_IOS
+  bool autoEnterPip = false;
+  VideoCanvas canvas = VideoCanvas();
+#endif
+  PipOptions(): contentSource(NULL), contentWidth(0), contentHeight(0) {}
 };
 
 /** Image enhancement options.
