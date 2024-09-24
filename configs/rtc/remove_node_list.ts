@@ -56,7 +56,6 @@ module.exports = [
   'agora::rtc::IRtcEngineEventHandler.eventHandlerType',
   'agora::rtc::IRtcEngineEventHandlerEx.eventHandlerType',
   'agora::rtc::IRtcEngineEventHandlerEx.onFirstLocalVideoFrame',
-  'agora::rtc::IRtcEngineEventHandlerEx.onFirstLocalVideoFramePublished',
   'agora::rtc::IRtcEngineEventHandlerEx.onLocalVideoStateChanged',
   'agora::rtc::IMediaPlayer.initialize',
   'agora::rtc::IMediaPlayer.openWithCustomSource',
