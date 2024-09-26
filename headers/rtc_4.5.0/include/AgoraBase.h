@@ -1055,7 +1055,14 @@ enum ORIENTATION_MODE {
  */
 enum DEGRADATION_PREFERENCE {
   /**
-   * 0: (Default) Prefers to reduce the video frame rate while maintaining video quality during
+   * -1: (Default) SDK uses degradation preference according to setVideoScenario API settings, real-time network state and other relevant data information.
+   * If API setVideoScenario set video scenario to APPLICATION_SCENARIO_LIVESHOW, then MAINTAIN_BALANCED is used. If not, then MAINTAIN_RESOLUTION is used.
+   * Also if network state has changed, SDK may change this parameter between MAINTAIN_FRAMERATE、MAINTAIN_BALANCED and MAINTAIN_RESOLUTION automatically to get the best QOE.
+   * We recommend using this option.
+  */
+  MAINTAIN_AUTO = -1,
+  /**
+   * 0: (Deprecated) Prefers to reduce the video frame rate while maintaining video quality during
    * video encoding under limited bandwidth. This degradation preference is suitable for scenarios
    * where video quality is prioritized.
    * @note In the COMMUNICATION channel profile, the resolution of the video sent may change, so
@@ -1070,7 +1077,7 @@ enum DEGRADATION_PREFERENCE {
   MAINTAIN_FRAMERATE = 1,
   /**
    * 2: Reduces the video frame rate and video quality simultaneously during video encoding under
-   * limited bandwidth. MAINTAIN_BALANCED has a lower reduction than MAINTAIN_QUALITY and
+   * limited bandwidth. MAINTAIN_BALANCED has a lower reduction than MAINTAIN_RESOLUTION and
    * MAINTAIN_FRAMERATE, and this preference is suitable for scenarios where both smoothness and
    * video quality are a priority.
    */
@@ -1185,6 +1192,7 @@ enum VIDEO_CODEC_TYPE {
   VIDEO_CODEC_GENERIC = 6,
   /**
    * 7: Generic H264.
+   * @deprecated This codec type is deprecated.
    */
   VIDEO_CODEC_GENERIC_H264 = 7,
   /**
@@ -1733,7 +1741,7 @@ enum COMPRESSION_PREFERENCE {
   /**
    * (Default) SDK uses compression preference according to setVideoScenario API settings, real-time network state and other relevant data information.
    * If API setVideoScenario set video scenario to APPLICATION_SCENARIO_LIVESHOW, then PREFER_QUALITY is used. If not, then PREFER_LOW_LATENCY is used.
-   * Also if network state is changed, SDK may change this parameter between PREFER_QUALITY and PREFER_LOW_LATENCY automatically to get the best QOE.
+   * Also if network state has changed, SDK may change this parameter between PREFER_QUALITY and PREFER_LOW_LATENCY automatically to get the best QOE.
    * We recommend using this option.
   */
   PREFER_COMPRESSION_AUTO = -1,
@@ -2024,7 +2032,7 @@ struct VideoEncoderConfiguration {
       bitrate(b),
       minBitrate(DEFAULT_MIN_BITRATE),
       orientationMode(m),
-      degradationPreference(MAINTAIN_QUALITY),
+      degradationPreference(MAINTAIN_AUTO),
       mirrorMode(mirror),
       advanceOptions(PREFER_AUTO, PREFER_COMPRESSION_AUTO, false) {}
   VideoEncoderConfiguration(int width, int height, int f, int b, ORIENTATION_MODE m, VIDEO_MIRROR_MODE_TYPE mirror = VIDEO_MIRROR_MODE_DISABLED)
@@ -2034,7 +2042,7 @@ struct VideoEncoderConfiguration {
       bitrate(b),
       minBitrate(DEFAULT_MIN_BITRATE),
       orientationMode(m),
-      degradationPreference(MAINTAIN_QUALITY),
+      degradationPreference(MAINTAIN_AUTO),
       mirrorMode(mirror),
       advanceOptions(PREFER_AUTO, PREFER_COMPRESSION_AUTO, false) {}
   VideoEncoderConfiguration(const VideoEncoderConfiguration& config)
@@ -2054,7 +2062,7 @@ struct VideoEncoderConfiguration {
       bitrate(STANDARD_BITRATE),
       minBitrate(DEFAULT_MIN_BITRATE),
       orientationMode(ORIENTATION_MODE_ADAPTIVE),
-      degradationPreference(MAINTAIN_QUALITY),
+      degradationPreference(MAINTAIN_AUTO),
       mirrorMode(VIDEO_MIRROR_MODE_DISABLED),
       advanceOptions(PREFER_AUTO, PREFER_COMPRESSION_AUTO, false) {}
 
