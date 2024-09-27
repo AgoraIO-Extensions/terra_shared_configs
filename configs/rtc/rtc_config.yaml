@@ -24,7 +24,7 @@ parsers:
       parseFiles:
         include:
           - '@agoraio-extensions/terra_shared_configs:headers/${SDK_VERSION}/include/*.h'
-          - '@agoraio-extensions/terra_shared_configs:headers/${SDK_VERSION}/custom_headers/*.h'
+          - '@agoraio-extensions/terra_shared_configs:headers/custom_headers/*.h'
         exclude:
           - '@agoraio-extensions/terra_shared_configs:headers/${SDK_VERSION}/include/time_utils.h'
           - '@agoraio-extensions/terra_shared_configs:headers/${SDK_VERSION}/include/rte_*.h'
