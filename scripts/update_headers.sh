@@ -6,47 +6,30 @@ PROJECT_ROOT=$(realpath ${MY_PATH}/..)
 
 # Check if url is provided
 if [ "$#" -lt 1 ]; then
-    echo "usage: \$0<url>"
     exit 1
 fi
-
-# Assign arguments to variables
 url=$1
-if [[ $url == *"Preview_"* ]]; then
-    type=${url#*Preview_}; type=${type%%_*}
-    version=${url#*${type}_}; version=${version%_*headers.zip}
-elif [[ $url == *"Agora_Native_SDK_"* ]]; then
-    type="rtc"
-    version=${url#*Windows_rel.v}; version=${version%%_*}
-fi
 
-# Check if second argument is provided, if so, use it as version
-if [ "$#" -ge 2 ]; then
-    version=$2
+# Check if version is provided
+if [ "$#" -lt 2 ]; then
+    exit 1
 fi
-latest_version="${version%.*}"
+version=$2
+
+# Check if product_type is provided
+if [ "$#" -lt 3 ]; then
+    exit 1
+fi
+product_type=$3
 
 # Construct the target directory path
-destination=${PROJECT_ROOT}"/headers/${type}_${version}"
+destination=${PROJECT_ROOT}"/headers/${product_type}_${version}"
 
-# If the target directory already exists, output a message
 if [ -d "$destination" ]; then
-    echo "The directory $destination already exists. no need to copy."
+    rm -rf "$destination"/*
 else
-    # Check if third argument is provided, if so, use it as version
-    if [ "$#" -ge 3 ]; then
-        last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_$3)
-    else
-        # Find the last folder
-        last_folder=$(ls -d ${PROJECT_ROOT}/headers/${type}_${latest_version}* | sort -V | tail -n 1)
-    fi
-    # Copy the last folder and rename it
-    echo "Copying $last_folder to $destination"
-    cp -r "$last_folder" "$destination"
+    mkdir "$destination"
 fi
-
-# Remove the include directory
-rm -rf "$destination/include"
 
 # Download the file with a temporary filename
 temp_file="${destination}/temp_file.zip"
