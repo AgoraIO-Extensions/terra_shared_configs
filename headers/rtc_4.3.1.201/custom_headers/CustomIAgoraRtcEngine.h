@@ -1,7 +1,6 @@
 #pragma once
 
 #include "AgoraBase.h"
-#include "AgoraMediaBase.h"
 #include "IAgoraMediaEngine.h"
 #include "IAgoraMediaRecorder.h"
 #include "IAgoraMusicContentCenter.h"
@@ -213,6 +212,30 @@ class IRtcEngine {
    */
   virtual void release(bool sync = false) = 0;
 
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUid_6b7aee8
+   * @source: virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUid_0a0b913
+   * @source: virtual int getUserInfoByUid(const char* channelId, uid_t uid, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUidWithChannelId(const char *channelId, uid_t uid, rtc::UserInfo *userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_c6a8f08
+   * @source: virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_86c855f
+   * @source: virtual int getUserInfoByUserAccount(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUserAccountWithChannelId(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+  
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
@@ -224,42 +247,42 @@ class IRtcEngine {
   virtual int startPreviewWithoutSourceType() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getAudioDeviceManager
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_AUDIO_DEVICE_MANAGER = 1,
    */
   virtual IAudioDeviceManager *getAudioDeviceManager() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getVideoDeviceManager
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_VIDEO_DEVICE_MANAGER = 2,
    */
   virtual IVideoDeviceManager *getVideoDeviceManager() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getMusicContentCenter
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_MUSIC_CONTENT_CENTER = 15,
    */
   virtual IMusicContentCenter *getMusicContentCenter() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getMediaEngine
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_MEDIA_ENGINE = 4,
    */
   virtual agora::media::IMediaEngine *getMediaEngine() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getLocalSpatialAudioEngine
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
    */
   virtual ILocalSpatialAudioEngine *getLocalSpatialAudioEngine() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getH265Transcoder
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_H265_TRANSCODER = 16,
    */
@@ -319,24 +342,6 @@ class IRtcEngine {
    * @source: virtual int preloadChannel(const char* token, const char* channelId, const char* userAccount) = 0;
    */
   virtual int preloadChannelWithUserAccount(const char* token, const char* channelId, const char* userAccount) = 0;
-
-  /**
-   * @iris_api_id: RtcEngine_takeSnapshot_1922dd1
-   * @source: virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
-   */
-  virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
-
-  /**
-   * @iris_api_id: RtcEngine_takeSnapshot_5669ea6
-   * @source: virtual int takeSnapshot(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
-   */
-  virtual int takeSnapshotWithConfig(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
-
-  /**
-   * @iris_api_id: RtcEngine_setExternalMediaProjection_f337cbf
-   * @source: virtual int setExternalMediaProjection(void* mediaProjection) = 0;
-   */
-  virtual int setExternalMediaProjection(const void* mediaProjection) = 0;
 };
 
 } // namespace ext

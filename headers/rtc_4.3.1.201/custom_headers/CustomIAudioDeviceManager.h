@@ -29,13 +29,13 @@ class IAudioDeviceManager {
    * @iris_api_id: AudioDeviceManager_getPlaybackDeviceInfo_ed3a96d
    * @source: virtual int getPlaybackDeviceInfo(char deviceId[MAX_DEVICE_ID_LENGTH], char deviceName[MAX_DEVICE_ID_LENGTH], char deviceTypeName[MAX_DEVICE_ID_LENGTH]) = 0;
    */
-  virtual AudioDeviceInfo *getPlaybackDeviceInfo() = 0;
+  virtual AudioDeviceInfo * getPlaybackDeviceInfo() = 0;
 
   /**
    * @iris_api_id: AudioDeviceManager_getRecordingDeviceInfo_ed3a96d
    * @source: virtual int getRecordingDeviceInfo(char deviceId[MAX_DEVICE_ID_LENGTH], char deviceName[MAX_DEVICE_ID_LENGTH], char deviceTypeName[MAX_DEVICE_ID_LENGTH]) = 0;
    */
-  virtual AudioDeviceInfo *getRecordingDeviceInfo() = 0;
+  virtual AudioDeviceInfo * getRecordingDeviceInfo() = 0;
 
   // ----------------------------- 👆🏻overload API👆🏻 ----------------------------- 
 

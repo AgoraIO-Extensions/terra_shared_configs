@@ -35,12 +35,6 @@ class IMediaEngine {
    */
   virtual int unregisterFaceInfoObserver(IFaceInfoObserver* observer) = 0;
 
-  /**
-   * @iris_api_id: MediaEngine_setExternalRemoteEglContext_f337cbf
-   * @source: virtual int setExternalRemoteEglContext(void* eglContext) = 0;
-   */
-  virtual int setExternalRemoteEglContext(const void* eglContext) = 0;
-
   // ----------------------------- 👆🏻new API👆🏻 -----------------------------
 };
 
