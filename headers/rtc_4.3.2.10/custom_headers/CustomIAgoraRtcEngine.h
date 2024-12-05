@@ -331,12 +331,6 @@ class IRtcEngine {
    * @source: virtual int takeSnapshot(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
    */
   virtual int takeSnapshotWithConfig(uid_t uid, const agora::media::SnapshotConfig& config)  = 0;
-
-  /**
-   * @iris_api_id: RtcEngine_setExternalMediaProjection_f337cbf
-   * @source: virtual int setExternalMediaProjection(void* mediaProjection) = 0;
-   */
-  virtual int setExternalMediaProjection(const void* mediaProjection) = 0;
 };
 
 } // namespace ext

@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 MY_PATH=$(realpath $(dirname "$0"))
 PROJECT_ROOT=$(realpath ${MY_PATH}/..)
 
@@ -53,3 +52,35 @@ mv "$nativeSDK/sdk/high_level_api/include" "$destination"
 
 # Remove the unzipped file
 rm -rf "$nativeSDK"
+
+directory="headers"
+target_folder="$3_$2"
+
+if [ ! -d "$directory" ]; then
+    echo "directory '$directory' not exist!"
+    exit 1
+fi
+
+folders=($(find "$directory" -maxdepth 1 -type d | sort -V | xargs -n 1 basename))
+index=0
+found=0
+
+for folder in "${folders[@]}"; do
+    index=$((index + 1))
+    if [[ "$folder" == "$target_folder" ]]; then
+        found=1
+        break
+    fi
+done
+
+if [ "$found" -eq 1 ]; then
+    if [ "$index" -gt 1 ]; then
+        echo "the last folder: '${folders[index-2]}'"
+        cp -r "${directory}/${folders[index-2]}/custom_headers" "$destination/custom_headers"
+        echo "copied custom_headers from '${folders[index-2]}' to '$target_folder'."
+    else
+        echo "this is first folder."
+    fi
+else
+    echo "folder '$target_folder' is not in '$directory'!"
+fi
