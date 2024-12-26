@@ -54,8 +54,17 @@ class Error {
     }
   }
 
+  /**
+   * Returns the error code of the Error object.
+   * @since v4.4.0
+   * @return ErrorCode 
+   */
   ErrorCode Code() const { return c_error != nullptr ? c_error->code : kRteErrorDefault; }
 
+  /**
+   * Returns the error message of the Error object.
+   * @return const char* 
+   */
   const char *Message() const { 
     if(c_error != nullptr && c_error->message != nullptr){
       return RteStringCStr(c_error->message, nullptr);

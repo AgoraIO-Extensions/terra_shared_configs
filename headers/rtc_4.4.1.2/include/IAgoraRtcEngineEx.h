@@ -1634,6 +1634,35 @@ public:
     - < 0: Failure.
     */
     virtual int addVideoWatermarkEx(const char* watermarkUrl, const WatermarkOptions& options, const RtcConnection& connection) = 0;
+
+    /** Adds a watermark image to the local video.
+
+    This method adds a PNG watermark image to the local video in a live broadcast. Once the watermark image is added, all the audience in the channel (CDN audience included),
+    and the recording device can see and capture it. Agora supports adding only one watermark image onto the local video, and the newly watermark image replaces the previous one.
+
+    The watermark position depends on the settings in the \ref IRtcEngine::setVideoEncoderConfiguration "setVideoEncoderConfiguration" method:
+    - If the orientation mode of the encoding video is #ORIENTATION_MODE_FIXED_LANDSCAPE, or the landscape mode in #ORIENTATION_MODE_ADAPTIVE, the watermark uses the landscape orientation.
+    - If the orientation mode of the encoding video is #ORIENTATION_MODE_FIXED_PORTRAIT, or the portrait mode in #ORIENTATION_MODE_ADAPTIVE, the watermark uses the portrait orientation.
+    - When setting the watermark position, the region must be less than the dimensions set in the `setVideoEncoderConfiguration` method. Otherwise, the watermark image will be cropped.
+
+    @note
+    - Ensure that you have called the \ref agora::rtc::IRtcEngine::enableVideo "enableVideo" method to enable the video module before calling this method.
+    - If you only want to add a watermark image to the local video for the audience in the CDN live broadcast channel to see and capture, you can call this method or the \ref agora::rtc::IRtcEngine::setLiveTranscoding "setLiveTranscoding" method.
+    - This method supports adding a watermark image in the PNG file format only. Supported pixel formats of the PNG image are RGBA, RGB, Palette, Gray, and Alpha_gray.
+    - If the dimensions of the PNG image differ from your settings in this method, the image will be cropped or zoomed to conform to your settings.
+    - If you have enabled the local video preview by calling the \ref agora::rtc::IRtcEngine::startPreview "startPreview" method, you can use the `visibleInPreview` member in the WatermarkOptions class to set whether or not the watermark is visible in preview.
+    - If you have enabled the mirror mode for the local video, the watermark on the local video is also mirrored. To avoid mirroring the watermark, Agora recommends that you do not use the mirror and watermark functions for the local video at the same time. You can implement the watermark function in your application layer.
+
+    @param watermarkImageBuffer The buffer of the watermark image  in memory to be added.
+    @param options Pointer to the watermark's options to be added. See WatermarkOptions for more infomation.
+    @param connection The RtcConnection object.
+
+    @return int
+    - 0: Success.
+    - < 0: Failure.
+    */
+    virtual int addVideoWatermarkEx(media::ImageBuffer watermarkImageBuffer, const WatermarkOptions& options, const RtcConnection& connection) = 0;
+  
     /** Removes the watermark image on the video stream added by
     addVideoWatermark().
 
