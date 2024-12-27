@@ -1,7 +1,3 @@
-import * as fs from 'fs';
-
-import { replace } from 'lodash';
-
 import { Diff } from '../utils/diff';
 import { askGPT } from '../utils/gpt_utils';
 
@@ -39,25 +35,25 @@ const new_version_path = `headers/${new_version}/include`;
 const blackList = ['include/rte_base', 'include/internal'];
 
 const diffTool = new Diff(old_version_path, new_version_path, blackList);
-diffTool.setOutputDirectory(`temp/${old_version}↔${new_version}`);
+// diffTool.setOutputDirectory(`temp/${old_version}↔${new_version}`);
 diffTool.run();
 
 let promptWithMethod = prompt
   .replace('{{ METHOD_SOURCE }}', methodSource)
   .trim();
 
-let promptWithDiff = prompt
-  .replace(
-    '{{ DIFF_SOURCE }}',
-    fs.readFileSync(
-      `temp/${old_version}↔${new_version}/AgoraBase.h.diff`,
-      'utf8'
-    )
-  )
-  .trim();
+// let promptWithDiff = prompt
+//   .replace(
+//     '{{ DIFF_SOURCE }}',
+//     fs.readFileSync(
+//       `temp/${old_version}↔${new_version}/AgoraBase.h.diff`,
+//       'utf8'
+//     )
+//   )
+//   .trim();
 
-(async () => {
-  // let res = await askGPT(promptWithMethod);
-  let res = await askGPT(promptWithDiff);
-  console.log(res);
-})();
+// (async () => {
+//   // let res = await askGPT(promptWithMethod);
+//   let res = await askGPT(promptWithDiff);
+//   console.log(res);
+// })();

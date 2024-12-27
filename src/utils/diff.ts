@@ -6,6 +6,7 @@ import * as path from 'path';
 interface Difference {
   filePath: string; // Path of the file with differences
   diffs: string[]; // Store the output from the diff command as an array
+  diffsBlocks: string[]; // Store the output from the diff command as an array
 }
 
 export class Diff {
@@ -59,30 +60,51 @@ export class Diff {
         console.log('Differences found.');
         const errorOutput = error.stdout || 'Differences found but no output.';
         const diffLines = errorOutput.split('\n');
-        let currentFile: string | null = null;
+        let currentFile: string = '';
         let currentDiff: string[] = [];
 
-        diffLines.forEach((line: string) => {
-          if (line.startsWith('--- ')) {
+        diffLines.map((line: string, index: number) => {
+          if (line.startsWith('+++ ')) {
+            currentFile = line.substring(4).trim();
+            currentFile = this.cleanFilePath(currentFile);
+          } else if (line.startsWith('diff -u -b')) {
             if (currentFile && currentDiff.length > 0) {
-              differences.push({
-                filePath: this.cleanFilePath(currentFile),
-                diffs: currentDiff,
-              });
+              differences[differences.length - 1].filePath = currentFile;
+              differences[differences.length - 1].diffs = currentDiff;
+              differences[differences.length - 1].diffsBlocks = currentDiff
+                .join('\n')
+                .split(/(?=@@ -)/)
+                .map((part) =>
+                  part.includes('@@ -')
+                    ? part.split(/(?=@@ -)/).join('@@ -')
+                    : part
+                )
+                .filter(Boolean);
+              currentFile = '';
               currentDiff = [];
             }
-            currentFile = line.substring(4).trim();
+            differences.push({
+              filePath: currentFile,
+              diffs: currentDiff,
+              diffsBlocks: [],
+            });
           } else if (currentFile) {
             currentDiff.push(line);
           }
+          if (index === diffLines.length - 1) {
+            differences[differences.length - 1].filePath = currentFile;
+            differences[differences.length - 1].diffs = currentDiff;
+            differences[differences.length - 1].diffsBlocks = currentDiff
+              .join('\n')
+              .split(/(?=@@ -)/)
+              .map((part) =>
+                part.includes('@@ -')
+                  ? part.split(/(?=@@ -)/).join('@@ -')
+                  : part
+              )
+              .filter(Boolean);
+          }
         });
-
-        if (currentFile && currentDiff.length > 0) {
-          differences.push({
-            filePath: this.cleanFilePath(currentFile),
-            diffs: currentDiff,
-          });
-        }
       } else {
         console.error(`Error executing diff: ${error.message}`);
         console.error(`Command output: ${error.stdout}`);
@@ -140,7 +162,9 @@ export class Diff {
     const differences = this.compareDirectories();
 
     // Write differences to the output directory if set
-    this.writeDifferencesToFile(differences);
+    if (this.outputDir) {
+      this.writeDifferencesToFile(differences);
+    }
 
     return differences;
   }

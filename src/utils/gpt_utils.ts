@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import openai, { ClientOptions } from 'openai';
 
@@ -48,13 +46,4 @@ export async function askGPT(prompt: string): Promise<string> {
   let res = response?.choices[0]?.message?.content ?? '';
 
   return res;
-}
-
-// 生成嵌入
-async function generateEmbeddings(text: string) {
-  const embedding = await openAIClient().embeddings.create({
-    model: 'text-embedding-ada-002',
-    input: text,
-  });
-  return embedding;
 }
