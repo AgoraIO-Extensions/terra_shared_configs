@@ -1,0 +1,10 @@
++++ headers/rtc_4.5.0/include/IAgoraMediaRecorder.h	2024-09-27 19:00:43
+@@ -7,7 +7,6 @@
+ 
+ #include "AgoraBase.h"
+ #include "AgoraMediaBase.h"
+-#include "IAgoraRtcEngineEx.h"
+ 
+ namespace agora {
+ namespace rtc {
+diff -u -b -r headers/rtc_4.4.0/include/IAgoraRtcEngine.h headers/rtc_4.5.0/include/IAgoraRtcEngine.h

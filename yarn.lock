@@ -44,7 +44,7 @@ __metadata:
     jest: "npm:^29.5.0"
     lodash: "npm:^4.17.21"
     mustache: "npm:^4.2.0"
-    openai: "npm:^4.29.1"
+    openai: "npm:^4.77.0"
     prettier: "npm:^2.0.5"
     ts-jest: "npm:^29.1.0"
     ts-node: "npm:^10.9.1"
@@ -4511,9 +4511,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openai@npm:^4.29.1":
-  version: 4.76.0
-  resolution: "openai@npm:4.76.0"
+"openai@npm:^4.77.0":
+  version: 4.77.0
+  resolution: "openai@npm:4.77.0"
   dependencies:
     "@types/node": "npm:^18.11.18"
     "@types/node-fetch": "npm:^2.6.4"
@@ -4529,7 +4529,7 @@ __metadata:
       optional: true
   bin:
     openai: bin/cli
-  checksum: f0b53906ba72e6d21405353f26ae3dd4327f3cbe212787fac321089772fccaaabfcd699abb8632e19c1eb536bd31e9fff3d1f90f7de693d86ae9624c04a9d74b
+  checksum: 438e5acbcdc592ff192f294e936c10a8b71edf898b53afacb937da45f8d4e221e041bfcc84d6174c8dcb9ed4080b32760f8d94de1fcec7ab889046f1e1173f68
   languageName: node
   linkType: hard
 

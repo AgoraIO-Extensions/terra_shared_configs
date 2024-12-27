@@ -26,7 +26,7 @@
     "@agoraio-extensions/terra-core": "git@github.com:AgoraIO-Extensions/terra.git#head=main&workspace=terra-core",
     "lodash": "^4.17.21",
     "mustache": "^4.2.0",
-    "openai": "^4.29.1"
+    "openai": "^4.77.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",

@@ -1,0 +1,27 @@
++++ headers/rtc_4.5.0/include/IAgoraMediaEngine.h	2024-09-27 19:00:43
+@@ -141,6 +141,24 @@
+       bool enabled, bool useTexture, EXTERNAL_VIDEO_SOURCE_TYPE sourceType = VIDEO_FRAME,
+       rtc::SenderOptions encodedVideoOption = rtc::SenderOptions()) = 0;
+ 
++#if defined(__ANDROID__)
++  /**
++   * Sets the remote eglContext.
++   *
++   * When the engine is destroyed, the SDK will automatically release the eglContext.
++   *
++   * @param eglContext.
++   *
++   * @note
++   * setExternalRemoteEglContext needs to be called before joining the channel.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   */
++  virtual int setExternalRemoteEglContext(void* eglContext) = 0;
++#endif
++
+   /**
+    * Sets the external audio source.
+    *
+diff -u -b -r headers/rtc_4.4.0/include/IAgoraMediaRecorder.h headers/rtc_4.5.0/include/IAgoraMediaRecorder.h
