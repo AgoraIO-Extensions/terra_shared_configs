@@ -1,0 +1,1375 @@
+@@ -50,106 +50,108 @@
+    * 1: The audio recording device.
+    */
+   AUDIO_RECORDING_DEVICE = 1,
+   /**
+    * 2: The video renderer.
+    */
+   VIDEO_RENDER_DEVICE = 2,
+   /**
+    * 3: The video capturer.
+    */
+   VIDEO_CAPTURE_DEVICE = 3,
+   /**
+    * 4: The audio playback device of the app.
+    */
+   AUDIO_APPLICATION_PLAYOUT_DEVICE = 4,
+   /**
+    * 5: The virtual audio playback device.
+    */
+   AUDIO_VIRTUAL_PLAYOUT_DEVICE = 5,
+   /**
+    * 6: The virtual audio recording device.
+    */
+   AUDIO_VIRTUAL_RECORDING_DEVICE = 6,
+ };
+ 
+ /**
+  The playback state of the music file.
+  */
+ enum AUDIO_MIXING_STATE_TYPE {
+  /** 710: The music file is playing. */
+   AUDIO_MIXING_STATE_PLAYING = 710,
+   /** 711: The music file pauses playing. */
+   AUDIO_MIXING_STATE_PAUSED = 711,
+   /** 713: The music file stops playing. */
+   AUDIO_MIXING_STATE_STOPPED = 713,
+   /** 714: An error occurs during the playback of the audio mixing file.
+    */
+   AUDIO_MIXING_STATE_FAILED = 714,
+ };
+ 
+ /**
+  The reson codes of the local user's audio mixing file.
+  */
+ enum AUDIO_MIXING_REASON_TYPE {
+   /** 701: The SDK cannot open the audio mixing file. */
+   AUDIO_MIXING_REASON_CAN_NOT_OPEN = 701,
+   /** 702: The SDK opens the audio mixing file too frequently. */
+   AUDIO_MIXING_REASON_TOO_FREQUENT_CALL = 702,
+   /** 703: The audio mixing file playback is interrupted. */
+   AUDIO_MIXING_REASON_INTERRUPTED_EOF = 703,
+-  /** 715: The audio mixing file is played once. */
++  /** 721: The audio mixing file is played once. */
+   AUDIO_MIXING_REASON_ONE_LOOP_COMPLETED = 721,
+-  /** 716: The audio mixing file is all played out. */
++  /** 723: The audio mixing file is all played out. */
+   AUDIO_MIXING_REASON_ALL_LOOPS_COMPLETED = 723,
+-  /** 716: The audio mixing file stopped by user */
++  /** 724: The audio mixing file stopped by user */
+   AUDIO_MIXING_REASON_STOPPED_BY_USER = 724,
++  /** 726: The audio mixing playback has resumed by user */
++  AUDIO_MIXING_REASON_RESUMED_BY_USER = 726,
+   /** 0: The SDK can open the audio mixing file. */
+   AUDIO_MIXING_REASON_OK = 0,
+ };
+ 
+ /**
+  * The status of importing an external video stream in a live broadcast.
+  */
+ enum INJECT_STREAM_STATUS {
+   /**
+    * 0: The media stream is injected successfully.
+    */
+   INJECT_STREAM_STATUS_START_SUCCESS = 0,
+   /**
+    * 1: The media stream already exists.
+    */
+   INJECT_STREAM_STATUS_START_ALREADY_EXISTS = 1,
+   /**
+    * 2: The media stream injection is unauthorized.
+    */
+   INJECT_STREAM_STATUS_START_UNAUTHORIZED = 2,
+   /**
+    * 3: Timeout occurs when injecting a media stream.
+    */
+   INJECT_STREAM_STATUS_START_TIMEDOUT = 3,
+   /**
+    * 4: The media stream injection fails.
+    */
+   INJECT_STREAM_STATUS_START_FAILED = 4,
+   /**
+    * 5: The media stream stops being injected successfully.
+    */
+   INJECT_STREAM_STATUS_STOP_SUCCESS = 5,
+   /**
+    * 6: The media stream injection that you want to stop is found.
+    */
+   INJECT_STREAM_STATUS_STOP_NOT_FOUND = 6,
+   /**
+    * 7: You are not authorized to stop the media stream injection.
+    */
+   INJECT_STREAM_STATUS_STOP_UNAUTHORIZED = 7,
+   /**
+    * 8: Timeout occurs when you stop injecting the media stream.
+    */
+   INJECT_STREAM_STATUS_STOP_TIMEDOUT = 8,
+   /**
+    * 9: Stopping injecting the media stream fails.
+    */
+   INJECT_STREAM_STATUS_STOP_FAILED = 9,
+   /**
+    * 10: The media stream is broken.
+@@ -807,238 +809,238 @@
+   /// @endcond
+ };
+ 
+ /** Camera capturer configuration.*/
+ struct CameraCapturerConfiguration {
+   /** Camera direction settings (for Android/iOS only). See: #CAMERA_DIRECTION. */
+ #if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
+   /**
+    * The camera direction.
+    */
+   Optional<CAMERA_DIRECTION> cameraDirection;
+ 
+   /*- CAMERA_FOCAL_LENGTH_TYPE.CAMERA_FOCAL_LENGTH_DEFAULT:
+   For iOS, if iPhone/iPad has 3 or 2 back camera, it means combination of triple (wide + ultra wide + telephoto) camera
+   or dual wide(wide + ultra wide) camera.In this situation, you can apply for ultra wide len by set smaller zoom fator
+   and bigger zoom fator for telephoto len.Otherwise, it always means wide back/front camera.
+ 
+   - CAMERA_FOCAL_LENGTH_TYPE.CAMERA_FOCAL_LENGTH_WIDE_ANGLE:wide camera
+   - CAMERA_FOCAL_LENGTH_TYPE.CAMERA_FOCAL_LENGTH_ULTRA_WIDE:ultra wide camera
+   - CAMERA_FOCAL_LENGTH_TYPE.CAMERA_FOCAL_LENGTH_TELEPHOTO:telephoto camera*/
+   Optional<CAMERA_FOCAL_LENGTH_TYPE> cameraFocalLengthType;
+ #else
+   /** For windows. The device ID of the playback device. */
+   Optional<const char *> deviceId;
+ #endif
+ 
+ #if defined(__ANDROID__)
+   /**
+    * The camera id.
+    */
+   Optional<const char *> cameraId;
+ #endif
+   Optional<bool> followEncodeDimensionRatio;
+     /** The video format. See VideoFormat. */
+   VideoFormat format;
+   CameraCapturerConfiguration() : format(VideoFormat(0, 0, 0)) {}
+ };
+ /**
+  * The configuration of the captured screen.
+  */
+ struct ScreenCaptureConfiguration {
+   /**
+    * Whether to capture the window on the screen:
+    * - `true`: Capture the window.
+    * - `false`: (Default) Capture the screen, not the window.
+    */
+   bool isCaptureWindow; // true - capture window, false - capture display
+   /**
+    * (macOS only) The display ID of the screen.
+    */
+-  uint32_t displayId;
++  int64_t displayId;
+   /**
+    * (Windows only) The relative position of the shared screen to the virtual screen.
+    * @note This parameter takes effect only when you want to capture the screen on Windows.
+    */
+   Rectangle screenRect; //Windows only
+   /**
+    * (For Windows and macOS only) The window ID.
+    * @note This parameter takes effect only when you want to capture the window.
+    */
+-  view_t windowId;
++  int64_t windowId;
+   /**
+    * (For Windows and macOS only) The screen capture configuration. For details, see ScreenCaptureParameters.
+    */
+   ScreenCaptureParameters params;
+   /**
+    * (For Windows and macOS only) The relative position of the shared region to the whole screen. For details, see Rectangle.
+    *
+    * If you do not set this parameter, the SDK shares the whole screen. If the region you set exceeds the boundary of the
+    * screen, only the region within in the screen is shared. If you set width or height in Rectangle as 0, the whole
+    * screen is shared.
+    */
+   Rectangle regionRect;
+ 
+   ScreenCaptureConfiguration() : isCaptureWindow(false), displayId(0), windowId(0) {}
+ };
+ 
+ #if (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+ /** The size of the screen shot to the screen or window.
+  */
+ struct SIZE {
+   /** The width of the screen shot.
+    */
+   int width;
+   /** The width of the screen shot.
+    */
+   int height;
+ 
+   SIZE() : width(0), height(0) {}
+   SIZE(int ww, int hh) : width(ww), height(hh) {}
+ };
+ #endif
+ 
+ #if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+ /**
+  * The image content of the thumbnail or icon.
+  * @note The default image is in the RGBA format. If you need to use another format, you need to convert the image on
+  * your own.
+  */
+ struct ThumbImageBuffer {
+   /**
+    * The buffer of the thumbnail ot icon.
+    */
+   const char* buffer;
+   /**
+    * The buffer length of the thumbnail or icon, in bytes.
+    */
+   unsigned int length;
+   /**
+    * The actual width (px) of the thumbnail or icon.
+    */
+   unsigned int width;
+   /**
+    * The actual height (px) of the thumbnail or icon.
+    */
+   unsigned int height;
+   ThumbImageBuffer() : buffer(nullptr), length(0), width(0), height(0) {}
+ };
+ /**
+  * The type of the shared target. Set in ScreenCaptureSourceInfo.
+  */
+ enum ScreenCaptureSourceType {
+   /** -1: Unknown type. */
+   ScreenCaptureSourceType_Unknown = -1,
+   /** 0: The shared target is a window.*/
+   ScreenCaptureSourceType_Window = 0,
+   /** 1: The shared target is a screen of a particular monitor.*/
+   ScreenCaptureSourceType_Screen = 1,
+   /** 2: Reserved parameter.*/
+   ScreenCaptureSourceType_Custom = 2,
+ };
+ /** The information about the specified shareable window or screen. It is returned in IScreenCaptureSourceList. */
+ struct ScreenCaptureSourceInfo {
+   /**
+    * The type of the shared target. See \ref agora::rtc::ScreenCaptureSourceType "ScreenCaptureSourceType".
+    */
+   ScreenCaptureSourceType type;
+   /**
+    * The window ID for a window or the display ID for a screen.
+    */
+-  view_t sourceId;
++  int64_t sourceId;
+   /**
+    * The name of the window or screen. UTF-8 encoding.
+    */
+   const char* sourceName;
+   /**
+    * The image content of the thumbnail. See ThumbImageBuffer.
+    */
+   ThumbImageBuffer thumbImage;
+   /**
+    * The image content of the icon. See ThumbImageBuffer.
+    */
+   ThumbImageBuffer iconImage;
+   /**
+    * The process to which the window belongs. UTF-8 encoding.
+    */
+   const char* processPath;
+   /**
+    * The title of the window. UTF-8 encoding.
+    */
+   const char* sourceTitle;
+   /**
+    * Determines whether the screen is the primary display:
+    * - true: The screen is the primary display.
+    * - false: The screen is not the primary display.
+    */
+   bool primaryMonitor;
+   bool isOccluded;
+   /**
+    * The relative position of the shared region to the screen space (A virtual space include all the screens). See Rectangle.
+    */
+   Rectangle position;
+ #if defined(_WIN32)
+   /**
+    * Determines whether the window is minimized.
+    */
+   bool minimizeWindow;
+   /**
+    * The display ID to the window of interest.
+    * If the window intersects one or more display monitor rectangles, the return value is an valid
+    * ID to the display monitor that has the largest area of intersection with the window, Otherwise
+    * the return value is -2.
+    */
+-  view_t sourceDisplayId;
+-  ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(nullptr), sourceName(nullptr),
+-                              processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false), minimizeWindow(false), sourceDisplayId((view_t)-2) {}
++  int64_t sourceDisplayId;
++  ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(0), sourceName(nullptr),
++                              processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false), minimizeWindow(false), sourceDisplayId(-2) {}
+ #else
+-  ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(nullptr), sourceName(nullptr), processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false) {}
++  ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(0), sourceName(nullptr), processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false) {}
+ #endif
+ };
+ /**
+  * The IScreenCaptureSourceList class. This class is returned in the getScreenCaptureSources method.
+  */
+ class IScreenCaptureSourceList {
+  protected:
+   virtual ~IScreenCaptureSourceList(){};
+ 
+  public:
+   /**
+    * Gets the number of shareable cpp and screens.
+    *
+    * @return The number of shareable cpp and screens.
+    */
+   virtual unsigned int getCount() = 0;
+   /**
+    * Gets information about the specified shareable window or screen.
+    *
+    * After you get IScreenCaptureSourceList, you can pass in the index value of the specified shareable window or
+    * screen to get information about that window or screen from ScreenCaptureSourceInfo.
+    *
+    * @param index The index of the specified shareable window or screen. The value range is [0, getCount()).
+    * @return ScreenCaptureSourceInfo The information of the specified window or screen.
+    */
+   virtual ScreenCaptureSourceInfo getSourceInfo(unsigned int index) = 0;
+   /**
+    * Releases IScreenCaptureSourceList.
+    *
+    * After you get the list of shareable cpp and screens, to avoid memory leaks, call this method to release
+    * IScreenCaptureSourceList instead of deleting IScreenCaptureSourceList directly.
+    */
+   virtual void release() = 0;
+ };
+ #endif // _WIN32 || (__APPLE__ && !TARGET_OS_IPHONE && TARGET_OS_MAC)
+ /**
+  * The advanced options for audio.
+  */
+ struct AdvancedAudioOptions {
+   /**
+    * Audio processing channels, only support 1 or 2.
+    */
+    Optional<int> audioProcessingChannels;
+ 
+    AdvancedAudioOptions() {}
+   ~AdvancedAudioOptions() {}
+ };
+ 
+ struct ImageTrackOptions {
+   const char* imageUrl;
+@@ -4141,167 +4143,193 @@
+    * - < 0: Failure.
+    */
+   virtual int setVideoEncoderConfiguration(const VideoEncoderConfiguration& config) = 0;
+ 
+   /** Enables/Disables image enhancement and sets the options.
+    *
+    * @note Call this method after calling the \ref IRtcEngine::enableVideo "enableVideo" method.
+    *
+    * @param enabled Sets whether or not to enable image enhancement:
+    * - true: enables image enhancement.
+    * - false: disables image enhancement.
+    * @param options Sets the image enhancement option. See BeautyOptions.
+    */
+   virtual int setBeautyEffectOptions(bool enabled, const BeautyOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   /** Enables/Disables face shape and sets the beauty options.
+    *
+    * @note Call this method after calling the \ref IRtcEngine::enableVideo "enableVideo" method.
+    *
+    * @param enabled Sets whether or not to enable face shape:
+    * - true: enables face shape.
+    * - false: disables face shape.
+    * @param options Sets the face shape beauty option. See FaceShapeBeautyOptions.
+    */
+   virtual int setFaceShapeBeautyOptions(bool enabled, const FaceShapeBeautyOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   /** Enables/Disables face shape and sets the area options.
+    *
+    * @note Call this method after calling the \ref IRtcEngine::setFaceShapeBeautyOptions "setFaceShapeBeautyOptions" method.
+    *
+    * @param options Sets the face shape area option. See FaceShapeAreaOptions.
+    */
+   virtual int setFaceShapeAreaOptions(const FaceShapeAreaOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   
+   /** Gets the face shape beauty options.
+    *
+    * @note Call this method after calling the \ref IRtcEngine::enableVideo "enableVideo" method.
+    *
+    * @param options Gets the face shape beauty option. See FaceShapeBeautyOptions.
+    */
+   virtual int getFaceShapeBeautyOptions(FaceShapeBeautyOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   
+   /** Gets the face shape area options.
+    *
+    * @note Call this method after calling the \ref IRtcEngine::enableVideo "enableVideo" method.
+    *
+    * @param shapeArea  The face area. See FaceShapeAreaOptions::FACE_SHAPE_AREA.
+    * @param options Gets the face area beauty option. See FaceShapeAreaOptions.
+    */
+   virtual int getFaceShapeAreaOptions(agora::rtc::FaceShapeAreaOptions::FACE_SHAPE_AREA shapeArea, FaceShapeAreaOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   
+   /**
++   * Sets filter effect options.
++   *
++   * @since v4.4.1
++   * You can call this method to enable the filter effect feature and set the options of the filter effect.
++   *
++   * @note
++   * - Before calling this method, ensure that you have integrated the following dynamic library into your project:
++   *  - Android: `libagora_clear_vision_extension.so`
++   *  - iOS/macOS: `AgoraClearVisionExtension.xcframework`
++   *  - Windows: `libagora_clear_vision_extension.dll`
++   * - Call this method after calling the \ref IRtcEngine::enableVideo "enableVideo" method.
++   * - You can call this method either before or after joining a channel.
++   * - The filter effect feature has specific performance requirements for devices. If your device overheats after enabling the filter effect, Agora recommends disabling it entirely.
++   *
++   * @param enabled. Whether to enable filter effect:
++   * - `true`: Enable.
++   * - `false`: (Default) Disable.
++   * @param options. Set the filter effect options. See FilterEffectOptions.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   */
++  virtual int setFilterEffectOptions(bool enabled, const FilterEffectOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
++
++  /**
+    * Sets low-light enhancement.
+    *
+    * @since v4.0.0
+    *
+    * The low-light enhancement feature can adaptively adjust the brightness value of the video captured in situations with low or uneven lighting, such as backlit, cloudy, or dark scenes. It restores or highlights the image details and improves the overall visual effect of the video.
+    *
+    * You can call this method to enable the low-light enhancement feature and set the options of the low-light enhancement effect.
+    *
+    * @note
+    * - Before calling this method, ensure that you have integrated the following dynamic library into your project:
+-   *  - Android: `libagora_segmentation_extension.so`
+-   *  - iOS/macOS: `AgoraVideoSegmentationExtension.xcframework`
+-   *  - Windows: `libagora_segmentation_extension.dll`
++   *  - Android: `libagora_clear_vision_extension.so`
++   *  - iOS/macOS: `AgoraClearVisionExtension.xcframework`
++   *  - Windows: `libagora_clear_vision_extension.dll`
+    * - Call this method after \ref IRtcEngine::enableVideo "enableVideo".
+    * - The low-light enhancement feature has certain performance requirements on devices. If your device overheats after you enable low-light enhancement, Agora recommends modifying the low-light enhancement options to a less performance-consuming level or disabling low-light enhancement entirely.
+    *
+    * @param enabled Sets whether to enable low-light enhancement:
+    * - `true`: Enable.
+    * - `false`: (Default) Disable.
+    * @param options The low-light enhancement options. See LowlightEnhanceOptions.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setLowlightEnhanceOptions(bool enabled, const LowlightEnhanceOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   /**
+    * Sets video noise reduction.
+    *
+    * @since v4.0.0
+    *
+    * Underlit environments and low-end video capture devices can cause video images to contain significant noise, which affects video quality. In real-time interactive scenarios, video noise also consumes bitstream resources and reduces encoding efficiency during encoding.
+    *
+    * You can call this method to enable the video noise reduction feature and set the options of the video noise reduction effect.
+    *
+    * @note
+    * - Before calling this method, ensure that you have integrated the following dynamic library into your project:
+-   *  - Android: `libagora_segmentation_extension.so`
+-   *  - iOS/macOS: `AgoraVideoSegmentationExtension.xcframework`
+-   *  - Windows: `libagora_segmentation_extension.dll`
++   *  - Android: `libagora_clear_vision_extension.so`
++   *  - iOS/macOS: `AgoraClearVisionExtension.xcframework`
++   *  - Windows: `libagora_clear_vision_extension.dll`
+    * - Call this method after \ref IRtcEngine::enableVideo "enableVideo".
+    * - The video noise reduction feature has certain performance requirements on devices. If your device overheats after you enable video noise reduction, Agora recommends modifying the video noise reduction options to a less performance-consuming level or disabling video noise reduction entirely.
+    *
+    * @param enabled Sets whether to enable video noise reduction:
+    * - `true`: Enable.
+    * - `false`: (Default) Disable.
+    * @param options The video noise reduction options. See VideoDenoiserOptions.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setVideoDenoiserOptions(bool enabled, const VideoDenoiserOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+   /**
+    * Sets color enhancement.
+    *
+    * @since v4.0.0
+    *
+    * The video images captured by the camera can have color distortion. The color enhancement feature intelligently adjusts video characteristics such as saturation and contrast to enhance the video color richness and color reproduction, making the video more vivid.
+    *
+    * You can call this method to enable the color enhancement feature and set the options of the color enhancement effect.
+    *
+    * @note
+    * - Before calling this method, ensure that you have integrated the following dynamic library into your project:
+-   *  - Android: `libagora_segmentation_extension.so`
+-   *  - iOS/macOS: `AgoraVideoSegmentationExtension.xcframework`
+-   *  - Windows: `libagora_segmentation_extension.dll`
++   *  - Android: `libagora_clear_vision_extension.so`
++   *  - iOS/macOS: `AgoraClearVisionExtension.xcframework`
++   *  - Windows: `libagora_clear_vision_extension.dll`
+    * - Call this method after \ref IRtcEngine::enableVideo "enableVideo".
+    * - The color enhancement feature has certain performance requirements on devices. If your device overheats after you enable color enhancement, Agora recommends modifying the color enhancement options to a less performance-consuming level or disabling color enhancement entirely.
+    *
+    * @param enabled Sets whether to enable color enhancement:
+    * - `true`: Enable.
+    * - `false`: (Default) Disable.
+    * @param options The color enhancement options. See ColorEnhanceOptions.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setColorEnhanceOptions(bool enabled, const ColorEnhanceOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+ 
+   /**
+    * Enables/Disables the virtual background. (beta function)
+    *
+    * @since v3.7.200
+    *
+    * After enabling the virtual background function, you can replace the original background image of the local user
+    * with a custom background image. After the replacement, all users in the channel can see the custom background
+    * image.
+    *
+    * @note
+    * - Before calling this method, ensure that you have integrated the
+    * `libagora_segmentation_extension.dll` (Windows)/`AgoraVideoSegmentationExtension.framework` (macOS) dynamic
+    * library into the project folder.
+    * - Call this method after \ref IRtcEngine::enableVideo "enableVideo".
+    * - This function requires a high-performance device. Agora recommends that you use this function on devices with
+    * an i5 CPU and better.
+    * - Agora recommends that you use this function in scenarios that meet the following conditions:
+    *  - A high-definition camera device is used, and the environment is uniformly lit.
+    *  - The captured video image is uncluttered, the user's portrait is half-length and largely unobstructed, and the
+    * background is a single color that differs from the color of the user's clothing.
+    *
+    * @param enabled Sets whether to enable the virtual background:
+    * - true: Enable.
+    * - false: Disable.
+    * @param backgroundSource The custom background image. See VirtualBackgroundSource. **Note**: To adapt the
+    * resolution of the custom background image to the resolution of the SDK capturing video, the SDK scales and crops
+    * the custom background image while ensuring that the content of the custom background image is not distorted.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int enableVirtualBackground(bool enabled, VirtualBackgroundSource backgroundSource, SegmentationProperty segproperty, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
+ 
+   /**
+    * Initializes the video view of a remote user.
+@@ -5953,101 +5981,120 @@
+    * - `LOG_LEVEL_FATAL (0x0008)`: Output log files of the FATAL level.
+    *
+    *  @return
+    *  - 0: Success.
+    *  - < 0: Failure.
+    */
+   virtual int writeLog(commons::LOG_LEVEL level, const char* fmt, ...) = 0;
+ 
+   /**
+    * Updates the display mode of the local video view.
+    *
+    * After initializing the local video view, you can call this method to  update its rendering mode.
+    * It affects only the video view that the local user sees, not the published local video stream.
+    *
+    * @note
+    * - Ensure that you have called \ref setupLocalVideo "setupLocalVideo" to initialize the local video
+    * view before this method.
+    * - During a call, you can call this method as many times as necessary to update the local video view.
+    *
+    * @param renderMode Sets the local display mode. See #RENDER_MODE_TYPE.
+    * @param mirrorMode Sets the local mirror mode. See #VIDEO_MIRROR_MODE_TYPE.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setLocalRenderMode(media::base::RENDER_MODE_TYPE renderMode, VIDEO_MIRROR_MODE_TYPE mirrorMode) = 0;
+ 
+   /**
+    * Updates the display mode of the video view of a remote user.
+    *
+    * After initializing the video view of a remote user, you can call this method to update its
+    * rendering and mirror modes. This method affects only the video view that the local user sees.
+    *
+    * @note
+    * - Ensure that you have called \ref setupRemoteVideo "setupRemoteVideo" to initialize the remote video
+    * view before calling this method.
+    * - During a call, you can call this method as many times as necessary to update the display mode
+    * of the video view of a remote user.
+    *
+    * @param uid ID of the remote user.
+    * @param renderMode Sets the remote display mode. See #RENDER_MODE_TYPE.
+    * @param mirrorMode Sets the mirror type. See #VIDEO_MIRROR_MODE_TYPE.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setRemoteRenderMode(uid_t uid, media::base::RENDER_MODE_TYPE renderMode,
+                                   VIDEO_MIRROR_MODE_TYPE mirrorMode) = 0;
+-
++  /**
++   * Sets the target frames per second (FPS) for the local render target.
++   *
++   * @param sourceType The type of video source.
++   * @param targetFps The target frames per second to be set.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   */
++  virtual int setLocalRenderTargetFps(VIDEO_SOURCE_TYPE sourceType, int targetFps) = 0;
++  /**
++   * Sets the target frames per second (FPS) for the remote render target.
++   *
++   * @param targetFps The target frames per second to be set for the remote render target.
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   */
++  virtual int setRemoteRenderTargetFps(int targetFps) = 0;
+   // The following APIs are either deprecated and going to deleted.
+ 
+   /**
+    * Updates the display mode of the local video view.
+    *
+    * After initializing the local video view, you can call this method to  update its rendering mode.
+    * It affects only the video view that the local user sees, not the published local video stream.
+    *
+    * @note
+    * - Ensure that you have called \ref setupLocalVideo "setupLocalVideo" to initialize the local video
+    * view before this method.
+    * - During a call, you can call this method as many times as necessary to update the local video view.
+    *
+    * @param renderMode Sets the local display mode. See #RENDER_MODE_TYPE.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setLocalRenderMode(media::base::RENDER_MODE_TYPE renderMode) __deprecated = 0;
+ 
+   /**
+    * Sets the local video mirror mode.
+    *
+    * Use this method before calling the \ref startPreview "startPreview" method, or the mirror mode
+    * does not take effect until you call the `startPreview` method again.
+    * @param mirrorMode Sets the local video mirror mode. See #VIDEO_MIRROR_MODE_TYPE.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setLocalVideoMirrorMode(VIDEO_MIRROR_MODE_TYPE mirrorMode) __deprecated = 0;
+ 
+   /**
+    * Enables or disables the dual video stream mode.
+    *
+    * If dual-stream mode is enabled, the subscriber can choose to receive the high-stream
+    * (high-resolution high-bitrate video stream) or low-stream (low-resolution low-bitrate video stream)
+    * video using \ref setRemoteVideoStreamType "setRemoteVideoStreamType".
+    *
+    * @param enabled
+    * - true: Enable the dual-stream mode.
+    * - false: (default) Disable the dual-stream mode.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int enableDualStreamMode(bool enabled) __deprecated = 0;
+ 
+@@ -6974,164 +7021,164 @@
+ #if (defined(__APPLE__) && TARGET_OS_IOS)
+   /** Sets the operational permission of the SDK on the audio session.
+    *
+    * The SDK and the app can both configure the audio session by default. If
+    * you need to only use the app to configure the audio session, this method
+    * restricts the operational permission of the SDK on the audio session.
+    *
+    * You can call this method either before or after joining a channel. Once
+    * you call this method to restrict the operational permission of the SDK
+    * on the audio session, the restriction takes effect when the SDK needs to
+    * change the audio session.
+    *
+    * @note
+    * - This method is for iOS only.
+    * - This method does not restrict the operational permission of the app on
+    * the audio session.
+    *
+    * @param restriction The operational permission of the SDK on the audio session.
+    * See #AUDIO_SESSION_OPERATION_RESTRICTION. This parameter is in bit mask
+    * format, and each bit corresponds to a permission.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setAudioSessionOperationRestriction(AUDIO_SESSION_OPERATION_RESTRICTION restriction) = 0;
+ #endif // __APPLE__ && TARGET_OS_IOS
+ 
+ #if defined(_WIN32) || (defined(__APPLE__) && !TARGET_OS_IPHONE && TARGET_OS_MAC)
+ 
+   /** Shares the whole or part of a screen by specifying the display ID.
+ 
+   @note This method applies to macOS only.
+ 
+   @param  displayId The display ID of the screen to be shared. This parameter
+   specifies which screen you want to share. For information on how to get the
+   displayId, see the advanced guide: Share the Screen.
+   @param regionRect (Optional) Sets the relative location of the region to the
+   screen. NIL means sharing the whole screen. See Rectangle.
+   If the specified region overruns the screen, the SDK shares only the region
+   within it; if you set width or height as 0, the SDK shares the whole screen.
+   @param captureParams Sets the screen sharing encoding parameters. See
+   ScreenCaptureParameters.
+ 
+   @return
+   - 0: Success.
+   - < 0: Failure:
+   - ERR_INVALID_ARGUMENT (2): The argument is invalid.
+   - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when try to start screen capture.
+   */
+-  virtual int startScreenCaptureByDisplayId(uint32_t displayId, const Rectangle& regionRect,
++  virtual int startScreenCaptureByDisplayId(int64_t displayId, const Rectangle& regionRect,
+                                             const ScreenCaptureParameters& captureParams) = 0;
+ 
+ #endif  // __APPLE__ && TARGET_OS_MAC && !TARGET_OS_IPHONE
+ 
+ #if defined(_WIN32)
+   /**
+    * Shares the whole or part of a screen by specifying the screen rect.
+    *
+    * @deprecated This method is deprecated, use \ref IRtcEngine::startScreenCaptureByDisplayId "startScreenCaptureByDisplayId" instead. Agora strongly recommends using `startScreenCaptureByDisplayId` if you need to start screen sharing on a device connected to another display.
+    *
+    * @note This method applies to Windows only.
+    *
+    * @param screenRect Sets the relative location of the screen to the virtual
+    * screen. For information on how to get screenRect, see the advanced guide:
+    * Share the Screen.
+    * @param regionRect (Optional) Sets the relative location of the region to the
+    * screen. NULL means sharing the whole screen. See Rectangle.
+    * If the specified region overruns the screen, the SDK shares only the region
+    * within it; if you set width or height as 0, the SDK shares the whole screen.
+    * @param captureParams Sets the screen sharing encoding parameters. See
+    * ScreenCaptureParameters.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure:
+    * - ERR_INVALID_ARGUMENT (2): The argument is invalid.
+    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when try to start screen capture.
+   */
+   virtual int startScreenCaptureByScreenRect(const Rectangle& screenRect,
+                                              const Rectangle& regionRect,
+                                              const ScreenCaptureParameters& captureParams) __deprecated = 0;
+ #endif
+ 
+ #if defined(__ANDROID__)
+   /**
+    * Gets the the Audio device Info
+    * @return
+    * - 0: Success.
+    * - < 0: Failure..
+    */
+   virtual int getAudioDeviceInfo(DeviceInfo& deviceInfo) = 0;
+ #endif  // __ANDROID__
+ 
+ #if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
+ 
+  /** Shares the whole or part of a window by specifying the window ID.
+   *
+   * @param windowId The ID of the window to be shared. For information on how to
+   * get the windowId, see the advanced guide *Share Screen*.
+   * @param regionRect (Optional) The relative location of the region to the
+   * window. NULL means sharing the whole window. See Rectangle. If the
+   * specified region overruns the window, the SDK shares only the region within
+   * it; if you set width or height as 0, the SDK shares the whole window.
+   * @param captureParams The window sharing encoding parameters. See
+   * ScreenCaptureParameters.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure:
+   * - ERR_INVALID_ARGUMENT (2): The argument is invalid.
+   * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when try to start screen capture.
+   */
+-  virtual int startScreenCaptureByWindowId(view_t windowId, const Rectangle& regionRect,
++  virtual int startScreenCaptureByWindowId(int64_t windowId, const Rectangle& regionRect,
+                                            const ScreenCaptureParameters& captureParams) = 0;
+ 
+   /**
+    * Sets the content hint for screen sharing.
+    *
+    * A content hint suggests the type of the content being shared, so that the SDK applies different
+    * optimization algorithm to different types of content.
+    *
+    * @param contentHint Sets the content hint for screen sharing: #VIDEO_CONTENT_HINT.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure:
+    * - ERR_NOT_SUPPORTED (4): unable to set screencapture content hint
+    * - ERR_FAILED (1): A general error occurs (no specified reason).
+    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when set screen capture content hint.
+    */
+   virtual int setScreenCaptureContentHint(VIDEO_CONTENT_HINT contentHint) = 0;
+ 
+   /**
+    * Updates the screen sharing region.
+    *
+    * @param regionRect Sets the relative location of the region to the screen or
+    * window. NULL means sharing the whole screen or window. See Rectangle.
+    * If the specified region overruns the screen or window, the SDK shares only
+    * the region within it; if you set width or height as 0, the SDK shares the
+    * whole screen or window.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure:
+    * - ERR_NOT_SUPPORTED (4): unable to update screen capture region
+    * - ERR_FAILED (1): A general error occurs (no specified reason).
+    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when update screen capture regoin.
+    */
+   virtual int updateScreenCaptureRegion(const Rectangle& regionRect) = 0;
+ 
+   /**
+    * Updates the screen sharing parameters.
+    *
+    * @param captureParams Sets the screen sharing encoding parameters: ScreenCaptureParameters.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    * - ERR_NOT_SUPPORTED (4): unable to update screen capture parameters
+    * - ERR_INVALID_ARGUMENT (2): The argument is invalid.
+    * - ERR_FAILED (1): A general error occurs (no specified reason).
+    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when update screen capture parameters.
+    */
+@@ -7139,101 +7186,121 @@
+ #endif // _WIN32 || (__APPLE__ && !TARGET_OS_IPHONE && TARGET_OS_MAC)
+ 
+ #if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
+   /**
+    * Starts screen sharing.
+    *
+    * @param captureParams The configuration of the screen sharing. See {@link
+    *     ScreenCaptureParameters ScreenCaptureParameters}.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int startScreenCapture(const ScreenCaptureParameters2& captureParams) = 0;
+ 
+   /**
+    * Updates the screen sharing configuration.
+    *
+    * @param captureParams The configuration of the screen sharing. See {@link
+    *     ScreenCaptureParameters ScreenCaptureParameters}.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int updateScreenCapture(const ScreenCaptureParameters2& captureParams) = 0;
+     
+    /**
+    * Queries the ability of screen sharing to support the maximum frame rate.
+    *
+    * @since v4.2.0
+    * 
+    * @return
+    * - 0: support 15 fps, Low devices.
+    * - 1: support 30 fps, Usually low - to mid-range devices.
+    * - 2: support 60 fps, Advanced devices.
+    * - < 0: Failure.
+    */
+   virtual int queryScreenCaptureCapability() = 0;
+ 
+   /**
+    * Query all focal attributes supported by the camera.
+    * 
+    * @param focalLengthInfos The camera supports the collection of focal segments.Ensure the size of array is not less than 8.
+    * 
+    * @param size The camera supports the size of the focal segment set. Ensure the size is not less than 8.
+    * 
+    * @return
+    * - 0: Success.
+    * - < 0: Failure..
+    */
+   virtual int queryCameraFocalLengthCapability(agora::rtc::FocalLengthInfo* focalLengthInfos, int& size) = 0;
++
++#if defined(__ANDROID__)
++  /**
++   * Sets screen sharing using the Android native class MediaProjection.
++   *
++   * When screen capture stopped, the SDK will automatically release the MediaProjection internally.
++   *
++   * @param mediaProjection MediaProjection is an Android class that provides access to screen capture and recording capabiliies.
++   *
++   * @note
++   * Additional MediaProjection is primarily used for specific scenarios, 
++   * such as IOT custom devices or subprocess screen sharing.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   * @technical preview 
++   */
++  virtual int setExternalMediaProjection(void* mediaProjection) = 0;
+ #endif
++#endif
+ 
+ #if defined(_WIN32) || defined(__APPLE__) || defined(__ANDROID__)
+   /**
+    * Sets the screen sharing scenario.
+    *
+    *
+    * When you start screen sharing or window sharing, you can call this method to set the screen sharing scenario. The SDK adjusts the video quality and experience of the sharing according to the scenario.
+    *
+    *
+    * @param screenScenario The screen sharing scenario. See #SCREEN_SCENARIO_TYPE.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    * - ERR_NOT_SUPPORTED (4): unable to set screencapture scenario
+    * - ERR_FAILED (1): A general error occurs (no specified reason).
+    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when set screencapture scenario.
+    */
+   virtual int setScreenCaptureScenario(SCREEN_SCENARIO_TYPE screenScenario) = 0;
+   
+   /**
+    * Stops the screen sharing.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int stopScreenCapture() = 0;
+ #endif  // _WIN32 || (__APPLE__ && !TARGET_OS_IPHONE && TARGET_OS_MAC) || __ANDROID__
+ 
+   /**
+    * Gets the current call ID.
+    *
+    * When a user joins a channel on a client, a `callId` is generated to identify
+    * the call.
+    *
+    * After a call ends, you can call `rate` or `complain` to gather feedback from the customer.
+    * These methods require a `callId` parameter. To use these feedback methods, call the this
+    * method first to retrieve the `callId` during the call, and then pass the value as an
+    * argument in the `rate` or `complain` method after the call ends.
+    *
+    * @param callId The reference to the call ID.
+    * @return
+    * - The call ID if the method call is successful.
+    * - < 0: Failure.
+   */
+   virtual int getCallId(agora::util::AString& callId) = 0;
+ 
+   /**
+    * Allows a user to rate the call.
+@@ -7299,101 +7366,135 @@
+     * - The RTMP URL address must not contain special characters, such as Chinese language characters.
+     * - This method applies to Live Broadcast only.
+ 
+     * @param url The CDN streaming URL in the RTMP format. The maximum length of this parameter is 1024 bytes.
+     * @param transcoding Sets the CDN live audio/video transcoding settings.  See LiveTranscoding.
+ 
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     *   - #ERR_INVALID_ARGUMENT (2): The RTMP URL address is NULL or has a string length of 0.
+     *   - #ERR_NOT_INITIALIZED (7): You have not initialized the RTC engine when publishing the stream.
+     *   - #ERR_ALREADY_IN_USE (19): This streaming URL is already in use. Use a new streaming URL for CDN streaming.
+     */
+   virtual int startRtmpStreamWithTranscoding(const char* url, const LiveTranscoding& transcoding) = 0;
+ 
+   /** Update the video layout and audio settings for CDN live. (CDN live only.)
+     * @note This method applies to Live Broadcast only.
+ 
+     * @param transcoding Sets the CDN live audio/video transcoding settings. See LiveTranscoding.
+ 
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+   virtual int updateRtmpTranscoding(const LiveTranscoding& transcoding) = 0;
+ 
+   virtual int startLocalVideoTranscoder(const LocalTranscoderConfiguration& config) = 0;
+   virtual int updateLocalTranscoderConfiguration(const LocalTranscoderConfiguration& config) = 0;
+ 
+   /** Stop an RTMP stream with transcoding or without transcoding from the CDN. (CDN live only.)
+ 
+     * This method removes the RTMP URL address (added by the \ref IRtcEngine::startRtmpStreamWithoutTranscoding "startRtmpStreamWithoutTranscoding" method
+     * or IRtcEngine::startRtmpStreamWithTranscoding "startRtmpStreamWithTranscoding" method) from a CDN live stream.
+     * The SDK returns the result of this method call in the \ref IRtcEngineEventHandler::onStreamUnpublished "onStreamUnpublished" callback.
+ 
+     * The \ref agora::rtc::IRtcEngine::stopRtmpStream "stopRtmpStream" method call triggers the \ref agora::rtc::IRtcEngineEventHandler::onRtmpStreamingStateChanged "onRtmpStreamingStateChanged" callback on the local client to report the state of removing an RTMP stream from the CDN.
+     * @note
+     * - This method removes only one RTMP URL address each time it is called.
+     * - The RTMP URL address must not contain special characters, such as Chinese language characters.
+     * - This method applies to Live Broadcast only.
+ 
+     * @param url The RTMP URL address to be removed. The maximum length of this parameter is 1024 bytes.
+ 
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+   virtual int stopRtmpStream(const char* url) = 0;
+ 
+   virtual int stopLocalVideoTranscoder() = 0;
++
+   /**
++   * Starts the local audio with a mixed audio stream.
++   * @param config Sets the mixed audio stream source settings.
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   *   - #ERR_NOT_INITIALIZED (7): You have not initialized the RTC engine when publishing the
++   * stream.
++   */
++  virtual int startLocalAudioMixer(const LocalAudioMixerConfiguration& config) = 0;
++
++  /**
++   * Update the source stream settings for the mixed audio stream.
++   * @param config Update the source audio stream settings.  See
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   *   - #ERR_NOT_INITIALIZED (7): You have not initialized the RTC engine when publishing the
++   stream.
++   */
++  virtual int updateLocalAudioMixerConfiguration(const LocalAudioMixerConfiguration& config) = 0;
++ 
++  /**
++   * Stops a mixed audio track.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   *   - #ERR_NOT_INITIALIZED (7): You have not initialized the RTC engine when publishing the
++   * stream.
++   */  
++  virtual int stopLocalAudioMixer() = 0;
++
++  /**
+    * Starts video capture with a camera.
+    *
+    * @param config The configuration of the video capture with a primary camera. For details, see CameraCaptureConfiguration.
+    * @param sourceType Source type of camera. See #VIDEO_SOURCE_TYPE.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int startCameraCapture(VIDEO_SOURCE_TYPE sourceType, const CameraCapturerConfiguration& config) = 0;
+ 
+   /**
+    * Stops capturing video through camera.
+    *
+    * You can call this method to stop capturing video through the first camera after calling `startCameraCapture`.
+    *
+    * @param sourceType Source type of camera. See #VIDEO_SOURCE_TYPE.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int stopCameraCapture(VIDEO_SOURCE_TYPE sourceType) = 0;
+   /**
+    * Sets the rotation angle of the video captured by the camera.
+    *
+    * When the video capture device does not have the gravity sensing function, you can call this method to manually adjust the rotation angle of the captured video.
+    *
+    * @param type The video source type. See #VIDEO_SOURCE_TYPE.
+    * @param orientation The clockwise rotation angle. See #VIDEO_ORIENTATION.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setCameraDeviceOrientation(VIDEO_SOURCE_TYPE type, VIDEO_ORIENTATION orientation) = 0;
+   /**
+    * Sets the rotation angle of the video captured by the screen.
+    *
+    * When the screen capture device does not have the gravity sensing function, you can call this method to manually adjust the rotation angle of the captured video.
+    *
+    * @param type The video source type. See #VIDEO_SOURCE_TYPE.
+    * @param orientation The clockwise rotation angle. See #VIDEO_ORIENTATION.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setScreenCaptureOrientation(VIDEO_SOURCE_TYPE type, VIDEO_ORIENTATION orientation) = 0;
+ 
+   /**
+    * Starts sharing a screen.
+    *
+    * @param config The configuration of the captured screen. For details, see ScreenCaptureConfiguration.
+@@ -8059,100 +8160,126 @@
+ 
+   /** Disables the rhythm player.
+    *
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int stopRhythmPlayer() = 0;
+ 
+   /** Configures the rhythm player.
+    *
+    * @param config The configuration of rhythm player.
+    *
+    * @return int
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int configRhythmPlayer(const AgoraRhythmPlayerConfig& config) = 0;
+ 
+   /**
+    * Takes a snapshot of a video stream.
+    *
+    * This method takes a snapshot of a video stream from the specified user, generates a JPG
+    * image, and saves it to the specified path.
+    *
+    * The method is asynchronous, and the SDK has not taken the snapshot when the method call
+    * returns. After a successful method call, the SDK triggers the `onSnapshotTaken` callback
+    * to report whether the snapshot is successfully taken, as well as the details for that
+    * snapshot.
+    *
+    * @note
+    * - Call this method after joining a channel.
+    * - This method takes a snapshot of the published video stream specified in `ChannelMediaOptions`.
+    * - If the user's video has been preprocessed, for example, watermarked or beautified, the resulting
+    * snapshot includes the pre-processing effect.
+    *
+    * @param uid The user ID. Set uid as 0 if you want to take a snapshot of the local user's video.
+    * @param filePath The local path (including filename extensions) of the snapshot. For example:
+    * - Windows: `C:\Users\<user_name>\AppData\Local\Agora\<process_name>\example.jpg`
+    * - iOS: `/App Sandbox/Library/Caches/example.jpg`
+    * - macOS: `～/Library/Logs/example.jpg`
+    * - Android: `/storage/emulated/0/Android/data/<package name>/files/example.jpg`
+    *
+    * Ensure that the path you specify exists and is writable.
+    * @return
+    * - 0 : Success.
+    * - < 0 : Failure.
+    */
+   virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
+ 
++  /**
++   * Takes a snapshot of a video stream.
++   *
++   * This method takes a snapshot of a video stream from the specified user, generates a JPG
++   * image, and saves it to the specified path.
++   *
++   * The method is asynchronous, and the SDK has not taken the snapshot when the method call
++   * returns. After a successful method call, the SDK triggers the `onSnapshotTaken` callback
++   * to report whether the snapshot is successfully taken, as well as the details for that
++   * snapshot.
++   *
++   * @note
++   * - Call this method after joining a channel.
++   * - This method takes a snapshot of the published video stream specified in `ChannelMediaOptions`.
++   *
++   * @param uid The user ID. Set uid as 0 if you want to take a snapshot of the local user's video.
++   * @param config The configuration for the take snapshot. See SnapshotConfig.
++   *
++   * Ensure that the path you specify exists and is writable.
++   * @return
++   * - 0 : Success.
++   * - &lt; 0: Failure.
++   *   - -4: Incorrect observation position. Modify the input observation position according to the reqiurements specified in SnapshotConfig.
++   */
++  virtual int takeSnapshot(uid_t uid, const media::SnapshotConfig& config)  = 0;
++
+     /** Enables the content inspect.
+     @param enabled Whether to enable content inspect:
+     - `true`: Yes.
+     - `false`: No.
+     @param config The configuration for the content inspection.
+     @return
+     - 0: Success.
+     - < 0: Failure.
+     */
+   virtual int enableContentInspect(bool enabled, const media::ContentInspectConfig &config) = 0;
+   /*
+    * Adjust the custom audio publish volume by track id.
+    * @param trackId custom audio track id.
+    * @param volume The volume, range is [0,100]:
+    * 0: mute, 100: The original volume
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int adjustCustomAudioPublishVolume(track_id_t trackId, int volume) = 0;
+ 
+   /*
+    * Adjust the custom audio playout volume by track id.
+    * @param trackId custom audio track id.
+    * @param volume The volume, range is [0,100]:
+    * 0: mute, 100: The original volume
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int adjustCustomAudioPlayoutVolume(track_id_t trackId, int volume) = 0;
+ 
+   /** Sets the Agora cloud proxy service.
+    *
+    * @since v3.3.0
+    *
+    * When the user's firewall restricts the IP address and port, refer to *Use Cloud Proxy* to add the specific
+    * IP addresses and ports to the firewall allowlist; then, call this method to enable the cloud proxy and set
+    * the `proxyType` parameter as `UDP_PROXY(1)`, which is the cloud proxy for the UDP protocol.
+    *
+    * After a successfully cloud proxy connection, the SDK triggers
+    * the \ref IRtcEngineEventHandler::onConnectionStateChanged "onConnectionStateChanged" (CONNECTION_STATE_CONNECTING, CONNECTION_CHANGED_SETTING_PROXY_SERVER) callback.
+    *
+    * To disable the cloud proxy that has been set, call `setCloudProxy(NONE_PROXY)`. To change the cloud proxy type that has been set,
+    * call `setCloudProxy(NONE_PROXY)` first, and then call `setCloudProxy`, and pass the value that you expect in `proxyType`.
+    *
+    * @note
+    * - Agora recommends that you call this method before joining the channel or after leaving the channel.
+    * - For the SDK v3.3.x, the services for pushing streams to CDN and co-hosting across channels are not available
+    * when you use the cloud proxy for the UDP protocol. For the SDK v3.4.0 and later, the services for pushing streams
+@@ -8285,123 +8412,139 @@
+    - By default, SDK will trace media rendering events when `IRtcEngine::joinChannel` is called.
+    - The start point of event tracing will be reset after leaving channel.
+    @return
+    - 0: Success.
+    - < 0: Failure.
+     - -7(ERR_NOT_INITIALIZED): The SDK is not initialized. Initialize the `IRtcEngine` instance before calling this method.
+    */
+   virtual int startMediaRenderingTracing() = 0;
+ 
+   /**
+    @brief Enable instant media rendering.
+    @since v4.1.1
+    @discussion
+    - This method enable SDK to render video or playout audio faster.
+    @note
+    - Once enable this mode, we should destroy rtc engine to disable it.
+    - Enable this mode, will sacrifice some part of experience.
+    @return
+    - 0: Success.
+    - < 0: Failure.
+     - -7(ERR_NOT_INITIALIZED): The SDK is not initialized. Initialize the `IRtcEngine` instance before calling this method.
+    */
+   virtual int enableInstantMediaRendering() = 0;
+ 
+   /**
+    * Return current NTP(unix timestamp) time in milliseconds.
+    */
+   virtual uint64_t getNtpWallTimeInMs() = 0;
+ 
+   /** 
+    * @brief Whether the target feature is available for the device.
+    * @since v4.3.0
+    * @param type The feature type. See FeatureType.
+    * @return
+    * - true: available.
+    * - false: not available.
+    */
+   virtual bool isFeatureAvailableOnDevice(FeatureType type) = 0;
+ 
+   /**
+    * @brief send audio metadata
+    * @since v4.3.1
+    * @param metadata The pointer of metadata
+    * @param length Size of metadata
+    * @return
+    * - 0: success
+    * - <0: failure
+    * @technical preview
+   */
+   virtual int sendAudioMetadata(const char* metadata, size_t length) = 0;
++  
++  /**
++   * @brief Queries the HDR capability of the video module
++   * @param videoModule The video module. See VIDEO_MODULE_TYPE
++   * @param capability HDR capability of video module. See HDR_CAPABILITY
++   * @return
++   * - 0: success
++   * - <0: failure
++   * @technical preview
++  */
++  virtual int queryHDRCapability(VIDEO_MODULE_TYPE videoModule, HDR_CAPABILITY& capability) = 0;
+ };
+ 
+ // The following types are either deprecated or not implmented yet.
+ enum QUALITY_REPORT_FORMAT_TYPE {
+   /** 0: The quality report in JSON format,
+    */
+   QUALITY_REPORT_JSON = 0,
+   /** 1: The quality report in HTML format.
+    */
+   QUALITY_REPORT_HTML = 1,
+ };
+ 
+ /** Media device states. */
+ enum MEDIA_DEVICE_STATE_TYPE {
+   /** 0: The device is ready for use.
+    */
+   MEDIA_DEVICE_STATE_IDLE = 0,
+   /** 1: The device is active.
+    */
+   MEDIA_DEVICE_STATE_ACTIVE = 1,
+   /** 2: The device is disabled.
+    */
+   MEDIA_DEVICE_STATE_DISABLED = 2,
++  
++  /** 3: The device is plugged in.
++   */
++  MEDIA_DEVICE_STATE_PLUGGED_IN = 3,
++  
+   /** 4: The device is not present.
+    */
+   MEDIA_DEVICE_STATE_NOT_PRESENT = 4,
+   /** 8: The device is unplugged.
+    */
+   MEDIA_DEVICE_STATE_UNPLUGGED = 8
+ };
+ 
+ enum VIDEO_PROFILE_TYPE {
+   /** 0: 160 x 120  @ 15 fps */      // res       fps
+   VIDEO_PROFILE_LANDSCAPE_120P = 0,  // 160x120   15
+   /** 2: 120 x 120 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_120P_3 = 2,   // 120x120   15
+                                         /** 10: 320 x 180 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_180P = 10,    // 320x180   15
+                                         /** 12: 180 x 180  @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_180P_3 = 12,  // 180x180   15
+                                         /** 13: 240 x 180 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_180P_4 = 13,  // 240x180   15
+                                         /** 20: 320 x 240 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_240P = 20,    // 320x240   15
+   /** 22: 240 x 240 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_240P_3 = 22,  // 240x240   15
+   /** 23: 424 x 240 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_240P_4 = 23,  // 424x240   15
+   /** 30: 640 x 360 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P = 30,  // 640x360   15
+   /** 32: 360 x 360 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_3 = 32,  // 360x360   15
+   /** 33: 640 x 360 @ 30 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_4 = 33,  // 640x360   30
+   /** 35: 360 x 360 @ 30 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_6 = 35,  // 360x360   30
+   /** 36: 480 x 360 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_7 = 36,  // 480x360   15
+   /** 37: 480 x 360 @ 30 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_8 = 37,  // 480x360   30
+   /** 38: 640 x 360 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_9 = 38,   // 640x360   15
+                                          /** 39: 640 x 360 @ 24 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_10 = 39,  // 640x360   24
+   /** 100: 640 x 360 @ 24 fps */
+   VIDEO_PROFILE_LANDSCAPE_360P_11 = 100,  // 640x360   24
+   /** 40: 640 x 480 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_480P = 40,  // 640x480   15
+   /** 42: 480 x 480 @ 15 fps */
+   VIDEO_PROFILE_LANDSCAPE_480P_3 = 42,  // 480x480   15
+   /** 43: 640 x 480 @ 30 fps */
+   VIDEO_PROFILE_LANDSCAPE_480P_4 = 43,  // 640x480   30
+                                         /** 45: 480 x 480 @ 30 fps */

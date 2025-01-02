@@ -1,0 +1,119 @@
+@@ -94,100 +94,118 @@
+    * @param trackId The audio track ID.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+    
+   virtual int pushAudioFrame(IAudioFrameObserverBase::AudioFrame* frame, rtc::track_id_t trackId = 0) = 0;
+ 
+   /**
+    * Pulls the remote audio data.
+    *
+    * After a successful method call, the app pulls the decoded and mixed audio data for playback.
+    *
+    * The difference between this method and the \ref onPlaybackAudioFrame "onPlaybackAudioFrame" is as follows:
+    * - `onPlaybackAudioFrame`: The SDK sends the audio data to the app once every 10 ms. Any delay in processing
+    * the audio frames may result in audio jitter.
+    * - `pullAudioFrame`: The app pulls the remote audio data. After setting the audio data parameters, the
+    * SDK adjusts the frame buffer and avoids problems caused by jitter in the external audio playback.
+    *
+    * @param frame The pointer to the audio frame: AudioFrame.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int pullAudioFrame(IAudioFrameObserverBase::AudioFrame* frame) = 0;
+ 
+   /**
+    * Sets the external video source.
+    *
+    * Once the external video source is enabled, the SDK prepares to accept the external video frame.
+    *
+    * @param enabled Determines whether to enable the external video source.
+    * - true: Enable the external video source. Once set, the SDK creates the external source and prepares
+    * video data from `pushVideoFrame` or `pushEncodedVideoImage`.
+    * - false: Disable the external video source.
+    * @param useTexture Determines whether to use textured video data.
+    * - true: Use texture, which is not supported now.
+    * - False: Do not use texture.
+    * @param sourceType Determines the type of external video source frame.
+    * - ENCODED_VIDEO_FRAME: The external video source is encoded.
+    * - VIDEO_FRAME: The external video source is not encoded.
+    * @param encodedVideoOption Video encoded track option, which is only used for ENCODED_VIDEO_FRAME.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setExternalVideoSource(
+       bool enabled, bool useTexture, EXTERNAL_VIDEO_SOURCE_TYPE sourceType = VIDEO_FRAME,
+       rtc::SenderOptions encodedVideoOption = rtc::SenderOptions()) = 0;
+ 
++#if defined(__ANDROID__)
++  /**
++   * Sets the remote eglContext.
++   *
++   * When the engine is destroyed, the SDK will automatically release the eglContext.
++   *
++   * @param eglContext.
++   *
++   * @note
++   * setExternalRemoteEglContext needs to be called before joining the channel.
++   *
++   * @return
++   * - 0: Success.
++   * - < 0: Failure.
++   */
++  virtual int setExternalRemoteEglContext(void* eglContext) = 0;
++#endif
++
+   /**
+    * Sets the external audio source.
+    *
+    * @note
+    * Ensure that you call this method before joining the channel.
+    *
+    * @deprecated This method is deprecated. Use createCustomAudioTrack(rtc::AUDIO_TRACK_TYPE trackType, const rtc::AudioTrackConfig& config) instead.
+    *
+    * @param enabled Determines whether to enable the external audio source:
+    * - true: Enable the external audio source.
+    * - false: (default) Disable the external audio source.
+    * @param sampleRate The Sample rate (Hz) of the external audio source, which can set be as
+    * 8000, 16000, 32000, 44100, or 48000.
+    * @param channels The number of channels of the external audio source, which can be set as 1 or 2:
+    * - 1: Mono.
+    * - 2: Stereo.
+    * @param localPlayback Enable/Disables the local playback of external audio track:
+    * - true: Enable local playback
+    * - false: (Default) Do not enable local playback
+    * @param publish Determines whether to publish the external audio track:
+    * - true: (Default) Publish the external audio track.
+    * - false: Don`t publish the external audio track.
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+   virtual int setExternalAudioSource(bool enabled, int sampleRate, int channels, bool localPlayback = false, bool publish = true) __deprecated = 0;
+ 
+   /**
+    * Create a custom audio track and get the audio track id.
+    *
+    * @note Ensure that you call this method before calling `joinChannel`.
+    *
+    * @param trackType The type of custom audio track
+    * See AUDIO_TRACK_TYPE.
+    *
+    * @param config The config of custom audio track
+    * See AudioTrackConfig.
+    *
+    * @return
+    * - If the call is successful, SDK returns audio track id.
+    * - If the call fails, SDK returns 0xffffffff.
+    */
+   virtual rtc::track_id_t createCustomAudioTrack(rtc::AUDIO_TRACK_TYPE trackType, const rtc::AudioTrackConfig& config) = 0;
+ 
+   /**
+    * Destroy custom audio track by trackId
+    *
+    * @param trackId The custom audio track id.
+    *

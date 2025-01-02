@@ -35,7 +35,7 @@ const new_version_path = `headers/${new_version}/include`;
 const blackList = ['include/rte_base', 'include/internal'];
 
 const diffTool = new Diff(old_version_path, new_version_path, blackList);
-// diffTool.setOutputDirectory(`temp/${old_version}↔${new_version}`);
+diffTool.setOutputDirectory(`temp/${old_version}↔${new_version}`);
 diffTool.run();
 
 let promptWithMethod = prompt

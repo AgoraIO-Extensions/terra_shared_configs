@@ -47,9 +47,12 @@ export class Diff {
     console.log(`Comparing directories: ${this.dirA} vs ${this.dirB}`);
 
     try {
-      const result = execSync(`diff -u -b -r ${this.dirA} ${this.dirB}`, {
-        encoding: 'utf-8',
-      });
+      const result = execSync(
+        `diff -u -b -r --unified=50 ${this.dirA} ${this.dirB}`,
+        {
+          encoding: 'utf-8',
+        }
+      );
 
       if (!result) {
         console.log('No Differences found.');
@@ -165,7 +168,7 @@ export class Diff {
     if (this.outputDir) {
       this.writeDifferencesToFile(differences);
     }
-
+    debugger;
     return differences;
   }
 }
