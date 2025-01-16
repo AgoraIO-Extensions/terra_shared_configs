@@ -1,0 +1,88 @@
+[
+  {
+    "file": "ut/cpp/IRtcEngine.h",
+    "changes": {
+      "api_changes": [
+        {
+          "diff": [
+            "+",
+            "+    /**",
+            "+   * Gets the detailed video frame information of the video capture device in the specified video format.",
+            "+   *",
+            "+   * After calling `numberOfCapabilities` to get the number of video formats supported by the video capture",
+            "+   * device, you can call this method to get the specific video frame information supported by the",
+            "+   * specified index number.",
+            "+   *",
+            "+   * @param deviceIdUTF8 ID of the video capture device.",
+            "+   * @param deviceCapabilityNumber The index number of the video format. If the return value of `numberOfCapabilities`",
+            "+   * is i, the value range of this parameter is [0,i).",
+            "+   * @param capability Output parameter. Indicates the specific information of the specified video format,",
+            "+   * including width (px), height (px), and frame rate (fps). See VideoFormat.",
+            "+   *",
+            "+   * @return",
+            "+   * - 0: Success.",
+            "+   * - < 0: Failure.",
+            "+   */",
+            "+  virtual int getCapability(const char* deviceIdUTF8, const uint32_t deviceCapabilityNumber, VideoFormat& capability) = 0;"
+          ],
+          "parent_class": "IRtcEngine",
+          "language": "cpp",
+          "details": {
+            "api_name": "getCapability",
+            "api_signature": "virtual int getCapability(const char* deviceIdUTF8, const uint32_t deviceCapabilityNumber, VideoFormat& capability) = 0;",
+            "change_type": "create",
+            "change_desc": "新增获取视频捕获设备指定视频格式的详细视频帧信息的接口。",
+            "shortdesc": "获取视频捕获设备指定视频格式的详细视频帧信息。",
+            "detailed_desc": {
+              "since": "",
+              "desc": "在调用 `numberOfCapabilities` 获取视频捕获设备支持的视频格式数量后，可以调用此方法获取指定索引号支持的具体视频帧信息。",
+              "deprecated": ""
+            },
+            "platforms": "windows",
+            "parent_class": "IRtcEngine",
+            "parameters": [
+              {
+                "name": "deviceIdUTF8",
+                "type": "const char*",
+                "desc": "视频捕获设备的 ID。",
+                "change_type": "create",
+                "old_value": "",
+                "new_value": "",
+                "is_output": false,
+                "is_array": false
+              },
+              {
+                "name": "deviceCapabilityNumber",
+                "type": "const uint32_t",
+                "desc": "视频格式的索引号。如果 `numberOfCapabilities` 的返回值是 i，则该参数的取值范围是 [0,i)。",
+                "change_type": "create",
+                "old_value": "",
+                "new_value": "",
+                "is_output": false,
+                "is_array": false
+              },
+              {
+                "name": "capability",
+                "type": "VideoFormat&",
+                "desc": "输出参数。表示指定视频格式的具体信息，包括宽度（px）、高度（px）和帧率（fps）。详见 `VideoFormat`。",
+                "change_type": "create",
+                "old_value": "",
+                "new_value": "",
+                "is_output": true,
+                "is_array": false
+              }
+            ],
+            "scenarios": "",
+            "timing": "",
+            "restrictions": "",
+            "return_value": "- 0: 方法调用成功。\n - < 0: 方法调用失败。",
+            "old_api_name": "",
+            "old_api_signature": ""
+          }
+        }
+      ],
+      "struct_changes": [],
+      "enum_changes": []
+    }
+  }
+]
