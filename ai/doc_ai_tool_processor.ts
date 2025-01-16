@@ -1,3 +1,4 @@
+import { exec } from 'child_process';
 import * as fs from 'fs';
 
 interface DocParameter {
@@ -86,6 +87,7 @@ export class DocAIToolJsonProcessor {
     const configString = `module.exports = ${JSON.stringify(config, null, 2)};`;
     try {
       fs.writeFileSync(outputPath, configString, 'utf-8');
+      exec(`yarn eslint --fix ${outputPath}`);
       console.log(`Configuration saved to ${outputPath}`);
     } catch (error) {
       console.error('Error writing configuration to file:', error);
