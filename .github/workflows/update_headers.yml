@@ -9,6 +9,10 @@ on:
         description: 'URL of the native headers'
         type: 'string'
         required: true
+      ai_json_url:
+        description: 'URL of the AI JSON'
+        type: 'string'
+        required: true
       version:
         description: 'native headers version'
         type: 'string'
@@ -44,3 +48,10 @@ jobs:
             native headers source:
             ${{ inputs.url }}
           add-paths: headers/*
+
+      - name: Fetch AI JSON if ai_json_url is provided
+        if: ${{ inputs.ai_json_url != '' }}
+        uses: ./.github/actions/fetch_ai_json
+        with:
+          url: ${{ inputs.ai_json_url }}
+          product_type: ${{ inputs.product_type }}

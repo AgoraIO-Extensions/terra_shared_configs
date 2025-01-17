@@ -9,12 +9,8 @@ on:
         description: 'URL of the native headers'
         type: 'string'
         required: true
-      version:
-        description: 'native headers version'
-        type: 'string'
-        required: true
       product_type:
-        description: 'product type'
+        description: 'product type, available options: rtc, rtm'
         type: 'string'
         required: true
 
@@ -34,12 +30,10 @@ jobs:
         run: >
           git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 
-      - name: Run unit test
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fetch AI JSON from URL
         run: |
           yarn
-          yarn run test
+          ts-node ai/index.ts ${{ inputs.url }} configs/${{ inputs.product_type }}/ai/parameter_list.ts
 
       - name: Create pull request
         uses: AgoraIO-Extensions/actions/.github/actions/pr@main
@@ -47,10 +41,10 @@ jobs:
           github-token: ${{ secrets.GH_TOKEN }}
           target-repo: ${{ github.workspace }}
           target-branch: ${{ github.ref_name }}
-          target-branch-name-surffix: headers-update
+          target-branch-name-surffix: fetch-ai-json
           pull-request-title: |
-            [AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}
+            [AUTO] Fetch AI JSON
           pull-request-body: |
-            native headers source:
+            AI JSON source:
             ${{ inputs.url }}
-          add-paths: headers/*
+          add-paths: configs/*

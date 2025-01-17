@@ -103,7 +103,7 @@ export function ReturnTypeParser(
             if (args.useAI) {
               let config: AIParameter =
                 AIConfigMethodParameters[
-                  `${param.parent?.parent?.name}:${param.parent?.name}.${param.name}@type`
+                  `${param.parent?.parent?.name}:${param.parent?.name}.${param.name}`
                 ];
               if (config && config.parent_name) {
                 param.is_output = config.is_output;

@@ -41,7 +41,7 @@ function markArray(
     if (args.useAI) {
       let _config: AIParameter =
         AIConfigMethodParameters[
-          `${node.parent?.parent?.name}:${node.parent?.name}.${node.name}@type`
+          `${node.parent?.parent?.name}:${node.parent?.name}.${node.name}`
         ];
       if (_config?.parent_name) {
         node.type.kind = SimpleTypeKind.array_t;
