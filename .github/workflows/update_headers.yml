@@ -35,6 +35,14 @@ jobs:
           bash scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
         shell: bash
 
+      - name: Fetch AI JSON if ai_json_url is provided
+        if: ${{ inputs.ai_json_url != '' }}
+        uses: ./.github/actions/fetch_ai_json
+        with:
+          url: ${{ inputs.ai_json_url }}
+          product_type: ${{ inputs.product_type }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create pull request
         uses: AgoraIO-Extensions/actions/.github/actions/pr@main
         with:
@@ -48,11 +56,3 @@ jobs:
             native headers source:
             ${{ inputs.url }}
           add-paths: headers/*
-
-      - name: Fetch AI JSON if ai_json_url is provided
-        if: ${{ inputs.ai_json_url != '' }}
-        uses: ./.github/actions/fetch_ai_json
-        with:
-          url: ${{ inputs.ai_json_url }}
-          product_type: ${{ inputs.product_type }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
