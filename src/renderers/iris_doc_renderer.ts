@@ -1,8 +1,8 @@
 import { strict as assert } from 'assert';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
-import path from 'path';
 import * as os from 'os';
+import path from 'path';
 
 import {
   ParseResult,

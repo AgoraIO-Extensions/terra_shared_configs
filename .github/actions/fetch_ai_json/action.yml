@@ -1,0 +1,46 @@
+name: Fetch AI JSON
+inputs:
+  url:
+    description: 'URL of the native headers'
+    type: 'string'
+    required: true
+  product_type:
+    description: 'product type, available options: rtc, rtm'
+    type: 'string'
+    required: true
+  GH_TOKEN:
+    description: 'GitHub token'
+    type: 'string'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    # Setup .npmrc file to publish to GitHub Packages
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Reconfigure git to use HTTP authentication
+      run: >
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+      shell: bash
+
+    - name: Fetch AI JSON from URL
+      run: |
+        yarn
+        mkdir -p ai/temp
+        curl -o ai/temp/differences.json ${{ inputs.url }}
+        yarn ts-node ai/index.ts ai/temp/differences.json configs/${{ inputs.product_type }}/ai/parameter_list.ts
+      shell: bash
+
+    - name: Create pull request
+      uses: AgoraIO-Extensions/actions/.github/actions/pr@main
+      with:
+        github-token: ${{ inputs.GH_TOKEN }}
+        target-repo: ${{ github.workspace }}
+        target-branch: ${{ github.ref_name }}
+        target-branch-name-surffix: fetch-ai-json
+        pull-request-title: |
+          [AUTO] Fetch AI JSON with ${{ inputs.url }}
+        add-paths: configs/*

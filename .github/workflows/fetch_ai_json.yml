@@ -21,30 +21,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
-      # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v3
+      - uses: ./.github/actions/fetch_ai_json
         with:
-          node-version: '18.x'
-
-      - name: Reconfigure git to use HTTP authentication
-        run: >
-          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
-
-      - name: Fetch AI JSON from URL
-        run: |
-          yarn
-          ts-node ai/index.ts ${{ inputs.url }} configs/${{ inputs.product_type }}/ai/parameter_list.ts
-
-      - name: Create pull request
-        uses: AgoraIO-Extensions/actions/.github/actions/pr@main
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          target-repo: ${{ github.workspace }}
-          target-branch: ${{ github.ref_name }}
-          target-branch-name-surffix: fetch-ai-json
-          pull-request-title: |
-            [AUTO] Fetch AI JSON
-          pull-request-body: |
-            AI JSON source:
-            ${{ inputs.url }}
-          add-paths: configs/*
+          url: ${{ inputs.url }}
+          product_type: ${{ inputs.product_type }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

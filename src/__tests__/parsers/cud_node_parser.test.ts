@@ -13,11 +13,13 @@ import {
   MemberFunction,
   Struct,
 } from '@agoraio-extensions/cxx-parser';
+
+import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
+
 import CUDNodeParser, {
   CUDNodeParserArgs,
   isNodeMatched,
 } from '../../parsers/cud_node_parser';
-import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
 describe('CUDNodeParser', () => {
   it('isNodeMatched', () => {

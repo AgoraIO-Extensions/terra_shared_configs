@@ -1,28 +1,36 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
 import path from 'path';
+
+import {
+  CXXFile,
+  SimpleTypeKind,
+  Struct,
+} from '@agoraio-extensions/cxx-parser';
+import {
+  ParseResult,
+  RenderResult,
+  TerraContext,
+} from '@agoraio-extensions/terra-core';
 import _ from 'lodash';
 
 import {
-    ParseResult,
-    RenderResult,
-    TerraContext,
-} from '@agoraio-extensions/terra-core';
+  PointerArrayNameMapping,
+  PointerMarkerParserConfigMarker,
+} from '../parsers/pointer_marker_parser';
 import { askGPT } from '../utils/gpt_utils';
-import { PointerArrayNameMapping, PointerMarkerParserConfigMarker } from '../parsers/pointer_marker_parser';
-import { CXXFile, SimpleTypeKind, Struct } from '@agoraio-extensions/cxx-parser';
 
 export interface PointerMarkerGPTRenderer {
-    configPath?: string
+  configPath?: string;
 }
 
 export function PointerMarkerGPTRenderer(
-    terraContext: TerraContext,
-    args?: PointerMarkerGPTRenderer,
-    parseResult?: ParseResult
+  terraContext: TerraContext,
+  args?: PointerMarkerGPTRenderer,
+  parseResult?: ParseResult
 ): RenderResult[] {
-    processGPT(parseResult!, args?.configPath);
-    return [];
+  processGPT(parseResult!, args?.configPath);
+  return [];
 }
 
 const prompt = `
@@ -37,61 +45,72 @@ Given struct:
 \`\`\`
 `;
 
-const defualtConfigPath = path.resolve(`${__dirname}/../../configs/rtc/pointer_marker.config.ts`);
+const defualtConfigPath = path.resolve(
+  `${__dirname}/../../configs/rtc/pointer_marker.config.ts`
+);
 async function processGPT(parseResult: ParseResult, configPath?: string) {
-    let originalConfigPath = configPath ?? defualtConfigPath;
-    let originalMarkers = require(originalConfigPath).markers as PointerMarkerParserConfigMarker[];
+  let originalConfigPath = configPath ?? defualtConfigPath;
+  let originalMarkers = require(originalConfigPath)
+    .markers as PointerMarkerParserConfigMarker[];
 
-    let structs = parseResult.nodes
-        .flatMap((node) => (node as CXXFile).nodes)
-        .filter((node) => node.isStruct())
-        .filter((node) => {
-            return node.asStruct()
-                .member_variables
-                .find((member) => member.type.kind === SimpleTypeKind.pointer_t) !== undefined;
-        });
+  let structs = parseResult.nodes
+    .flatMap((node) => (node as CXXFile).nodes)
+    .filter((node) => node.isStruct())
+    .filter((node) => {
+      return (
+        node
+          .asStruct()
+          .member_variables.find(
+            (member) => member.type.kind === SimpleTypeKind.pointer_t
+          ) !== undefined
+      );
+    });
 
-    let markers: string[] = [];
+  let markers: string[] = [];
 
-    for (let st of structs) {
-        let struct = st.asStruct();
-        let structSource = structToSource(struct);
-        let promptWithStruct = prompt
-            .replace('{{ STRUCT_NAME }}', struct.name)
-            .replace('{{ STRUCT_SOURCE }}', structSource)
-            .trim();
-        let res = await askGPT(promptWithStruct);
-        if (res.length > 0) {
-            let jsonArray = Object.values(JSON.parse(res));
-            if (jsonArray.length === 0) {
-                continue;
-            }
+  for (let st of structs) {
+    let struct = st.asStruct();
+    let structSource = structToSource(struct);
+    let promptWithStruct = prompt
+      .replace('{{ STRUCT_NAME }}', struct.name)
+      .replace('{{ STRUCT_SOURCE }}', structSource)
+      .trim();
+    let res = await askGPT(promptWithStruct);
+    if (res.length > 0) {
+      let jsonArray = Object.values(JSON.parse(res));
+      if (jsonArray.length === 0) {
+        continue;
+      }
 
-            // let newJsonArray = jsonArray as PointerArrayNameMapping[];
-            let newJsonArray: PointerArrayNameMapping[] = [];
-            let originalMarker = originalMarkers.find((entry: any) => _.isMatch(struct, entry.node));
-            if (originalMarker) {
-                for (let om of (jsonArray as PointerArrayNameMapping[])) {
-                    if (om.lengthName.length === 0) {
-                        continue;
-                    }
-                    let found = originalMarker.pointerArrayNameMappings?.find((entry) => entry.ptrName === om.ptrName);
-                    // Only add the ptrName if it's not found in the original marker
-                    let toAdd = found ? found : om;
-                    newJsonArray.push(toAdd);
-                }
-            }
+      // let newJsonArray = jsonArray as PointerArrayNameMapping[];
+      let newJsonArray: PointerArrayNameMapping[] = [];
+      let originalMarker = originalMarkers.find((entry: any) =>
+        _.isMatch(struct, entry.node)
+      );
+      if (originalMarker) {
+        for (let om of jsonArray as PointerArrayNameMapping[]) {
+          if (om.lengthName.length === 0) {
+            continue;
+          }
+          let found = originalMarker.pointerArrayNameMappings?.find(
+            (entry) => entry.ptrName === om.ptrName
+          );
+          // Only add the ptrName if it's not found in the original marker
+          let toAdd = found ? found : om;
+          newJsonArray.push(toAdd);
+        }
+      }
 
-            if (newJsonArray.length > 0) {
-                let pointerArrayNameMappings = newJsonArray.map((entry: any) => {
-                    return `
+      if (newJsonArray.length > 0) {
+        let pointerArrayNameMappings = newJsonArray.map((entry: any) => {
+          return `
 {
     ptrName: "${entry.ptrName}",
     lengthName: "${entry.lengthName}",
 }`.trim();
-                });
+        });
 
-                let marker = `
+        let marker = `
 {
     node: {
         __TYPE: CXXTYPE.Struct,
@@ -102,13 +121,13 @@ async function processGPT(parseResult: ParseResult, configPath?: string) {
         ${pointerArrayNameMappings.join(',\n')}
     ],
 }`.trim();
-                markers.push(marker);
-            }
-        }
+        markers.push(marker);
+      }
     }
-    console.log(markers);
+  }
+  console.log(markers);
 
-    let output = `
+  let output = `
 import { CXXTYPE } from "@agoraio-extensions/cxx-parser";
 
 module.exports = {
@@ -118,28 +137,32 @@ module.exports = {
 };
 `.trim();
 
-    fs.writeFileSync(originalConfigPath, output);
+  fs.writeFileSync(originalConfigPath, output);
 
-    // Reformat the file
-    execSync(`yarn prettier ${originalConfigPath} --write`, {
-        cwd: path.resolve(__dirname, '../../'),
-    });
+  // Reformat the file
+  execSync(`yarn prettier ${originalConfigPath} --write`, {
+    cwd: path.resolve(__dirname, '../../'),
+  });
 }
 
 function structToSource(struct: Struct): string {
-    let structName = struct.name;
-    let structContent = struct.member_variables.map((member) => {
-        let memberName = member.name;
-        let memberType = member.type.source;
-        let memberComment = member.comment.split('\n').map((line) => `/// ${line}`).join('\n');
-        return `
+  let structName = struct.name;
+  let structContent = struct.member_variables
+    .map((member) => {
+      let memberName = member.name;
+      let memberType = member.type.source;
+      let memberComment = member.comment
+        .split('\n')
+        .map((line) => `/// ${line}`)
+        .join('\n');
+      return `
 ${memberComment}
 ${memberType} ${memberName};`.trim();
-    }).join('\n\n');
+    })
+    .join('\n\n');
 
-    return `
+  return `
 struct ${structName} {
 ${structContent}
 };`.trim();
 }
-
