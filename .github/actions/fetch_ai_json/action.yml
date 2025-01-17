@@ -8,6 +8,10 @@ inputs:
     description: 'product type, available options: rtc, rtm'
     type: 'string'
     required: true
+  GH_TOKEN:
+    description: 'GitHub token'
+    type: 'string'
+    required: true
 
 runs:
   using: composite
@@ -19,7 +23,7 @@ runs:
 
     - name: Reconfigure git to use HTTP authentication
       run: >
-        git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
 
     - name: Fetch AI JSON from URL
       run: |
@@ -29,7 +33,7 @@ runs:
     - name: Create pull request
       uses: AgoraIO-Extensions/actions/.github/actions/pr@main
       with:
-        github-token: ${{ secrets.GH_TOKEN }}
+        github-token: ${{ inputs.GH_TOKEN }}
         target-repo: ${{ github.workspace }}
         target-branch: ${{ github.ref_name }}
         target-branch-name-surffix: fetch-ai-json

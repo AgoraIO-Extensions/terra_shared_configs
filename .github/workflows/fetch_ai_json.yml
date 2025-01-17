@@ -25,3 +25,4 @@ jobs:
         with:
           url: ${{ inputs.url }}
           product_type: ${{ inputs.product_type }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
