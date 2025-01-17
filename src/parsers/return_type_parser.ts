@@ -7,11 +7,14 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
+import { AIParameter } from '../../ai/doc_ai_tool_processor';
+
 import { isOutputVariable } from '../utils';
 import { getConfigs } from '../utils/parser_utils';
 
 import { BaseParserArgs } from './index';
 
+const AIConfigMethodParameters = require('../../configs/rtc/ai/method_parameters.ts');
 const defaultConfig = require('../../configs/rtc/fixed_return_type_list.ts');
 
 export type ReturnTypeParserArgs = BaseParserArgs & {
@@ -98,6 +101,13 @@ export function ReturnTypeParser(
               }
             }
             if (args.useAI) {
+              let config: AIParameter =
+                AIConfigMethodParameters[
+                  `${param.parent?.parent?.name}:${param.parent?.name}.${param.name}@type`
+                ];
+              if (config && config.parent_name) {
+                param.is_output = config.is_output;
+              }
             }
           }
         }

@@ -23,17 +23,15 @@ interface DocChanges {
   };
 }
 
-interface RenameParameterObject {
-  [key: string]: {
-    parent_name: string;
-    parent_class: string;
-    is_output: boolean;
-    is_array: boolean;
-  };
+export interface AIParameter {
+  parent_name: string;
+  parent_class: string;
+  is_output: boolean;
+  is_array: boolean;
 }
 
-export interface AIconfiguration {
-  renameParameterConfigs: RenameParameterObject;
+interface AIParameterObject {
+  [key: string]: AIParameter;
 }
 
 export interface DocAIToolJson {
@@ -60,8 +58,8 @@ export class DocAIToolJsonProcessor {
     }
   }
 
-  generateConfigFromDocAPIChanges(): RenameParameterObject {
-    let output: RenameParameterObject = {};
+  generateConfigFromDocAPIChanges(): AIParameterObject {
+    let output: AIParameterObject = {};
     if (!this.data) {
       console.error('call readJsonFromFile() first.');
       return output;

@@ -1,0 +1,56 @@
+name: Fetch AI JSON
+
+on:
+  repository_dispatch:
+    types: [fetch_ai_json]
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL of the native headers'
+        type: 'string'
+        required: true
+      version:
+        description: 'native headers version'
+        type: 'string'
+        required: true
+      product_type:
+        description: 'product type'
+        type: 'string'
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Reconfigure git to use HTTP authentication
+        run: >
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+
+      - name: Run unit test
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn
+          yarn run test
+
+      - name: Create pull request
+        uses: AgoraIO-Extensions/actions/.github/actions/pr@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          target-repo: ${{ github.workspace }}
+          target-branch: ${{ github.ref_name }}
+          target-branch-name-surffix: headers-update
+          pull-request-title: |
+            [AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}
+          pull-request-body: |
+            native headers source:
+            ${{ inputs.url }}
+          add-paths: headers/*

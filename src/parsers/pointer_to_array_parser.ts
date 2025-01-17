@@ -8,13 +8,17 @@ import {
 } from '@agoraio-extensions/cxx-parser';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
+import { AIParameter } from '../../ai/doc_ai_tool_processor';
+
 import { getConfigs } from '../utils/parser_utils';
 
 import { BaseParserArgs } from './index';
 
+const AIConfigMethodParameters = require('../../configs/rtc/ai/method_parameters.ts');
 const defaultConfig = require('../../configs/rtc/pointer_to_array');
 
 function markArray(
+  args: BaseParserArgs,
   nodes: (Variable | MemberVariable)[],
   parentNode: CXXTerraNode,
   name_configs: string[],
@@ -32,6 +36,16 @@ function markArray(
       // 配置表中配置了该变量则标记为数组
       node.type.kind = SimpleTypeKind.array_t;
       return;
+    }
+
+    if (args.useAI) {
+      let _config: AIParameter =
+        AIConfigMethodParameters[
+          `${node.parent?.parent?.name}:${node.parent?.name}.${node.name}@type`
+        ];
+      if (_config?.parent_name) {
+        node.type.kind = SimpleTypeKind.array_t;
+      }
     }
 
     if (
@@ -86,6 +100,7 @@ export function PointerToArrayParser(
     file.nodes.forEach((node) => {
       if (node.__TYPE === CXXTYPE.Struct) {
         markArray(
+          args,
           node.asStruct().member_variables,
           node,
           name_configs,
@@ -93,6 +108,7 @@ export function PointerToArrayParser(
         );
       } else if (node.__TYPE === CXXTYPE.Clazz) {
         markArray(
+          args,
           node.asClazz().member_variables,
           node,
           name_configs,
@@ -100,6 +116,7 @@ export function PointerToArrayParser(
         );
         node.asClazz().methods.forEach((method) => {
           markArray(
+            args,
             method.parameters,
             method,
             name_configs,
