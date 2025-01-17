@@ -29,7 +29,7 @@ runs:
     - name: Fetch AI JSON from URL
       run: |
         yarn
-        ts-node ai/index.ts ${{ inputs.url }} configs/${{ inputs.product_type }}/ai/parameter_list.ts
+        yarn ts-node ai/index.ts ${{ inputs.url }} configs/${{ inputs.product_type }}/ai/parameter_list.ts
       shell: bash
 
     - name: Create pull request
