@@ -40,8 +40,5 @@ runs:
         target-branch: ${{ github.ref_name }}
         target-branch-name-surffix: fetch-ai-json
         pull-request-title: |
-          [AUTO] Fetch AI JSON
-        pull-request-body: |
-          AI JSON source:
-          ${{ inputs.url }}
+          [AUTO] Fetch AI JSON with ${{ inputs.url }}
         add-paths: configs/*
