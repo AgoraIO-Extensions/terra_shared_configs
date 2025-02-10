@@ -12,7 +12,7 @@ on:
       ai_json_url:
         description: 'URL of the AI JSON'
         type: 'string'
-        required: true
+        required: false
       version:
         description: 'native headers version'
         type: 'string'
