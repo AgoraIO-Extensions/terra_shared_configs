@@ -44,8 +44,15 @@ rm "$temp_file"
 mkdir -p "$destination"
 
 # Ensure the nativeSDK was successfully downloaded
-nativeSDK="$destination/Agora_Native_SDK_for_Windows_FULL"
+nativeSDK=$(find "$destination" -type d -name "*_Native_SDK_for_Windows*" -print -quit)
 mkdir -p $nativeSDK
+
+if [ -z "$nativeSDK" ]; then
+    echo "Native SDK directory not found."
+    exit 1
+fi
+
+echo "Native SDK directory found at $nativeSDK"
 
 # Move the file to the target location
 mv "$nativeSDK/sdk/high_level_api/include" "$destination"
