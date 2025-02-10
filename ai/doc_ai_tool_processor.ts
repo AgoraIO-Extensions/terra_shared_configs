@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
+import * as path from 'path';
 
 interface DocParameter {
   name: string;
@@ -46,13 +47,13 @@ export class DocAIToolJsonProcessor {
   private data: DocAIToolJson[] | undefined;
 
   constructor(filepath: string) {
-    this.readJsonFromFile(filepath);
+    this.data = this.readJsonFromFile(filepath);
   }
 
-  private readJsonFromFile(filepath: string): void {
+  private readJsonFromFile(filepath: string): DocAIToolJson[] | undefined {
     try {
       const jsonData = fs.readFileSync(filepath, 'utf-8');
-      this.data = JSON.parse(jsonData);
+      return JSON.parse(jsonData);
     } catch (error) {
       console.error('Error reading JSON file:', error);
     }
@@ -82,7 +83,13 @@ export class DocAIToolJsonProcessor {
 
   saveConfigToFile(outputPath: string): void {
     const config = this.generateConfigFromDocAPIChanges();
-    const configString = `module.exports = ${JSON.stringify(config, null, 2)};`;
+    let originConfigJson = require(path.resolve(__dirname, '../', outputPath));
+    let finalConfig = { ...originConfigJson, ...config };
+    const configString = `module.exports = ${JSON.stringify(
+      finalConfig,
+      null,
+      2
+    )};`;
     try {
       fs.writeFileSync(outputPath, configString, 'utf-8');
       exec(`yarn eslint --fix ${outputPath}`);

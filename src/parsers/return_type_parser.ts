@@ -14,7 +14,7 @@ import { getConfigs } from '../utils/parser_utils';
 
 import { BaseParserArgs } from './index';
 
-const AIConfigMethodParameters = require('../../configs/rtc/ai/method_parameters.ts');
+const AIConfigMethodParameters = require('../../configs/rtc/ai/parameter_list.ts');
 const defaultConfig = require('../../configs/rtc/fixed_return_type_list.ts');
 
 export type ReturnTypeParserArgs = BaseParserArgs & {
