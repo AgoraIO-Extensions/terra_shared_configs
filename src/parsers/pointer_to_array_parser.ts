@@ -38,7 +38,7 @@ function markArray(
       return;
     }
 
-    if (args.useAI) {
+    if (args?.useAI) {
       let _config: AIParameter =
         AIConfigMethodParameters[
           `${node.parent?.parent?.name}:${node.parent?.name}.${node.name}`

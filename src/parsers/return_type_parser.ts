@@ -100,7 +100,7 @@ export function ReturnTypeParser(
                 };
               }
             }
-            if (args.useAI) {
+            if (args?.useAI) {
               let config: AIParameter =
                 AIConfigMethodParameters[
                   `${param.parent?.parent?.name}:${param.parent?.name}.${param.name}`
