@@ -47,6 +47,7 @@ export function formatCXXParserConfig(
       include: parseFilesInclude,
       exclude: parseFilesExclude,
     },
+    parseClangQualType: false,
   };
   return cxxParserArgs;
 }
