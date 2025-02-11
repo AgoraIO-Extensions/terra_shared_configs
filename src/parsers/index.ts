@@ -25,4 +25,5 @@ export type BaseParserArgs = {
   configFilePath?: string;
   defaultConfig?: any;
   ignoreDefaultConfig?: boolean;
+  useAI?: boolean;
 };
