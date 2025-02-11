@@ -10,7 +10,7 @@ import {
   TerraContext,
 } from '@agoraio-extensions/terra-core';
 
-export const irisDocRepoURL = 'https://github.com/littleGnAl/iris-doc';
+export const irisDocRepoURL = 'https://github.com/AgoraIO-Extensions/iris_doc';
 
 function cloneIrisDoc(terraBuildDir: string): string {
   let irisDocDirPath = path.join(terraBuildDir, 'iris_doc');
@@ -24,7 +24,7 @@ function cloneIrisDoc(terraBuildDir: string): string {
     fs.mkdirSync(irisDocDirPath);
   }
 
-  // git clone the https://github.com/littleGnAl/iris-doc repo into irisDocDirPath
+  // git clone the https://github.com/AgoraIO-Extensions/iris_doc repo into irisDocDirPath
   let gitCommand = `git clone ${irisDocRepoURL} ${irisDocDirPath} --depth 1`;
 
   execSync(gitCommand, { encoding: 'utf8', stdio: 'inherit' });
