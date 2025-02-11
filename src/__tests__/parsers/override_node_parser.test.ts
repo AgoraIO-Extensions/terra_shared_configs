@@ -23,6 +23,7 @@ const parseConfig: CXXParserConfigs = {
     include: ['/my/path/test.h'],
     exclude: [],
   },
+  parseClangQualType: false,
 };
 export const genParseResultFromNode = (
   nodes: any[] = [],
