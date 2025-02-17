@@ -114,10 +114,10 @@ class PlayerInfo {
   }
 
   /**
-   * @brief Whether the audio is muted.
+   * @brief Whether player stops receiving the audio stream.
    * @since v4.5.1
-   * @details Indicates whether the receiver end stops receiving the audio stream.
-   * @return bool Whether the audio is muted.
+   * @details Indicates whether the player stops receiving the audio stream.
+   * @return bool Whether player stops receiving the audio stream.
    *  - true: Stop receiving the audio stream.
    *  - false: Continue receiving the audio stream.
    */
@@ -126,11 +126,11 @@ class PlayerInfo {
   }
 
   /**
-   * @brief Whether the video is muted.
+   * @brief Whether player stops receiving the video stream.
    * @since v4.5.1
-   * @details Indicates whether the receiver end stops receiving the video stream. 
+   * @details Indicates whether the player stops receiving the video stream. 
    * @note This field is only valid when you open an RTE URL.
-   * @return bool Whether the video is muted.
+   * @return bool Whether player stops receiving the video stream.
    *  - true: Stop receiving the video stream.
    *  - false: Continue receiving the video stream.
    */
