@@ -6,6 +6,7 @@ import {
   Clazz,
   MemberFunction,
 } from '@agoraio-extensions/cxx-parser';
+import { fillParentNode_ForParseResult } from '@agoraio-extensions/cxx-parser/src/utils';
 import { ParseResult, TerraContext } from '@agoraio-extensions/terra-core';
 
 import {
@@ -105,6 +106,9 @@ export const OverrideNodeParser = (
         preParseResult?.nodes.push(file);
       }
     });
+
+  // fix a node's parent pointer link
+  fillParentNode_ForParseResult(preParseResult);
 
   return preParseResult;
 };
