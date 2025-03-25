@@ -111,7 +111,9 @@ export function MergeNodeParser(
           ].map((it) => {
             // Fix the relationship.
             it.parent = targetClazz;
-            it.parent_name = targetClazz?.fullName ?? '';
+            //it.parent_name = targetClazz?.fullName ?? '';
+            // Since original parent name is without namespace
+            it.parent_name = targetClazz?.name ?? '';
             adjustIrisApiIdKeyIfNeeded(targetClazz!.asClazz(), it);
             adjustIrisApiIdValueIfNeeded(targetClazz!.asClazz(), it);
 
