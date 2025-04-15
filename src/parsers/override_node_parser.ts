@@ -98,7 +98,13 @@ export const OverrideNodeParser = (
         overrideNodesFullNameMap.forEach((value, _) => {
           if (!value.isVisited) {
             if (!filterCXXTypes.includes(value.value.__TYPE)) {
-              (existedFile as CXXFile).nodes.push(value.value);
+              // the rest node would be : struct
+              // they would be used in the following method,
+              // therefore, the order should be at the top, use [unshift] rather than [push]
+              // Ex.
+              // SDKBuildInfo
+              // used in getVersion
+              (existedFile as CXXFile).nodes.unshift(value.value);
             }
           }
         });
