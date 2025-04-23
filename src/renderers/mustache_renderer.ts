@@ -27,6 +27,11 @@ export interface MustacheRenderConfiguration {
    * default value: '.mustache'.
    */
   templateFilePostfix?: string;
+  /**
+   * partials directory path. for register more partials
+   * such as another folder template files.
+   */
+  partialsDir?: string;
 }
 
 export function renderWithConfiguration(
@@ -37,8 +42,9 @@ export function renderWithConfiguration(
     fileContentTemplatePath,
     childrenTemplatesPath = path.dirname(fileContentTemplatePath),
     templateFilePostfix = '.mustache',
+    partialsDir,
   } = config;
-  const childrenTemplates: { [key: string]: string } = fs
+  let childrenTemplates: { [key: string]: string } = fs
     .readdirSync(childrenTemplatesPath)
     .filter((it) => it.endsWith(templateFilePostfix))
     .reduce(
@@ -51,6 +57,20 @@ export function renderWithConfiguration(
       {}
     );
 
+  if (partialsDir) {
+    childrenTemplates = {
+      ...childrenTemplates,
+      ...fs.readdirSync(partialsDir).reduce(
+        (a, v) => ({
+          ...a,
+          [path.basename(v).replace(templateFilePostfix, '')]: readFileSync(
+            path.join(partialsDir, v)
+          ).toString(),
+        }),
+        {}
+      ),
+    };
+  }
   const _render = (view: any): RenderResult => {
     view.upper = function () {
       return function (text: string, render: (arg0: string) => string) {
