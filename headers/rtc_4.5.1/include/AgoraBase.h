@@ -2213,6 +2213,13 @@ struct SimulcastConfig {
    * The array of StreamLayerConfig, which contains STREAM_LAYER_COUNT_MAX layers of video stream at most.
    */
   StreamLayerConfig configs[STREAM_LAYER_COUNT_MAX];
+  /**
+   * Whether to enable fallback publishing. When set to true, it allows dynamic disabling
+   * of multiple streams when the publishing end's performance is poor .
+   */
+  bool publish_fallback_enable;
+  
+  SimulcastConfig(): publish_fallback_enable(false) {}
 };
 /**
  * The location of the target area relative to the screen or window. If you do not set this parameter,
