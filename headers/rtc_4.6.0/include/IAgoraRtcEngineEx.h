@@ -89,8 +89,6 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
   using IRtcEngineEventHandler::onRemoteAudioTransportStats;
   using IRtcEngineEventHandler::onRemoteVideoTransportStats;
   using IRtcEngineEventHandler::onConnectionStateChanged;
-  using IRtcEngineEventHandler::onWlAccMessage;
-  using IRtcEngineEventHandler::onWlAccStats;
   using IRtcEngineEventHandler::onNetworkTypeChanged;
   using IRtcEngineEventHandler::onEncryptionError;
   using IRtcEngineEventHandler::onUploadLogResult;
@@ -529,9 +527,10 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
    * stream (high bitrate, and high-resolution video stream).
    *
    * @param connection The RtcConnection object.
+   * @param sourceType The video source type: #VIDEO_SOURCE_TYPE.
    * @param stats Statistics of the local video stream. See LocalVideoStats.
    */
-  virtual void onLocalVideoStats(const RtcConnection& connection, const LocalVideoStats& stats) {
+  virtual void onLocalVideoStats(const RtcConnection& connection, VIDEO_SOURCE_TYPE sourceType, const LocalVideoStats& stats) {
     (void)connection;
     (void)stats;
   }
@@ -943,32 +942,6 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
     (void)reason;
   }
 
-  /** Occurs when the WIFI message need be sent to the user.
-   *
-   * @param connection The RtcConnection object.
-   * @param reason The reason of notifying the user of a message.
-   * @param action Suggest an action for the user.
-   * @param wlAccMsg The message content of notifying the user.
-   */
-  virtual void onWlAccMessage(const RtcConnection& connection, WLACC_MESSAGE_REASON reason, WLACC_SUGGEST_ACTION action, const char* wlAccMsg) {
-    (void)connection;
-    (void)reason;
-    (void)action;
-    (void)wlAccMsg;
-  }
-
-  /** Occurs when SDK statistics wifi acceleration optimization effect.
-   *
-   * @param connection The RtcConnection object.
-   * @param currentStats Instantaneous value of optimization effect.
-   * @param averageStats Average value of cumulative optimization effect.
-   */
-  virtual void onWlAccStats(const RtcConnection& connection, WlAccStats currentStats, WlAccStats averageStats) {
-    (void)connection;
-    (void)currentStats;
-    (void)averageStats;
-  }
-
   /** Occurs when the local network type changes.
    *
    * This callback occurs when the connection state of the local user changes. You can get the
@@ -1048,7 +1021,7 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
 
   /**
    * Reports the tracing result of video rendering event of the user.
-   * 
+   *
    * @param connection The RtcConnection object.
    * @param uid The user ID.
    * @param currentEvent The current event of the tracing result: #MEDIA_TRACE_EVENT.
@@ -1095,13 +1068,23 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
    * @param uid ID of the remote user.
    * @param metadata The pointer of metadata
    * @param length Size of metadata
-   * @technical preview 
+   * @technical preview
    */
   virtual void onAudioMetadataReceived(const RtcConnection& connection, uid_t uid, const char* metadata, size_t length) {
     (void)metadata;
     (void)length;
   }
 
+  /**
+   * @brief Report the multipath transmission statistics
+   *
+   * @post This callback is triggered after you set `enableMultipath` to `true` to enable multipath transmission.
+   *
+   * @since 4.6.0
+   *
+   * @param connection The RtcConnection object.
+   * @param stats The multipath statistics. See the MultipathStats structure for details.
+   */
   virtual void onMultipathStats(const RtcConnection& connection, const MultipathStats& stats) {
     (void)stats;
     (void)connection;
@@ -1376,7 +1359,7 @@ public:
      *- < 0: Failure.
      */
     virtual int muteLocalAudioStreamEx(bool mute, const RtcConnection& connection) = 0;
-  
+
     /**
      *Stops or resumes sending the local video stream with connection.
      *
@@ -1391,7 +1374,7 @@ public:
      *- < 0: Failure.
      */
     virtual int muteLocalVideoStreamEx(bool mute, const RtcConnection& connection) = 0;
-    
+
     /**
      *Stops or resumes receiving all remote audio stream with connection.
      *
@@ -1406,7 +1389,7 @@ public:
      *- < 0: Failure.
      */
     virtual int muteAllRemoteAudioStreamsEx(bool mute, const RtcConnection& connection) = 0;
-  
+
     /**
      *Stops or resumes receiving all remote video stream with connection.
      *
@@ -1580,7 +1563,7 @@ public:
      * - < 0: Failure.
      */
     virtual int enableLoopbackRecordingEx(const RtcConnection& connection, bool enabled, const char* deviceName = NULL) = 0;
-    
+
     /**
      * Adjusts the recording volume.
      *
@@ -1596,7 +1579,7 @@ public:
      * - < 0: Failure.
      */
     virtual int adjustRecordingSignalVolumeEx(int volume, const RtcConnection& connection) = 0;
-    
+
     /**
      * Mute or resume recording signal volume.
      *
@@ -1615,22 +1598,22 @@ public:
     /**
      * Adjust the playback signal volume of a specified remote user.
      * You can call this method as many times as necessary to adjust the playback volume of different remote users, or to repeatedly adjust the playback volume of the same remote user.
-     * 
+     *
      * @note
      * The playback volume here refers to the mixed volume of a specified remote user.
      * This method can only adjust the playback volume of one specified remote user at a time. To adjust the playback volume of different remote users, call the method as many times, once for each remote user.
-     * 
+     *
      * @param uid The ID of the remote user.
      * @param volume The playback volume of the specified remote user. The value ranges between 0 and 400, including the following:
-     * 
+     *
      * - 0: Mute.
      * - 100: (Default) Original volume.
      * @param connection  RtcConnection
-     * 
+     *
      * @return
      * - 0: Success.
      * - < 0: Failure.
-     */    
+     */
     virtual int adjustUserPlaybackSignalVolumeEx(uid_t uid, int volume, const RtcConnection& connection) = 0;
 
     /** Gets the current connection state of the SDK.
@@ -1877,7 +1860,7 @@ public:
      * - < 0: Failure.
      */
     virtual int enableAudioVolumeIndicationEx(int interval, int smooth, bool reportVad, const RtcConnection& connection) = 0;
-  
+
     /** Publishes the local stream without transcoding to a specified CDN live RTMP address.  (CDN live only.)
       *
       * @param url The CDN streaming URL in the RTMP format. The maximum length of this parameter is 1024 bytes.
@@ -1888,7 +1871,7 @@ public:
       * - < 0: Failure.
       */
     virtual int startRtmpStreamWithoutTranscodingEx(const char* url, const RtcConnection& connection) = 0;
-  
+
     /** Publishes the local stream with transcoding to a specified CDN live RTMP address.  (CDN live only.)
       *
       * @param url The CDN streaming URL in the RTMP format. The maximum length of this parameter is 1024 bytes.
@@ -1900,7 +1883,7 @@ public:
       * - < 0: Failure.
       */
     virtual int startRtmpStreamWithTranscodingEx(const char* url, const LiveTranscoding& transcoding, const RtcConnection& connection) = 0;
-  
+
     /** Update the video layout and audio settings for CDN live. (CDN live only.)
       * @note This method applies to Live Broadcast only.
       *
@@ -1912,7 +1895,7 @@ public:
       * - < 0: Failure.
       */
     virtual int updateRtmpTranscodingEx(const LiveTranscoding& transcoding, const RtcConnection& connection) = 0;
-  
+
     /** Stop an RTMP stream with transcoding or without transcoding from the CDN. (CDN live only.)
       * @param url The RTMP URL address to be removed. The maximum length of this parameter is 1024 bytes.
       * @param connection RtcConnection.
@@ -1921,7 +1904,7 @@ public:
       * - < 0: Failure.
       */
     virtual int stopRtmpStreamEx(const char* url, const RtcConnection& connection) = 0;
-  
+
     /** Starts relaying media streams across channels or updates the channels for media relay.
      *
      * @since v4.2.0
@@ -1936,7 +1919,7 @@ public:
      *   - -8(ERR_INVALID_STATE): The current status is invalid, only allowed to be called when the role is the broadcaster.
      */
     virtual int startOrUpdateChannelMediaRelayEx(const ChannelMediaRelayConfiguration& configuration, const RtcConnection& connection) = 0;
-  
+
     /** Stops the media stream relay.
      *
      * Once the relay stops, the host quits all the destination
@@ -1952,7 +1935,7 @@ public:
      *   - -7(ERR_NOT_INITIALIZED): cross channel media streams are not relayed.
      */
     virtual int stopChannelMediaRelayEx(const RtcConnection& connection) = 0;
-  
+
     /** pause the channels for media stream relay.
      *
      * @param connection RtcConnection.
@@ -2044,16 +2027,16 @@ public:
     /**
      * Set the multi-layer video stream configuration.
      *
-     * When users expect the same UID to send multiple streams of different resolutions, they can achieve this by calling setSimulcastConfig. 
-     * 
+     * When users expect the same UID to send multiple streams of different resolutions, they can achieve this by calling setSimulcastConfig.
+     *
      * If multi-layer is configed, the subscriber can choose to receive the corresponding layer
      * of video stream using {@link setRemoteVideoStreamType setRemoteVideoStreamType}.
      *
-     * @details This method allows a broadcaster to simultaneously transmit multiple video streams 
-     * with different resolutions. The configuration supports enabling up to four layers 
-     * simultaneously: one major stream (highest resolution) and three additional simulcast 
-     * streams. 
-     * 
+     * @details This method allows a broadcaster to simultaneously transmit multiple video streams
+     * with different resolutions. The configuration supports enabling up to four layers
+     * simultaneously: one major stream (highest resolution) and three additional simulcast
+     * streams.
+     *
      * @param simulcastConfig
      * - The configuration for multi-layer video stream. It includes seven layers, ranging from
      *   STREAM_LAYER_1 to STREAM_LOW. A maximum of 3 layers can be enabled simultaneously.
@@ -2066,7 +2049,7 @@ public:
      */
     virtual int setSimulcastConfigEx(const SimulcastConfig& simulcastConfig,
                                      const RtcConnection& connection) = 0;
-                                     
+
   /**
     * Set the high priority user list and their fallback level in weak network condition.
     *
@@ -2144,7 +2127,7 @@ public:
    *   - -4: Incorrect observation position. Modify the input observation position according to the reqiurements specified in SnapshotConfig.
    */
     virtual int takeSnapshotEx(const RtcConnection& connection, uid_t uid, const media::SnapshotConfig& config)  = 0;
-    
+
     /** Enables video screenshot and upload with the connection ID.
     @param enabled Whether to enable video screenshot and upload:
     - `true`: Yes.

@@ -1294,12 +1294,37 @@ struct ChannelMediaOptions {
    */
   Optional<const char*> parameters;
 
+  /**
+   * Whether to enable multipath transmission.
+   * - `true`: Enable multipath transmission.
+   * - `false`: Disable multipath transmission.
+   *
+   * @since 4.6.0
+   */
   Optional<bool> enableMultipath;
 
+  /**
+   * The mode for uplink multipath transmission.
+   * This defines how the uplink multipath is managed.
+   *
+   * @since 4.6.0
+   */
   Optional<MultipathMode> uplinkMultipathMode;
 
+  /**
+   * The mode for downlink multipath transmission.
+   * This defines how the downlink multipath is managed.
+   *
+   * @since 4.6.0
+   */
   Optional<MultipathMode> downlinkMultipathMode;
 
+  /**
+   * The preferred type of multipath transmission.
+   * This allows the user to specify a preferred multipath type.
+   *
+   * @since 4.6.0
+   */
   Optional<MultipathType> preferMultipathType;
 
   ChannelMediaOptions() {}
@@ -1787,17 +1812,6 @@ class IRtcEngineEventHandler {
   }
 
   /**
-   * Occurs when downlink network info is updated.
-   *
-   * This callback is used for notifying user to switch major/minor stream if needed.
-   *
-   * @param info The downlink network info collections.
-   */
-  virtual void onDownlinkNetworkInfoUpdated(const DownlinkNetworkInfo& info) {
-    (void)info;
-  }
-
-  /**
    * Reports the last-mile network quality of the local user.
    *
    * This callback reports the last-mile network conditions of the local user before the user joins
@@ -1919,7 +1933,7 @@ class IRtcEngineEventHandler {
    * @note This callback does not work properly when the number of users (in the voice/video call
    * channel) or hosts (in the live streaming channel) in the channel exceeds 17.
    *
-   * @param uid The ID of the user whose video state has changed.
+   * @param uid The ID of the remote user or broadcaster who leaves the channel or drops offline.
    * @param state The remote video state: #REMOTE_VIDEO_STATE.
    * @param reason The reason of the remote video state change: #REMOTE_VIDEO_STATE_REASON.
    * @param elapsed The time elapsed (ms) from the local client calling `joinChannel` until this callback is triggered.
@@ -2729,28 +2743,6 @@ class IRtcEngineEventHandler {
     (void)reason;
   }
 
-  /** Occurs when the WIFI message need be sent to the user.
-   *
-   * @param reason The reason of notifying the user of a message.
-   * @param action Suggest an action for the user.
-   * @param wlAccMsg The message content of notifying the user.
-   */
-  virtual void onWlAccMessage(WLACC_MESSAGE_REASON reason, WLACC_SUGGEST_ACTION action, const char* wlAccMsg) {
-    (void)reason;
-    (void)action;
-    (void)wlAccMsg;
-  }
-
-  /** Occurs when SDK statistics wifi acceleration optimization effect.
-   *
-   * @param currentStats Instantaneous value of optimization effect.
-   * @param averageStats Average value of cumulative optimization effect.
-   */
-  virtual void onWlAccStats(const WlAccStats& currentStats, const WlAccStats& averageStats) {
-    (void)currentStats;
-    (void)averageStats;
-  }
-
   /** Occurs when the local network type changes.
    *
    * This callback occurs when the connection state of the local user changes. You can get the
@@ -3022,13 +3014,21 @@ class IRtcEngineEventHandler {
     (void)code;
   }
 
-  virtual void onMultipathStats(const MultipathStats& stats) {
+  /**
+   * @brief Report the multipath transmission statistics
+   *
+   * @post This callback is triggered after you set `enableMultipath` to `true` to enable multipath transmission.
+   *
+   * @since 4.6.0
+   *
+   * @param stats The multipath statistics. See the MultipathStats structure for details.
+   */  virtual void onMultipathStats(const MultipathStats& stats) {
     (void)stats;
   }
 
   /**
    * @brief Reports the result of calling renewToken.
-   * @since v4.6.0
+   * @since 4.6.0
    * 
    *  Occurs when a user renews the token.
    *
@@ -3199,145 +3199,181 @@ class IVideoDeviceManager {
 };
 
 /**
- * The VideoEffectObject class.
+ * @brief Provides methods to manage and configure video effects, such as beauty, style makeup, and filter.
+ *
+ * @since v4.6.0
  */
 class IVideoEffectObject : public RefCountInterface {
  public:
   virtual ~IVideoEffectObject() {}
   
   /**
- * The video effect node types. 
- */
+   * @brief Types of video effect nodes that can be applied.
+   *
+   * @since v4.6.0
+   */
   enum class VIDEO_EFFECT_NODE_ID : uint32_t {
-      BEAUTY       = 1U << 0,
-      STYLE_MAKEUP = 1U << 1,
-      FILTER       = 1U << 2,
+    /** Beauty effect node. */
+    BEAUTY       = 1U << 0,
+    /** Style makeup effect node. */
+    STYLE_MAKEUP = 1U << 1,
+    /** Filter effect node. */
+    FILTER       = 1U << 2,
   };
   
   /**
- * The actions that can be performed on video effects.
- */
+   * @brief Actions that can be performed on video effect nodes.
+   *
+   * @since v4.6.0
+   */
   enum VIDEO_EFFECT_ACTION {
+    /** Save the current parameters of the video effect. */
     SAVE = 1,
+    /** Reset the video effect to its default parameters. */
     RESET = 2,
   };
 
-/**
- * Adds or updates video effects with specified node ID and template.
- * @param nodeId The unique identifier or combination of video effect nodes.
- *               Can be a single VIDEO_EFFECT_NODE_ID or a combination of multiple nodes using bitwise OR operation.
- *               For example:
- *               - Single effect: VIDEO_EFFECT_NODE_ID::BEAUTY
- *               - Combined effects: VIDEO_EFFECT_NODE_ID::BEAUTY | VIDEO_EFFECT_NODE_ID::STYLE_MAKEUP
- * 
- *               Note on priority:
- *               When both STYLE_MAKEUP and FILTER are added, STYLE_MAKEUP has higher priority.
- *               The filter parameters in STYLE_MAKEUP will override those in FILTER node.
- *               To apply FILTER node parameters, you must first call removeVideoEffect(VIDEO_EFFECT_NODE_ID：：STYLE_MAKEUP) 
- *               to remove STYLE_MAKEUP node.
- * @param templateName The name of the effect template. If set to null or empty string, the sdk will automatically
- *                     load the default parameter configuration from the resource bundle.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int addOrUpdateVideoEffect(uint32_t nodeId, const char* templateName) = 0;
+  /**
+   * @brief Adds or updates video effects with specified node ID and template.
+   *
+   * @since v4.6.0
+   *
+   * @param nodeId The unique identifier or combination of video effect nodes. See #VIDEO_EFFECT_NODE_ID
+   *               Example:
+   *               - Single effect: `VIDEO_EFFECT_NODE_ID::BEAUTY`
+   *               - Combined effects: `VIDEO_EFFECT_NODE_ID::BEAUTY | VIDEO_EFFECT_NODE_ID::STYLE_MAKEUP`
+   * 
+   * @note Priority Rules:
+   * - The `STYLE_MAKEUP` node takes precedence over `FILTER` parameters.
+   * - To apply `FILTER` parameters, first remove the `STYLE_MAKEUP` node:
+   *   @code{.cpp}
+   *   removeVideoEffect(VIDEO_EFFECT_NODE_ID::STYLE_MAKEUP);
+   *   addOrUpdateVideoEffect(VIDEO_EFFECT_NODE_ID::FILTER, "template name");
+   *   @endcode
+   *
+   * @param templateName The name of the effect template. If set to null or an empty string, the SDK loads the default configuration from the resource bundle.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure. The specific error code can provide more details about the failure.
+   */
+  virtual int addOrUpdateVideoEffect(uint32_t nodeId, const char* templateName) = 0;
 
-/**
- * Removes a video effect with specified node ID.
- * @param nodeId The unique identifier of the video effect node to remove.
- *               Can be a single VIDEO_EFFECT_NODE_ID or a combination of multiple nodes using bitwise OR operation.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int removeVideoEffect(uint32_t nodeId) = 0;
+  /**
+   * @brief Removes a video effect with specified node ID.
+   *
+   * @since v4.6.0
+   *
+   * @param nodeId The unique identifier of the video effect node to remove. See #VIDEO_EFFECT_NODE_ID
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int removeVideoEffect(uint32_t nodeId) = 0;
 
-/**
- * Performs an action on a specified video effect node.
- * @param nodeId The unique identifier of the video effect node.
- *               Can be a single VIDEO_EFFECT_NODE_ID or a combination of multiple nodes using bitwise OR operation.
- * @param actionId The action to perform on the video effect.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int performVideoEffectAction(uint32_t nodeId, VIDEO_EFFECT_ACTION actionId) = 0;
+  /**
+   * @brief Performs an action on a specified video effect node.
+   *
+   * @since v4.6.0
+   *
+   * @param nodeId The unique identifier of the video effect node. See #VIDEO_EFFECT_NODE_ID
+   * @param actionId The action to perform on the video effect. See #VIDEO_EFFECT_ACTION
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int performVideoEffectAction(uint32_t nodeId, VIDEO_EFFECT_ACTION actionId) = 0;
 
-/**
- * Sets a float parameter for the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * @param param The float value to set.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int setVideoEffectFloatParam(const char* option, const char* key, float param) = 0;
+  /**
+   * @brief Sets a float parameter for the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   * @param param The float value to set.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setVideoEffectFloatParam(const char* option, const char* key, float param) = 0;
 
-/**
- * Sets an integer parameter for the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * @param param The integer value to set.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int setVideoEffectIntParam(const char* option, const char* key, int param) = 0;
+  /**
+   * @brief Sets an integer parameter for the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   * @param param The integer value to set.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setVideoEffectIntParam(const char* option, const char* key, int param) = 0;
 
-/**
- * Sets a boolean parameter for the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * @param param The boolean value to set.
- * 
- * @return
- * - 0: Success.
- * - < 0: Failure.
- */
-virtual int setVideoEffectBoolParam(const char* option, const char* key, bool param) = 0;
+  /**
+   * @brief Sets a boolean parameter for the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   * @param param The boolean value to set.
+   * - true: Enable the option.
+   * - false: Disable the option.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setVideoEffectBoolParam(const char* option, const char* key, bool param) = 0;
 
-/**
- * Gets a float parameter from the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * 
- * @return
- * The value of the specified parameter.
- * - If the parameter exists, returns its float value
- * - If the parameter does not exist or an error occurs, returns 0.0f
- */
-virtual float getVideoEffectFloatParam(const char* option, const char* key) = 0;
+  /**
+   * @brief Gets a float parameter from the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   *
+   * @return
+   * - The float value of the parameter if it exists.
+   * - 0.0f if the parameter does not exist or an error occurs.
+   */
+  virtual float getVideoEffectFloatParam(const char* option, const char* key) = 0;
 
-/**
- * Gets an integer parameter from the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * 
- * @return
- * The value of the specified parameter.
- * - If the parameter exists, returns its integer value
- * - If the parameter does not exist or an error occurs, returns 0
- */
-virtual int getVideoEffectIntParam(const char* option, const char* key) = 0;
+  /**
+   * @brief Gets an integer parameter from the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   *
+   * @return
+   * - The integer value of the parameter if it exists.
+   * - 0 if the parameter does not exist or an error occurs.
+   */
+  virtual int getVideoEffectIntParam(const char* option, const char* key) = 0;
 
-/**
- * Gets a boolean parameter from the video effect.
- * @param option The option category of the parameter.
- * @param key The key name of the parameter.
- * 
- * @return
- * The value of the specified parameter.
- * - If the parameter exists, returns its boolean value
- * - If the parameter does not exist or an error occurs, returns false
- */
-virtual bool getVideoEffectBoolParam(const char* option, const char* key) = 0;
+  /**
+   * @brief Gets a boolean parameter from the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   *
+   * @return
+   * - true: The parameter is enabled.
+   * - false: The parameter is disabled or does not exist.
+   */
+  virtual bool getVideoEffectBoolParam(const char* option, const char* key) = 0;
 
 };
 
@@ -3413,7 +3449,7 @@ struct RtcEngineContext {
   Optional<THREAD_PRIORITY_TYPE> threadPriority;
 
   /**
-   * Whether to use egl context in the current thread as sdk‘s root egl context,
+   * Whether to use egl context in the current thread as sdk's root egl context,
    * which is shared by all egl related modules. eg. camera capture, video renderer.
    *
    * @note
@@ -4460,21 +4496,26 @@ class IRtcEngine : public agora::base::IEngineBase {
    */
   virtual int setFilterEffectOptions(bool enabled, const FilterEffectOptions& options, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
 
+
   /**
-   * Creates a video effect object and returns its pointer.
+   * @brief Creates a video effect object and returns its pointer.
+   *
+   * @since v4.6.0
    *
    * @param bundlePath The path of the video effect bundle.
    * @param type The media source type. See #MEDIA_SOURCE_TYPE.
    *
-   * @return
-   * - The pointer to \ref rtc::IVideoEffectObject "IVideoEffectObject",
-   *   if the method call succeeds.
-   * - The empty pointer NULL, if the method call fails.
+   * @return 
+   * - The pointer to \ref rtc::IVideoEffectObject "IVideoEffectObject", if the method call succeeds.
+   * - A null pointer, if the method call fails.
    */
   virtual agora_refptr<IVideoEffectObject> createVideoEffectObject(const char* bundlePath, agora::media::MEDIA_SOURCE_TYPE type = agora::media::PRIMARY_CAMERA_SOURCE) = 0;
   
+
   /**
-   * Destroys a video effect object.
+   * @brief Destroys a video effect object.
+   *
+   * @since v4.6.0
    *
    * @param videoEffectObject The pointer to \ref rtc::IVideoEffectObject.
    *
@@ -4820,9 +4861,9 @@ class IRtcEngine : public agora::base::IEngineBase {
    - If you call muteAllRemoteAudioStreams(true) after joining a channel, the
    local use stops receiving any audio stream from any user in the channel,
    including any user who joins the channel after you call this method.
-   - If you call muteAllRemoteAudioStreams(true) after leaving a channel, the
-   local user does not receive any audio stream the next time the user joins a
-   channel.
+   - If you call muteAllRemoteAudioStreams(true) after leaving a channel,
+   the local user does not receive any audio stream the next time the user
+   joins a channel.
 
    After you successfully call muteAllRemoteAudioStreams(true), you can take
    the following actions:
@@ -6155,7 +6196,7 @@ class IRtcEngine : public agora::base::IEngineBase {
 
   /** **DEPRECATED** Specifies an SDK output log file.
    *
-   * The log file records all log data for the SDK’s operation. Ensure that the
+   * The log file records all log data for the SDK's operation. Ensure that the
    * directory for the log file exists and is writable.
    *
    * @note
@@ -8657,7 +8698,7 @@ class IRtcEngine : public agora::base::IEngineBase {
   virtual int setAdvancedAudioOptions(AdvancedAudioOptions& options, int sourceType = 0) = 0;
 
   /** Bind local user and a remote user as an audio&video sync group. The remote user is defined by cid and uid.
-   *  There’s a usage limit that local user must be a video stream sender. On the receiver side, media streams from same sync group will be time-synced
+   *  There's a usage limit that local user must be a video stream sender. On the receiver side, media streams from same sync group will be time-synced
    *
    * @param channelId The channel id
    * @param uid The user ID of the remote user to be bound with (local user)
@@ -8700,23 +8741,6 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int64_t getCurrentMonotonicTimeInMs() = 0;
-
-  /**
-   * Turns WIFI acceleration on or off.
-   *
-   * @note
-   * - This method is called before and after joining a channel.
-   * - Users check the WIFI router app for information about acceleration. Therefore, if this interface is invoked, the caller accepts that the caller's name will be displayed to the user in the WIFI router application on behalf of the caller.
-   *
-   * @param enabled
-   * - true：Turn WIFI acceleration on.
-   * - false：Turn WIFI acceleration off.
-   *
-   * @return
-   * - 0: Success.
-   * - < 0: Failure.
-   */
-  virtual int enableWirelessAccelerate(bool enabled) = 0;
 
   /**
   * get network type value

@@ -2547,34 +2547,105 @@ struct WatermarkConfig {
   WatermarkConfig() : id(NULL), type(IMAGE), imageUrl(NULL) {}
 };
 
+/**
+ * @brief Defines how data is transmitted across multiple network paths.
+ *
+ * @since 4.6.0
+ */
 enum MultipathMode {
+    /**
+     * The same piece of data is redundantly transmitted over all available paths.
+     */
   Duplicate= 0,
+  /**
+   * The data is transmitted only over the path that the internal algorithm determines to be optimal for transmission quality.
+   */ 
   Dynamic
 };
 
+/**
+ * @brief Defines the types of network paths used in multipath transmission.
+ *
+ * @since 4.6.0
+ */ 
 enum MultipathType {
+  /**
+   * The local area network (LAN) path.
+   */
   LAN = 0,
+  /**
+   * The Wi-Fi path.
+   */
   WIFI,
+  /**
+   * The mobile network path.
+   */
   Mobile,
+  /**
+   * An unknown or unspecified network path.
+   */
   Unknown = 99
 };
 
+/**
+ * @brief Contains statistics for a specific network path in multipath transmission.
+ *
+ * @since 4.6.0
+ */
 struct PathStats {
+  /**
+   * The type of the path.
+   */
   MultipathType type;
+  /**
+   * The transmission bitrate of the path.
+   */
   int txKBitRate;
+  /**
+   * The receiving bitrate of the path.
+   */
   int rxKBitRate;
   PathStats() : type(Unknown), txKBitRate(0), rxKBitRate(0) {}
   PathStats(MultipathType t, int tx, int rx) : type(t), txKBitRate(tx), rxKBitRate(rx) {}
 };
 
+/**
+ * @brief Aggregates statistics for all network paths used in multipath transmission.
+ *
+ * @since 4.6.0
+ */
 struct MultipathStats {
+  /**
+   * The number of bytes transmitted over the LAN path.
+   */
   uint32_t lanTxBytes;
+  /**
+   * The number of bytes received over the LAN path.
+   */
   uint32_t lanRxBytes;
+  /**
+   * The number of bytes transmitted over the Wi-Fi path.
+   */
   uint32_t wifiTxBytes;
+  /**
+   * The number of bytes received over the Wi-Fi path.
+   */
   uint32_t wifiRxBytes;
+  /**
+   * The number of bytes transmitted over the mobile network path.
+   */
   uint32_t mobileTxBytes;
+  /**
+   * The number of bytes received over the mobile network path.
+   */
   uint32_t mobileRxBytes;
+  /**
+   * The number of active paths.
+   */
   int activePathNum;
+  /**
+   * “An array of statistics for each active path.
+   */
   const PathStats* pathStats;
   MultipathStats()
       : lanTxBytes(0),
@@ -3409,6 +3480,8 @@ enum LOCAL_VIDEO_STREAM_REASON {
   LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_INTERRUPTED_BY_OTHER = 32,
   /* 32: (HMOS only) ScreenCapture stopped by SIM call */
   LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_STOPPED_BY_CALL = 33,
+  /* 34: HDR Video Source fallback to SDR */
+  LOCAL_AUDIO_STREAM_REASON_VIDEO_SOURCE_HDR_TO_SDR = 34,
 };
 
 /**
@@ -4843,62 +4916,6 @@ enum CLIENT_ROLE_CHANGE_FAILED_REASON {
 };
 
 /**
- * The reason of notifying the user of a message.
- */
-enum WLACC_MESSAGE_REASON {
-  /**
-   * WIFI signal is weak.
-   */
-  WLACC_MESSAGE_REASON_WEAK_SIGNAL = 0,
-  /**
-   * Channel congestion.
-   */
-  WLACC_MESSAGE_REASON_CHANNEL_CONGESTION = 1,
-};
-
-/**
- * Suggest an action for the user.
- */
-enum WLACC_SUGGEST_ACTION {
-  /**
-   * Please get close to AP.
-   */
-  WLACC_SUGGEST_ACTION_CLOSE_TO_WIFI = 0,
-  /**
-   * The user is advised to connect to the prompted SSID.
-   */
-  WLACC_SUGGEST_ACTION_CONNECT_SSID = 1,
-  /**
-   * The user is advised to check whether the AP supports 5G band and enable 5G band (the aciton
-   * link is attached), or purchases an AP that supports 5G. AP does not support 5G band.
-   */
-  WLACC_SUGGEST_ACTION_CHECK_5G = 2,
-  /**
-   * The user is advised to change the SSID of the 2.4G or 5G band (the aciton link is attached).
-   * The SSID of the 2.4G band AP is the same as that of the 5G band.
-   */
-  WLACC_SUGGEST_ACTION_MODIFY_SSID = 3,
-};
-
-/**
- * Indicator optimization degree.
- */
-struct WlAccStats {
-  /**
-   * End-to-end delay optimization percentage.
-   */
-  unsigned short e2eDelayPercent;
-  /**
-   * Frozen Ratio optimization percentage.
-   */
-  unsigned short frozenRatioPercent;
-  /**
-   * Loss Rate optimization percentage.
-   */
-  unsigned short lossRatePercent;
-};
-
-/**
  * The network type.
  */
 enum NETWORK_TYPE {
@@ -5137,73 +5154,211 @@ struct BeautyOptions {
         sharpnessLevel(0) {}
 };
 
-/** Face shape area options. This structure defines options for facial adjustments on different facial areas.
+/** 
+ * @brief Face shape area options. This structure defines options for facial adjustments on different facial areas.
  *
- * @technical preview
+ * @since v4.4.0
  */
 struct FaceShapeAreaOptions {
-  /** The specific facial area to be adjusted.
-    */
+  /**
+   * @brief The specific facial area to be adjusted.
+   *
+   * @since v4.4.0
+   */
   enum FACE_SHAPE_AREA {
     /** (Default) Invalid area. */
     FACE_SHAPE_AREA_NONE = -1,
-    /** Head Scale, reduces the size of head. */
+    /** 
+     * Head Scale, reduces the size of the head. 
+     * The value range is [0, 100]. The default value is 50.
+     * The larger the value, the stronger the head reduction effect.
+     */
     FACE_SHAPE_AREA_HEADSCALE = 100,
-    /** Forehead, adjusts the size of forehead. */
+    /** 
+     * Forehead, adjusts the size of the forehead.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the forehead effect.
+     */
     FACE_SHAPE_AREA_FOREHEAD = 101,
-    /** Face Contour, slims the facial contour. */
+    /** 
+     * Face Contour, slims the facial contour.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the facial contour reduction effect.
+     */
     FACE_SHAPE_AREA_FACECONTOUR = 102,
-    /** Face Length, adjusts the length of face. */
+    /** 
+     * Face Length, adjusts the length of the face.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the face length effect, negative values indicate the opposite direction.
+     */
     FACE_SHAPE_AREA_FACELENGTH = 103,
-    /** Face Width, narrows the width of face. */
+    /** 
+     * Face Width, narrows the width of the face.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the face width reduction effect. 
+     */
     FACE_SHAPE_AREA_FACEWIDTH = 104,
-    /** Cheekbone, adjusts the size of cheekbone. */
+    /** 
+     * Cheekbone, adjusts the size of the cheekbone.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the cheekbone effect.
+     */
     FACE_SHAPE_AREA_CHEEKBONE = 105,
-    /** Cheek, adjusts the size of cheek. */
+    /** 
+     * Cheek, adjusts the size of the cheek.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the cheek effect.
+     */
     FACE_SHAPE_AREA_CHEEK = 106,
-    /** Mandible, slims the mandible. */
+    /** 
+     * Mandible, slims the mandible.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the mandible effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_MANDIBLE = 107,
-    /** Chin, adjusts the length of chin. */
+    /** 
+     * Chin, adjusts the length of the chin. 
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the chin effect, negative values indicate the opposite direction.
+    */
     FACE_SHAPE_AREA_CHIN = 108,
-    /** Eye Scale, adjusts the size of eyes. */
+    /** 
+     * Eye Scale, adjusts the size of the eyes.
+     * The value range is [0, 100]. The default value is 50.
+     * The larger the value, the stronger the eye size effect.
+     */
     FACE_SHAPE_AREA_EYESCALE = 200,
-    /** Eye Distance, adjust the distance between two eyes. */
+    /** 
+     * Eye Distance, adjusts the distance between the two eyes.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the eye distance effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEDISTANCE = 201,
-    /** Eye Position, adjust the upper and lower position of eyes. */
+    /** 
+     * Eye Position, adjusts the upper and lower position of the eyes.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the eye position effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEPOSITION = 202,
-    /** Lower Eyelid, adjust the downward position of eyelids. */
+    /** 
+     * Lower Eyelid, adjusts the downward position of the eyelids.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the lower eyelid effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_LOWEREYELID = 203,
-    /** Eye Pupils, adjust the size of eye pupils. */
+    /** 
+     * Eye Pupils, adjusts the size of the pupils.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the eye pupils effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEPUPILS = 204,
-    /** Eye Inner Corner, adjust the inner corner of eyes. */
+    /** 
+     * Eye Inner Corner, adjusts the inner corners of the eyes.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the eye inner corner effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEINNERCORNER = 205,
-    /** Eye Outer Corner, adjust the outer corner of eyes. */
+    /** 
+     * Eye Outer Corner, adjusts the outer corners of the eyes.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the eye outer corner effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEOUTERCORNER = 206,
-    /** Nose Length, adjusts the length of nose. */
+    /** 
+     * Nose Length, adjusts the length of the nose. 
+     * The value range is [-100, 100]. The default value is 0.
+     */
     FACE_SHAPE_AREA_NOSELENGTH = 300,
-    /** Nose Width, adjusts the width of nose. */
+    /** 
+     * Nose Width, adjusts the width of the nose. 
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the nose width effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSEWIDTH = 301,
-    /** Nose Wing, adjusts the size of nose wing. */
+    /** 
+     * Nose Wing, adjusts the size of the nose wings.
+     * The value range is [0, 100]. The default value is 10.
+     * The larger the value, the stronger the nose wing effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSEWING = 302,
-    /** Nose Root, adjusts the size of nose root. */
+    /** 
+     * Nose Root, adjusts the size of the nose root.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the nose root effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSEROOT = 303,
-    /** Nose Bridge, adjusts the size of nose bridge. */
+    /** 
+     * Nose Bridge, adjusts the size of the nose bridge.
+     * The value range is [0, 100]. The default value is 50.
+     * The larger the value, the stronger the nose bridge effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSEBRIDGE = 304,
-    /** Nose Tip, adjusts the size of nose tip. */
+    /** 
+     * Nose Tip, adjusts the size of the nose tip.
+     * The value range is [0, 100]. The default value is 50.
+     * The larger the value, the stronger the nose tip effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSETIP = 305,
-    /** Nose General, adjusts the overall size of nose. */
+    /** 
+     * Nose General, adjusts the overall size of the nose.
+     * The value range is [-100, 100]. The default value is 50.
+     * The larger the absolute value, the stronger the nose general effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_NOSEGENERAL = 306,
-    /** Mouth Scale, adjusts the size of mouth. */
+    /** 
+     * Mouth Scale, adjusts the size of the mouth.
+     * The value range is [-100, 100]. The default value is 20.
+     * The larger the absolute value, the stronger the mouth size effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_MOUTHSCALE = 400,
-    /** Mouth Position, adjusts the position of mouth. */
+    /** 
+     * Mouth Position, adjusts the position of the mouth.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the mouth position effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_MOUTHPOSITION = 401,
-    /** Mouth Smile, adjusts the smile degree of mouth. */
+    /** 
+     * Mouth Smile, adjusts the degree of the mouth's smile.
+     * The value range is [0, 100]. The default value is 30.
+     * The larger the value, the stronger the mouth smile effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_MOUTHSMILE = 402,
-    /** Mouth Lip, adjusts the size of lips. */
+    /** 
+     * Mouth Lip, adjusts the size of the lips.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the stronger the mouth lip effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_MOUTHLIP = 403,
-    /** Eyebrow Position, adjusts the position of eyebrows. */
+    /** 
+     * Eyebrow Position, adjusts the position of the eyebrows.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the absolute value, the stronger the eyebrow position effect, negative values indicate the opposite direction.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEBROWPOSITION = 500,
-    /** Eyebrow Position, adjusts the thickness of eyebrows. */
+    /** 
+     * Eyebrow Thickness, adjusts the thickness of the eyebrows.
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the value, the stronger the eyebrow thickness effect.
+     * @since v4.6.0
+     */
     FACE_SHAPE_AREA_EYEBROWTHICKNESS = 501,
   };
   
@@ -5211,11 +5366,9 @@ struct FaceShapeAreaOptions {
     */
   FACE_SHAPE_AREA shapeArea;
   
-  /** The intensity of the pinching effect applied to the specified facial area.
-   * For the following area values: #FACE_SHAPE_AREA_FOREHEAD, #FACE_SHAPE_AREA_FACELENGTH, #FACE_SHAPE_AREA_CHIN, #FACE_SHAPE_AREA_NOSELENGTH, #FACE_SHAPE_AREA_NOSEWIDTH, #FACE_SHAPE_AREA_MOUTHSCALE, the value ranges from -100 to 100.
-   * The default value is 0. The greater the absolute value, the stronger the intensity applied to the specified facial area, and negative values indicate the opposite direction.
-   * For enumeration values other than the above, the value ranges from 0 to 100. The default value is 0. The greater the value, the stronger the intensity applied to the specified facial area.
-    */
+  /** 
+   * The intensity of the pinching effect applied to the specified facial area.
+   */
   int shapeIntensity;
   
   FaceShapeAreaOptions(FACE_SHAPE_AREA shapeArea, int areaIntensity) : shapeArea(shapeArea), shapeIntensity(areaIntensity) {}
@@ -5223,20 +5376,30 @@ struct FaceShapeAreaOptions {
   FaceShapeAreaOptions() : shapeArea(FACE_SHAPE_AREA_NONE), shapeIntensity(0) {}
 };
 
-/** Face shape beauty options. This structure defines options for facial adjustments of different facial styles.
+/** @brief Face shape beauty options. This structure defines options for facial adjustments of different facial styles.
  *
- * @technical preview
+ * @since v4.4.0
  */
 struct FaceShapeBeautyOptions {
-  /** The face shape style.
-    */
+  /**
+   * @brief The face shape beauty style options.
+   *
+   * @since v4.4.0
+   */
   enum FACE_SHAPE_BEAUTY_STYLE {
-    /** (Default) Female face shape style. */
-    FACE_SHAPE_BEAUTY_STYLE_FEMALE = 0,
-    /** Male face shape style. */
-    FACE_SHAPE_BEAUTY_STYLE_MALE = 1,
-    /** Natural face shape style */
-    FACE_SHAPE_BEAUTY_STYLE_NATURAL = 2,
+  /**
+   * (Default) Female face shape style.
+   */
+  FACE_SHAPE_BEAUTY_STYLE_FEMALE = 0,
+  /**
+   * Male face shape style.
+   */
+  FACE_SHAPE_BEAUTY_STYLE_MALE = 1,
+  /**
+   * A natural-looking face shape style that applies minimal modification to facial features.
+   * @since v4.6.0
+   */
+  FACE_SHAPE_BEAUTY_STYLE_NATURAL = 2,
   };
   
   /** The face shape style, See #FACE_SHAPE_BEAUTY_STYLE.
