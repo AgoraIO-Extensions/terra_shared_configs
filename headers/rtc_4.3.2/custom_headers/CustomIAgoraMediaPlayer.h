@@ -13,7 +13,7 @@ class IMediaPlayerVideoFrameObserver {
 };
 
 namespace ext {
-
+  
 class IMediaPlayer {
   // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
 
@@ -28,6 +28,18 @@ class IMediaPlayer {
    * @source: virtual int setPlayerOption(const char* key, char* value) = 0;
    */
   virtual int setPlayerOptionInString(const char *key, const char *value) = 0;
+
+  /**
+   * @iris_api_id: MediaPlayer_getPlayerOption_ae3d0cf
+   * @source: virtual int getPlayerOption(const char* key, int& value) = 0;
+   */
+  virtual int getPlayerOptionInInt(const char *key, int &value) = 0;
+
+  /**
+   * @iris_api_id: MediaPlayer_getPlayerOption_f15226a
+   * @source: virtual int getPlayerOption(const char* key, agora::util::AString& value) = 0;
+   */
+  virtual int getPlayerOptionInString(const char *key, agora::util::AString &value) = 0;
 
   /**
    * @iris_api_id: MediaPlayer_registerAudioFrameObserver_a5b510b

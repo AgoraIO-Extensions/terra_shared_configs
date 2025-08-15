@@ -97,12 +97,14 @@ enum AUDIO_MIXING_REASON_TYPE {
   AUDIO_MIXING_REASON_TOO_FREQUENT_CALL = 702,
   /** 703: The audio mixing file playback is interrupted. */
   AUDIO_MIXING_REASON_INTERRUPTED_EOF = 703,
-  /** 715: The audio mixing file is played once. */
+  /** 721: The audio mixing file is played once. */
   AUDIO_MIXING_REASON_ONE_LOOP_COMPLETED = 721,
-  /** 716: The audio mixing file is all played out. */
+  /** 723: The audio mixing file is all played out. */
   AUDIO_MIXING_REASON_ALL_LOOPS_COMPLETED = 723,
-  /** 716: The audio mixing file stopped by user */
+  /** 724: The audio mixing file stopped by user */
   AUDIO_MIXING_REASON_STOPPED_BY_USER = 724,
+  /** 726: The audio mixing playback has resumed by user */
+  AUDIO_MIXING_REASON_RESUMED_BY_USER = 726,
   /** 0: The SDK can open the audio mixing file. */
   AUDIO_MIXING_REASON_OK = 0,
 };
@@ -230,19 +232,30 @@ enum AUDIO_REVERB_TYPE {
 };
 
 enum STREAM_FALLBACK_OPTIONS {
-  /** 0: No fallback operation for the stream when the network
-     condition is poor. The stream quality cannot be guaranteed. */
-
+  /** 0: No fallback operation to a lower resolution stream when the network
+     condition is poor. Fallback to Scalable Video Coding (e.g. SVC)
+     is still possible, but the resolution remains in high stream.
+     The stream quality cannot be guaranteed. */
   STREAM_FALLBACK_OPTION_DISABLED = 0,
-  /** 1: (Default) Under poor network conditions, the SDK will send or receive
+  /** 1: (Default) Under poor network conditions, the receiver SDK will receive
      agora::rtc::VIDEO_STREAM_LOW. You can only set this option in
      RtcEngineParameters::setRemoteSubscribeFallbackOption. Nothing happens when
      you set this in RtcEngineParameters::setLocalPublishFallbackOption. */
   STREAM_FALLBACK_OPTION_VIDEO_STREAM_LOW = 1,
-  /** 2: Under poor network conditions, the SDK may receive
-     agora::rtc::VIDEO_STREAM_LOW first, but if the network still does
-     not allow displaying the video, the SDK will send or receive audio only. */
+  /** 2: Under poor network conditions, the SDK may receive agora::rtc::VIDEO_STREAM_LOW first,
+     then agora::rtc::VIDEO_STREAM_LAYER_1 to agora::rtc::VIDEO_STREAM_LAYER_6 if the related layer exists.
+     If the network still does not allow displaying the video, the SDK will receive audio only. */
   STREAM_FALLBACK_OPTION_AUDIO_ONLY = 2,
+  /** 3~8: If the receiver SDK uses RtcEngineParameters::setRemoteSubscribeFallbackOption，it will receive
+     one of the streams from agora::rtc::VIDEO_STREAM_LAYER_1 to agora::rtc::VIDEO_STREAM_LAYER_6
+     if the related layer exists when the network condition is poor. The lower bound of fallback depends on
+     the STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_X. */
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_1 = 3,
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_2 = 4,
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_3 = 5,
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_4 = 6,
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_5 = 7,
+  STREAM_FALLBACK_OPTION_VIDEO_STREAM_LAYER_6 = 8,
 };
 
 enum PRIORITY_TYPE {
@@ -341,6 +354,9 @@ struct LocalVideoStats
     * - hardware = 1.
     */
   int hwEncoderAccelerating;
+  /** The dimensions of the simulcast streams's encoding frame.
+    */
+  VideoDimensions simulcastDimensions[SimulcastConfig::STREAM_LAYER_COUNT_MAX];
 };
 
 /**
@@ -423,6 +439,16 @@ struct RemoteAudioStats
   uint32_t plcCount;
 
   /**
+   * The number of times the remote audio stream has experienced freezing.
+   */
+  uint32_t frozenCntByCustom;
+
+  /**
+   * The total duration (ms) that the remote audio stream has been in a frozen state.
+   */
+  uint32_t frozenTimeByCustom;
+
+  /**
    * The total time (ms) when the remote user neither stops sending the audio
    * stream nor disables the audio module after joining the channel.
    */
@@ -462,6 +488,8 @@ struct RemoteAudioStats
         mosValue(0),
         frozenRateByCustomPlcCount(0),
         plcCount(0),
+        frozenCntByCustom(0),
+        frozenTimeByCustom(0),
         totalActiveTime(0),
         publishDuration(0),
         qoeQuality(0),
@@ -502,6 +530,9 @@ struct RemoteVideoStats {
    * Bitrate (Kbps) received since the last count.
    */
   int receivedBitrate;
+  /** The decoder input frame rate (fps) of the remote video.
+   */
+  int decoderInputFrameRate;
   /** The decoder output frame rate (fps) of the remote video.
    */
   int decoderOutputFrameRate;
@@ -1256,6 +1287,12 @@ struct ChannelMediaOptions {
    */
   Optional<bool> isAudioFilterable;
 
+  /** Provides the technical preview functionalities or special customizations by configuring the SDK with JSON options.
+      Pointer to the set parameters in a JSON string.
+    * @technical preview
+   */
+  Optional<const char*> parameters;
+
   ChannelMediaOptions() {}
   ~ChannelMediaOptions() {}
 
@@ -1301,6 +1338,7 @@ struct ChannelMediaOptions {
       SET_FROM(customVideoTrackId);
       SET_FROM(isAudioFilterable);
       SET_FROM(isInteractiveAudience);
+      SET_FROM(parameters);
 #undef SET_FROM
   }
 
@@ -1349,6 +1387,7 @@ struct ChannelMediaOptions {
       ADD_COMPARE(customVideoTrackId);
       ADD_COMPARE(isAudioFilterable);
       ADD_COMPARE(isInteractiveAudience);
+      ADD_COMPARE(parameters);
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -1400,6 +1439,7 @@ struct ChannelMediaOptions {
         REPLACE_BY(customVideoTrackId);
         REPLACE_BY(isAudioFilterable);
         REPLACE_BY(isInteractiveAudience);
+        REPLACE_BY(parameters);
 #undef REPLACE_BY
     }
     return *this;
@@ -1674,6 +1714,12 @@ class IRtcEngineEventHandler {
     (void)deviceType;
     (void)deviceState;
   }
+
+#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
+  virtual void onPipStateChanged(PIP_STATE state) {
+    (void)state;
+  };
+#endif
 
   /**
    * Reports the last mile network quality of each user in the channel.
@@ -2234,6 +2280,45 @@ class IRtcEngineEventHandler {
     (void)code;
     (void)missed;
     (void)cached;
+  }
+
+  /** Occurs when the local user receives the rdt data from the remote user.
+   *
+   * The SDK triggers this callback when the user receives the data stream that another user sends
+   * by calling the \ref agora::rtc::IRtcEngine::sendRdtMessage "sendRdtMessage" method.
+   *
+   * @param userId ID of the user who sends the data.
+   * @param type The RDT stream type
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onRdtMessage(uid_t userId, RdtStreamType type, const char *data, size_t length) {
+    (void)userId;
+    (void)type;
+    (void)data;
+    (void)length;
+  };
+
+  /** Occurs when the RDT tunnel state changed
+   *
+   * @param userId ID of the user who sends the data.
+   * @param state The RDT tunnel state
+   */
+  virtual void onRdtStateChanged(uid_t userId, RdtState state) {
+    (void)userId;
+    (void)state;
+  }
+
+  /** Occurs when the Media Control Message sent by others use sendMediaControlMessage
+   *
+   * @param userId ID of the user who sends the data.
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onMediaControlMessage(uid_t userId, const char* data, size_t length) {
+    (void)userId;
+    (void)data;
+    (void)length;
   }
 
   /**
@@ -3224,23 +3309,26 @@ public:
      */
     struct Metadata
     {
-      /** The User ID that sent the metadata.
-        * - For the receiver: The user ID of the user who sent the `metadata`.
-        * - For the sender: Ignore this value.
-        */
-      unsigned int uid;
-      /** The buffer size of the sent or received `metadata`.
-        */
-      unsigned int size;
-      /** The buffer address of the sent or received `metadata`.
-        */
-      unsigned char* buffer;
-      /** The timestamp (ms) of the `metadata`.
-        *
-        */
-      long long timeStampMs;
+        /** The channel ID of the `metadata`.
+         */
+        const char* channelId;
+        /** The User ID that sent the metadata.
+         * - For the receiver: The user ID of the user who sent the `metadata`.
+         * - For the sender: Ignore this value.
+         */
+        unsigned int uid;
+        /** The buffer size of the sent or received `metadata`.
+         */
+        unsigned int size;
+        /** The buffer address of the sent or received `metadata`.
+         */
+        unsigned char *buffer;
+        /** The NTP timestamp (ms) when the metadata is sent.
+         *  @note If the receiver is audience, the receiver cannot get the NTP timestamp (ms).
+         */
+        long long timeStampMs;
 
-      Metadata() : uid(0), size(0), buffer(NULL), timeStampMs(0) {}
+         Metadata() : channelId(NULL), uid(0), size(0), buffer(NULL), timeStampMs(0) {}
     };
 
    /** Occurs when the SDK requests the maximum size of the metadata.
@@ -4101,6 +4189,15 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int stopPreview(VIDEO_SOURCE_TYPE sourceType) = 0;
+
+#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
+  virtual bool isPipSupported() = 0;
+  virtual int setupPip(const PipOptions& options) = 0;
+  virtual int startPip() = 0;
+#if defined(__APPLE__) && TARGET_OS_IOS
+  virtual int stopPip() = 0;
+#endif
+#endif
 
   /** Starts the last-mile network probe test.
 
@@ -6100,6 +6197,23 @@ class IRtcEngine : public agora::base::IEngineBase {
   virtual int setDualStreamMode(SIMULCAST_STREAM_MODE mode) = 0;
 
   /**
+   * Sets the multi-layer video stream configuration.
+   *
+   * If multi-layer is configured, the subscriber can choose to receive the coresponding layer
+   * of video stream using {@link setRemoteVideoStreamType setRemoteVideoStreamType}.
+   *
+   * @param simulcastConfig
+   * - The configuration for multi-layer video stream. It includes seven layers, ranging from
+   *   STREAM_LAYER_1 to STREAM_LOW. A maximum of 3 layers can be enabled simultaneously.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   * @technical preview
+   */
+  virtual int setSimulcastConfig(const SimulcastConfig& simulcastConfig) = 0;
+
+  /**
    * Enables, disables or auto enable the dual video stream mode.
    *
    * If dual-stream mode is enabled, the subscriber can choose to receive the high-stream
@@ -7183,6 +7297,25 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure..
    */
   virtual int queryCameraFocalLengthCapability(agora::rtc::FocalLengthInfo* focalLengthInfos, int& size) = 0;
+
+#if defined(__ANDROID__)
+  /**
+   * Set screen sharing MediaProjection.
+   *
+   * When screen capture stopped, the SDK will automatically release the MediaProjection internally.
+   *
+   * @param mediaProjection MediaProjection is an Android class that provides access to screen capture and recording capabiliies.
+   *
+   * @note
+   * It is mainly used in some specific scenarios, such as iot custom devices, or child process screen sharing. 
+   * MediaProjection is not easily obtained or for other reasons.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setExternalMediaProjection(void* mediaProjection) = 0;
+#endif
 #endif
 
 #if defined(_WIN32) || defined(__APPLE__) || defined(__ANDROID__)
@@ -7577,6 +7710,27 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int sendStreamMessage(int streamId, const char* data, size_t length) = 0;
+
+  /** Send Reliable message to remote uid in channel.
+   * @param uid remote user id.
+   * @param type Reliable Data Transmission tunnel message type.
+   * @param data The pointer to the sent data.
+   * @param length The length of the sent data.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int sendRdtMessage(uid_t uid, RdtStreamType type, const char *data, size_t length) = 0;
+
+  /** Send media control message
+   * @param uid Remote user id. In particular, if uid=0, the user is broadcast to the channel
+   * @param data The pointer to the sent data.
+   * @param length The length of the sent data, max 1024.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int sendMediaControlMessage(uid_t uid, const char* data, size_t length) = 0;
 
   /** **DEPRECATED** Adds a watermark image to the local video or CDN live stream.
 
@@ -8143,6 +8297,32 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0 : Failure.
    */
   virtual int takeSnapshot(uid_t uid, const char* filePath)  = 0;
+
+  /**
+   * Takes a snapshot of a video stream.
+   *
+   * This method takes a snapshot of a video stream from the specified user, generates a JPG
+   * image, and saves it to the specified path.
+   *
+   * The method is asynchronous, and the SDK has not taken the snapshot when the method call
+   * returns. After a successful method call, the SDK triggers the `onSnapshotTaken` callback
+   * to report whether the snapshot is successfully taken, as well as the details for that
+   * snapshot.
+   *
+   * @note
+   * - Call this method after joining a channel.
+   * - This method takes a snapshot of the published video stream specified in `ChannelMediaOptions`.
+   *
+   * @param uid The user ID. Set uid as 0 if you want to take a snapshot of the local user's video.
+   * @param config The configuration for the take snapshot. See SnapshotConfig.
+   *
+   * Ensure that the path you specify exists and is writable.
+   * @return
+   * - 0 : Success.
+   * - &lt; 0: Failure.
+   *   - -4: Incorrect observation position. Modify the input observation position according to the reqiurements specified in SnapshotConfig.
+   */
+  virtual int takeSnapshot(uid_t uid, const media::SnapshotConfig& config)  = 0;
 
     /** Enables the content inspect.
     @param enabled Whether to enable content inspect:

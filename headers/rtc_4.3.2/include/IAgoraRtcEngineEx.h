@@ -72,6 +72,9 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
   using IRtcEngineEventHandler::onConnectionBanned;
   using IRtcEngineEventHandler::onStreamMessage;
   using IRtcEngineEventHandler::onStreamMessageError;
+  using IRtcEngineEventHandler::onRdtMessage;
+  using IRtcEngineEventHandler::onRdtStateChanged;
+  using IRtcEngineEventHandler::onMediaControlMessage;
   using IRtcEngineEventHandler::onRequestToken;
   using IRtcEngineEventHandler::onTokenPrivilegeWillExpire;
   using IRtcEngineEventHandler::onLicenseValidationFailure;
@@ -661,6 +664,51 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
     (void)cached;
   }
 
+  /** Occurs when the local user receives the rdt data from the remote user.
+   *
+   * The SDK triggers this callback when the user receives the data stream that another user sends
+   * by calling the \ref agora::rtc::IRtcEngine::sendRdtMessage "sendRdtMessage" method.
+   *
+   * @param connection The RtcConnection object.
+   * @param userId ID of the user who sends the data.
+   * @param type The RDT stream type
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onRdtMessage(const RtcConnection& connection, uid_t userId, RdtStreamType type, const char *data, size_t length) {
+    (void)connection;
+    (void)userId;
+    (void)type;
+    (void)data;
+    (void)length;
+  }
+
+  /** Occurs when the RDT tunnel state changed
+   *
+   * @param connection The RtcConnection object.
+   * @param userId ID of the user who sends the data.
+   * @param state The RDT tunnel state
+   */
+  virtual void onRdtStateChanged(const RtcConnection& connection, uid_t userId, RdtState state) {
+    (void)connection;
+    (void)userId;
+    (void)state;
+  }
+
+  /** Occurs when the Media Control Message sent by others use sendMediaControlMessage
+   *
+   * @param connection The RtcConnection object.
+   * @param userId ID of the user who sends the data.
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onMediaControlMessage(const RtcConnection& connection, uid_t userId, const char* data, size_t length) {
+    (void)connection;
+    (void)userId;
+    (void)data;
+    (void)length;
+  }
+
   /**
    * Occurs when the token expires.
    *
@@ -1161,6 +1209,55 @@ public:
      */
     virtual int leaveChannelEx(const RtcConnection& connection, const LeaveChannelOptions& options) = 0;
 
+  /**
+    * Leaves a channel with the channel ID and user account.
+    *
+    * This method allows a user to leave the channel, for example, by hanging up or exiting a call.
+    *
+    * This method is an asynchronous call, which means that the result of this method returns even before
+    * the user has not actually left the channel. Once the user successfully leaves the channel, the
+    * SDK triggers the \ref IRtcEngineEventHandler::onLeaveChannel "onLeaveChannel" callback.
+    *
+    * @param channelId The channel name. The maximum length of this parameter is 64 bytes. Supported character scopes are:
+    * - All lowercase English letters: a to z.
+    * - All uppercase English letters: A to Z.
+    * - All numeric characters: 0 to 9.
+    * - The space character.
+    * - Punctuation characters and other symbols, including: "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    * @param userAccount The user account. The maximum length of this parameter is 255 bytes. Ensure that you set this parameter and do not set it as null. Supported character scopes are:
+    * - All lowercase English letters: a to z.
+    * - All uppercase English letters: A to Z.
+    * - All numeric characters: 0 to 9.
+    * - The space character.
+    * - Punctuation characters and other symbols, including: "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    * @return
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+    virtual int leaveChannelWithUserAccountEx(const char* channelId, const char* userAccount) = 0;
+
+  /**
+    * Leaves a channel with the channel ID and user account and sets the options for leaving.
+    *
+    * @param channelId The channel name. The maximum length of this parameter is 64 bytes. Supported character scopes are:
+    * - All lowercase English letters: a to z.
+    * - All uppercase English letters: A to Z.
+    * - All numeric characters: 0 to 9.
+    * - The space character.
+    * - Punctuation characters and other symbols, including: "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    * @param userAccount The user account. The maximum length of this parameter is 255 bytes. Ensure that you set this parameter and do not set it as null. Supported character scopes are:
+    * - All lowercase English letters: a to z.
+    * - All uppercase English letters: A to Z.
+    * - All numeric characters: 0 to 9.
+    * - The space character.
+    * - Punctuation characters and other symbols, including: "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    * @param options The options for leaving the channel. See #LeaveChannelOptions.
+    * @return int
+    * - 0: Success.
+    * - < 0: Failure.
+    */
+    virtual int leaveChannelWithUserAccountEx(const char* channelId, const char* userAccount, const LeaveChannelOptions& options) = 0;
+
     /**
      *  Updates the channel media options after joining the channel.
      *
@@ -1641,6 +1738,30 @@ public:
      * - < 0: Failure.
      */
     virtual int sendStreamMessageEx(int streamId, const char* data, size_t length, const RtcConnection& connection) = 0;
+
+    /** Send Reliable message to remote uid in channel.
+     * @param uid Remote user id.
+     * @param type Reliable Data Transmission tunnel message type.
+     * @param data The pointer to the sent data.
+     * @param length The length of the sent data.
+     * @param connection The RtcConnection object.
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+    virtual int sendRdtMessageEx(uid_t uid, RdtStreamType type, const char *data, size_t length, const RtcConnection& connection) = 0;
+
+    /** Send media control message
+     * @param uid Remote user id. In particular, if uid=0, the user is broadcast to the channel
+     * @param data The pointer to the sent data.
+     * @param length The length of the sent data, max 1024.
+     * @param connection The RtcConnection object.
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     */
+    virtual int sendMediaControlMessageEx(uid_t uid, const char *data, size_t length, const RtcConnection& connection) = 0;
+
     /** Adds a watermark image to the local video.
 
     This method adds a PNG watermark image to the local video in a live broadcast. Once the watermark image is added, all the audience in the channel (CDN audience included),
@@ -1879,6 +2000,24 @@ public:
     virtual int setDualStreamModeEx(SIMULCAST_STREAM_MODE mode,
                                    const SimulcastStreamConfig& streamConfig,
                                    const RtcConnection& connection) = 0;
+
+    /**
+     * Set the multi-layer video stream configuration.
+     *
+     * If multi-layer is configed, the subscriber can choose to receive the coresponding layer
+     * of video stream using {@link setRemoteVideoStreamType setRemoteVideoStreamType}.
+     *
+     * @param simulcastConfig
+     * - The configuration for multi-layer video stream. It includes seven layers, ranging from
+     *   STREAM_LAYER_1 to STREAM_LOW. A maximum of 3 layers can be enabled simultaneously.
+     * @param connection The RtcConnection object.
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+     * @technical preview
+     */
+    virtual int setSimulcastConfigEx(const SimulcastConfig& simulcastConfig,
+                                     const RtcConnection& connection) = 0;
     
   /**
     * Set the high priority user list and their fallback level in weak network condition.
@@ -1931,6 +2070,33 @@ public:
    */
     virtual int takeSnapshotEx(const RtcConnection& connection, uid_t uid, const char* filePath)  = 0;
 
+  /**
+   * Takes a snapshot of a video stream.
+   *
+   * This method takes a snapshot of a video stream from the specified user, generates a JPG
+   * image, and saves it to the specified path.
+   *
+   * The method is asynchronous, and the SDK has not taken the snapshot when the method call
+   * returns. After a successful method call, the SDK triggers the `onSnapshotTaken` callback
+   * to report whether the snapshot is successfully taken, as well as the details for that
+   * snapshot.
+   *
+   * @note
+   * - Call this method after joining a channel.
+   * - This method takes a snapshot of the published video stream specified in `ChannelMediaOptions`.
+   *
+   * @param connection The RtcConnection object.
+   * @param uid The user ID. Set uid as 0 if you want to take a snapshot of the local user's video.
+   * @param config The configuration for the take snapshot. See SnapshotConfig.
+   *
+   * Ensure that the path you specify exists and is writable.
+   * @return
+   * - 0 : Success.
+   * - &lt; 0: Failure.
+   *   - -4: Incorrect observation position. Modify the input observation position according to the reqiurements specified in SnapshotConfig.
+   */
+    virtual int takeSnapshotEx(const RtcConnection& connection, uid_t uid, const media::SnapshotConfig& config)  = 0;
+    
     /** Enables video screenshot and upload with the connection ID.
     @param enabled Whether to enable video screenshot and upload:
     - `true`: Yes.
@@ -2002,6 +2168,73 @@ public:
      * @technical preview
     */
     virtual int sendAudioMetadataEx(const RtcConnection& connection, const char* metadata, size_t length) = 0;
+
+    /** Preloads a specified audio effect.
+     *
+     * This method preloads only one specified audio effect into the memory each time
+     * it is called. To preload multiple audio effects, call this method multiple times.
+     *
+     * After preloading, you can call \ref IRtcEngine::playEffect "playEffect"
+     * to play the preloaded audio effect or call
+     * \ref IRtcEngine::playAllEffects "playAllEffects" to play all the preloaded
+     * audio effects.
+     *
+     * @note
+     * - To ensure smooth communication, limit the size of the audio effect file.
+     * - Agora recommends calling this method before joining the channel.
+     *
+     * @param connection The RtcConnection object.
+     * @param soundId The ID of the audio effect.
+     * @param filePath The absolute path of the local audio effect file or the URL
+     * of the online audio effect file. Supported audio formats: mp3, mp4, m4a, aac,
+     * 3gp, mkv, and wav.
+     *
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+    */
+    virtual int preloadEffectEx(const RtcConnection& connection, int soundId, const char* filePath, int startPos = 0) = 0;
+
+    /** Plays a specified audio effect.
+     *
+     *
+     * This method plays only one specified audio effect each time it is called.
+     * To play multiple audio effects, call this method multiple times.
+     *
+     * @note
+     * - Agora recommends playing no more than three audio effects at the same time.
+     * - The ID and file path of the audio effect in this method must be the same
+     * as that in the \ref IRtcEngine::preloadEffect "preloadEffect" method.
+     *
+     * @param connection The RtcConnection object.
+     * @param soundId The ID of the audio effect.
+     * @param filePath The absolute path of the local audio effect file or the URL
+     * of the online audio effect file. Supported audio formats: mp3, mp4, m4a, aac,
+     * 3gp, mkv, and wav.
+     * @param loopCount The number of times the audio effect loops:
+     * - `-1`: Play the audio effect in an indefinite loop until
+     * \ref IRtcEngine::stopEffect "stopEffect" or
+     * \ref IRtcEngine::stopAllEffects "stopAllEffects"
+     * - `0`: Play the audio effect once.
+     * - `1`: Play the audio effect twice.
+     * @param pitch The pitch of the audio effect. The value ranges between 0.5 and 2.0.
+     * The default value is `1.0` (original pitch). The lower the value, the lower the pitch.
+     * @param pan The spatial position of the audio effect. The value ranges between -1.0 and 1.0:
+     * - `-1.0`: The audio effect displays to the left.
+     * - `0.0`: The audio effect displays ahead.
+     * - `1.0`: The audio effect displays to the right.
+     * @param gain The volume of the audio effect. The value ranges between 0 and 100.
+     * The default value is `100` (original volume). The lower the value, the lower
+     * the volume of the audio effect.
+     * @param publish Sets whether to publish the audio effect to the remote:
+     * - true: Publish the audio effect to the remote.
+     * - false: (Default) Do not publish the audio effect to the remote.
+     *
+     * @return
+     * - 0: Success.
+     * - < 0: Failure.
+    */
+    virtual int playEffectEx(const RtcConnection& connection, int soundId, const char* filePath, int loopCount, double pitch, double pan, int gain, bool publish = false, int startPos = 0) = 0;
 };
 
 }  // namespace rtc

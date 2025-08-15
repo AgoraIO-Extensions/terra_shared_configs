@@ -212,6 +212,30 @@ class IRtcEngine {
    */
   virtual void release(bool sync = false) = 0;
 
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUid_6b7aee8
+   * @source: virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUid(uid_t uid, rtc::UserInfo* userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUid_0a0b913
+   * @source: virtual int getUserInfoByUid(const char* channelId, uid_t uid, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUidWithChannelId(const char *channelId, uid_t uid, rtc::UserInfo *userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_c6a8f08
+   * @source: virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUserAccount(const char* userAccount, rtc::UserInfo* userInfo) = 0;
+
+  /**
+   * @iris_api_id: RtcEngine_getUserInfoByUserAccount_86c855f
+   * @source: virtual int getUserInfoByUserAccount(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+   */
+  virtual int getUserInfoByUserAccountWithChannelId(const char* channelId, const char* userAccount, rtc::UserInfo* userInfo) = 0;
+  
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 
   // ----------------------------- 👇🏻rename API👇🏻 -----------------------------
@@ -223,42 +247,42 @@ class IRtcEngine {
   virtual int startPreviewWithoutSourceType() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getAudioDeviceManager
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_AUDIO_DEVICE_MANAGER = 1,
    */
   virtual IAudioDeviceManager *getAudioDeviceManager() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getVideoDeviceManager
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_VIDEO_DEVICE_MANAGER = 2,
    */
   virtual IVideoDeviceManager *getVideoDeviceManager() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getMusicContentCenter
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_MUSIC_CONTENT_CENTER = 15,
    */
   virtual IMusicContentCenter *getMusicContentCenter() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getMediaEngine
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_MEDIA_ENGINE = 4,
    */
   virtual agora::media::IMediaEngine *getMediaEngine() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getLocalSpatialAudioEngine
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_LOCAL_SPATIAL_AUDIO = 11,
    */
   virtual ILocalSpatialAudioEngine *getLocalSpatialAudioEngine() = 0;
 
   /**
-   * @iris_api_id: RtcEngine_getH265Transcoder
+   * @iris_api_id: RtcEngine_queryInterface_257d192
    * @source: virtual int queryInterface(INTERFACE_ID_TYPE iid, void** inter) = 0;
    * AGORA_IID_H265_TRANSCODER = 16,
    */
