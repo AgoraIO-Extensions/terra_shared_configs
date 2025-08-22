@@ -276,6 +276,40 @@ class IMediaEngine {
    */
   virtual int removeVideoFrameRenderer(IVideoFrameObserver *renderer) = 0;
 
+  /**
+   * Create a loopback audio track and get the audio track id.
+   *
+   * @param config The config of loopback audio track
+   * See LoopbackAudioTrackConfig.
+   *
+   * @return
+   * - If the call is successful, SDK returns audio track id.
+   * - If the call fails, SDK returns 0xffffffff.
+   */
+  virtual rtc::track_id_t createLoopbackAudioTrack(const rtc::LoopbackAudioTrackConfig& config) = 0;
+
+  /**
+   * Destroy loopback audio track by trackId
+   *
+   * @param trackId The loopback audio track id.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int destroyLoopbackAudioTrack(rtc::track_id_t trackId) = 0;
+
+  /**
+   * Adjust the volume of the loopback audio track
+   *
+   * @param trackId The loopback audio track id.
+   * @param volume The volume of the loopback audio track.
+   */
+  virtual int updateLoopbackAudioTrackConfig(rtc::track_id_t trackId, const rtc::LoopbackAudioTrackConfig& config) = 0;
+
+  /**
+   * Release the media engine
+   */
   virtual void release() = 0;
 
  protected:

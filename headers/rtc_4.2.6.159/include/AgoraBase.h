@@ -4561,6 +4561,43 @@ struct AudioTrackConfig {
     : enableLocalPlayback(true) {}
 };
 
+/** The type of loopback audio source mode
+*/
+enum LOOPBACK_AUDIO_TRACK_TYPE {
+  /** 
+   * 0: loopback the whole system
+   */
+  LOOPBACK_SYSTEM = 0,
+  /** 
+   * 1: loopback the whole system exclude self
+   */
+  LOOPBACK_SYSTEM_EXCLUDE_SELF = 1,
+  /** 
+   * 2: loopback the specific application
+   */
+  LOOPBACK_APPLICATION = 2,
+};
+
+/** The configuration of custom audio track
+*/
+struct LoopbackAudioTrackConfig {
+  /**
+   * The target app name of the loopback audio track
+   */
+  const char* appName;  
+  /**
+   * The volume of the loopback audio track
+   */
+  int volume;
+  /**
+   * The loopback type refer to LOOPBACK_AUDIO_TRACK_TYPE
+   */
+  LOOPBACK_AUDIO_TRACK_TYPE loopbackType;
+
+  LoopbackAudioTrackConfig()
+    : appName(NULL), volume(100), loopbackType(LOOPBACK_SYSTEM) {}
+};
+
 /**
  * Preset local voice reverberation options.
  * bitmap allocation:

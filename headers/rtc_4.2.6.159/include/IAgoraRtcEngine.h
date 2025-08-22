@@ -1115,6 +1115,16 @@ struct ChannelMediaOptions {
    */
   Optional<int> publishCustomAudioTrackId;
   /**
+   * Whether to publish the loopback audio from a specific source:
+   * - true: Publish the loopback audio from a specific source.
+   * - false: (Default) Do not publish the loopback audio from the specific source.
+   */
+  Optional<bool> publishLoopbackAudioTrack;
+  /**
+   * The loopback audio track id.
+   */
+  Optional<int>  publishLoopbackAudioTrackId;
+  /**
    * Whether to publish the captured video from a custom source:
    * - `true`: Publish the captured video from a custom source.
    * - `false`: (Default) Do not publish the captured video from the custom source.
@@ -1287,6 +1297,8 @@ struct ChannelMediaOptions {
       SET_FROM(publishCustomAudioTrack);
       SET_FROM(publishCustomAudioTrackId);
       SET_FROM(publishCustomVideoTrack);
+      SET_FROM(publishLoopbackAudioTrack);
+      SET_FROM(publishLoopbackAudioTrackId);
       SET_FROM(publishEncodedVideoTrack);
       SET_FROM(publishMediaPlayerAudioTrack);
       SET_FROM(publishMediaPlayerVideoTrack);
@@ -1336,6 +1348,8 @@ struct ChannelMediaOptions {
       ADD_COMPARE(publishCustomAudioTrack);
       ADD_COMPARE(publishCustomAudioTrackId);
       ADD_COMPARE(publishCustomVideoTrack);
+      ADD_COMPARE(publishLoopbackAudioTrack);
+      ADD_COMPARE(publishLoopbackAudioTrackId);
       ADD_COMPARE(publishEncodedVideoTrack);
       ADD_COMPARE(publishMediaPlayerAudioTrack);
       ADD_COMPARE(publishMediaPlayerVideoTrack);
@@ -1388,6 +1402,8 @@ struct ChannelMediaOptions {
         REPLACE_BY(publishCustomAudioTrack);
         REPLACE_BY(publishCustomAudioTrackId);
         REPLACE_BY(publishCustomVideoTrack);
+        REPLACE_BY(publishLoopbackAudioTrack);
+        REPLACE_BY(publishLoopbackAudioTrackId);
         REPLACE_BY(publishEncodedVideoTrack);
         REPLACE_BY(publishMediaPlayerAudioTrack);
         REPLACE_BY(publishMediaPlayerVideoTrack);
