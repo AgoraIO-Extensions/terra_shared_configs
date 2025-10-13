@@ -1145,28 +1145,6 @@ struct ChannelMediaOptions {
   */
   Optional<bool> publishTranscodedVideoTrack;
   /**
-  * Whether to publish the local mixed track.
-  * - `true`: Publish the audio track of local mixed track.
-  * - `false`: (Default) Do not publish the local mixed track.
-  */
-  Optional<bool> publishMixedAudioTrack;
-  /**
-  * Whether to allow local publish audio stream mixed by local mixed track.
-  * This is map for capture rule:
-  * - `3`: (1,1) Default both local and remote can be captured.
-  * - `2`: (0,1) local stream not captured, remote stream captured.
-  * - `1`: (1,0) local stream captured, remote stream not captured.
-  * - `0`: (0,0) local stream not captured, remote stream not captured.
-  * -  The connection for publishMixedAudioTrack(true) is never set capture local.
-  */
-  Optional<int> mixPolicyForMixedTrack;
-  /**
-  * Whether to publish the local lip sync video track.
-  * - `true`: Publish the video track of local lip sync  video track.
-  * - `false`: (Default) Do not publish the local lip sync  video track.
-  */
-  Optional<bool> publishLipSyncTrack;
-  /**
    * Whether to automatically subscribe to all remote audio streams when the user joins a channel:
    * - `true`: (Default) Subscribe to all remote audio streams.
    * - `false`: Do not subscribe to any remote audio stream.
@@ -1260,6 +1238,8 @@ struct ChannelMediaOptions {
    */
   Optional<bool> isAudioFilterable;
 
+  Optional<bool> autoConnectRdt;
+
   ChannelMediaOptions() {}
   ~ChannelMediaOptions() {}
 
@@ -1281,9 +1261,6 @@ struct ChannelMediaOptions {
       SET_FROM(publishFourthScreenTrack);
 #endif
       SET_FROM(publishTranscodedVideoTrack);
-      SET_FROM(publishMixedAudioTrack);
-      SET_FROM(mixPolicyForMixedTrack);
-      SET_FROM(publishLipSyncTrack);
       SET_FROM(publishCustomAudioTrack);
       SET_FROM(publishCustomAudioTrackId);
       SET_FROM(publishCustomVideoTrack);
@@ -1306,6 +1283,7 @@ struct ChannelMediaOptions {
       SET_FROM(customVideoTrackId);
       SET_FROM(isAudioFilterable);
       SET_FROM(isInteractiveAudience);
+      SET_FROM(autoConnectRdt);
 #undef SET_FROM
   }
 
@@ -1330,9 +1308,6 @@ struct ChannelMediaOptions {
       ADD_COMPARE(publishFourthScreenTrack);
 #endif
       ADD_COMPARE(publishTranscodedVideoTrack);
-      ADD_COMPARE(publishMixedAudioTrack);
-      ADD_COMPARE(mixPolicyForMixedTrack);
-      ADD_COMPARE(publishLipSyncTrack);
       ADD_COMPARE(publishCustomAudioTrack);
       ADD_COMPARE(publishCustomAudioTrackId);
       ADD_COMPARE(publishCustomVideoTrack);
@@ -1355,6 +1330,7 @@ struct ChannelMediaOptions {
       ADD_COMPARE(customVideoTrackId);
       ADD_COMPARE(isAudioFilterable);
       ADD_COMPARE(isInteractiveAudience);
+      ADD_COMPARE(autoConnectRdt);
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -1382,9 +1358,6 @@ struct ChannelMediaOptions {
         REPLACE_BY(publishFourthScreenTrack);
 #endif
         REPLACE_BY(publishTranscodedVideoTrack);
-        REPLACE_BY(publishMixedAudioTrack);
-        REPLACE_BY(mixPolicyForMixedTrack);
-        REPLACE_BY(publishLipSyncTrack);
         REPLACE_BY(publishCustomAudioTrack);
         REPLACE_BY(publishCustomAudioTrackId);
         REPLACE_BY(publishCustomVideoTrack);
@@ -1407,6 +1380,7 @@ struct ChannelMediaOptions {
         REPLACE_BY(customVideoTrackId);
         REPLACE_BY(isAudioFilterable);
         REPLACE_BY(isInteractiveAudience);
+        REPLACE_BY(autoConnectRdt);
 #undef REPLACE_BY
     }
     return *this;
@@ -2241,6 +2215,45 @@ class IRtcEngineEventHandler {
     (void)cached;
   }
 
+  /** Occurs when the local user receives the rdt data from the remote user.
+   *
+   * The SDK triggers this callback when the user receives the data stream that another user sends
+   * by calling the \ref agora::rtc::IRtcEngine::sendRdtMessage "sendRdtMessage" method.
+   *
+   * @param userId ID of the user who sends the data.
+   * @param type The RDT stream type
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onRdtMessage(uid_t userId, RdtStreamType type, const char *data, size_t length) {
+    (void)userId;
+    (void)type;
+    (void)data;
+    (void)length;
+  };
+
+  /** Occurs when the RDT tunnel state changed
+   *
+   * @param userId ID of the user who sends the data.
+   * @param state The RDT tunnel state
+   */
+  virtual void onRdtStateChanged(uid_t userId, RdtState state) {
+    (void)userId;
+    (void)state;
+  }
+
+  /** Occurs when the Media Control Message sent by others use sendMediaControlMessage
+   *
+   * @param userId ID of the user who sends the data.
+   * @param data The sending data.
+   * @param length The length (byte) of the data.
+   */
+  virtual void onMediaControlMessage(uid_t userId, const char* data, size_t length) {
+    (void)userId;
+    (void)data;
+    (void)length;
+  }
+
   /**
    * Occurs when the token expires.
    *
@@ -2733,14 +2746,6 @@ class IRtcEngineEventHandler {
     (void)permissionType;
   }
 
-#if defined(__ANDROID__)
-  /**
-    * Reports the permission granted.
-    * @param permission {@link PERMISSION}
-    */
-  virtual void onPermissionGranted(agora::rtc::PERMISSION_TYPE permissionType) {}
-#endif
-
   /** Occurs when the local user registers a user account.
    *
    * After the local user successfully calls `registerLocalUserAccount` to register the user account
@@ -3227,6 +3232,9 @@ public:
      */
     struct Metadata
     {
+        /** The channel ID of the `metadata`.
+         */
+        const char* channelId;
         /** The User ID that sent the metadata.
          * - For the receiver: The user ID of the user who sent the `metadata`.
          * - For the sender: Ignore this value.
@@ -3238,10 +3246,12 @@ public:
         /** The buffer address of the sent or received `metadata`.
          */
         unsigned char *buffer;
-        /** The timestamp (ms) of the `metadata`.
-         *
+        /** The NTP timestamp (ms) when the metadata is sent.
+         *  @note If the receiver is audience, the receiver cannot get the NTP timestamp (ms).
          */
         long long timeStampMs;
+
+         Metadata() : channelId(NULL), uid(0), size(0), buffer(NULL), timeStampMs(0) {}
     };
 
     virtual ~IMetadataObserver() {}
@@ -3412,53 +3422,6 @@ struct DirectCdnStreamingMediaOptions {
    */
   Optional<video_track_id_t> customVideoTrackId;
 
-#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
-  /**
-   * Whether to publish the captured video from the screen:
-   * This parameter is for macOS and Windows only.
-   * - `true`: Publish the captured video from the screen.
-   * - `false`: (Default) Do not publish the captured video from the screen.
-   */
-  Optional<bool> publishScreenTrack;
-  /**
-   * Whether to publish the captured video from the secondary screen:
-   * This parameter is for macOS and Windows only.
-   * - true: Publish the captured video from the secondary screen.
-   * - false: (Default) Do not publish the captured video from the secondary screen.
-   */
-  Optional<bool> publishSecondaryScreenTrack;
-  /**
-   * Whether to publish the captured video from the third screen:
-   * This parameter is for macOS and Windows only.
-   * - true: Publish the captured video from the third screen.
-   * - false: (Default) Do not publish the captured video from the third screen.
-   */
-  Optional<bool> publishThirdScreenTrack;
-  /**
-   * Whether to publish the captured video from the fourth screen:
-   * This parameter is for macOS and Windows only.
-   * - true: Publish the captured video from the fourth screen.
-   * - false: (Default) Do not publish the captured video from the fourth screen.
-   */
-  Optional<bool> publishFourthScreenTrack;
-
-  /**
-  * Whether to publish the audio played by the local loopback device.
-  * This parameter is for macOS and Windows only.
-  * - `true`: Publish the audio track of local loopback track.
-  * - `false`: (Default) Do not publish the local loopback track.
-  */
-  Optional<bool> publishLoopbackAudioTrack;
-
-  /**
-  * Pointer to the device name of the sound card. The default value is NULL (the default sound card).
-  * - This parameter is for macOS and Windows only.
-  * - macOS does not support loopback capturing of the default sound card. If you need to use this method,
-  * please use a virtual sound card and pass its name to the publishLoopbackDeviceName. Agora has tested and recommends using soundflower.
-  */
-  Optional<const char*> publishLoopbackDeviceName;
-#endif
-
   DirectCdnStreamingMediaOptions() {}
   ~DirectCdnStreamingMediaOptions() {}
 
@@ -3471,14 +3434,6 @@ struct DirectCdnStreamingMediaOptions {
       SET_FROM(publishMediaPlayerAudioTrack);
       SET_FROM(publishMediaPlayerId);
       SET_FROM(customVideoTrackId);
-#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
-      SET_FROM(publishScreenTrack);
-      SET_FROM(publishSecondaryScreenTrack);
-      SET_FROM(publishThirdScreenTrack);
-      SET_FROM(publishFourthScreenTrack);
-      SET_FROM(publishLoopbackAudioTrack);
-      SET_FROM(publishLoopbackDeviceName);
-#endif
 #undef SET_FROM
   }
 
@@ -3495,14 +3450,6 @@ struct DirectCdnStreamingMediaOptions {
       ADD_COMPARE(publishMediaPlayerAudioTrack);
       ADD_COMPARE(customVideoTrackId);
       ADD_COMPARE(publishMediaPlayerId);
-#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
-      ADD_COMPARE(publishScreenTrack);
-      ADD_COMPARE(publishSecondaryScreenTrack);
-      ADD_COMPARE(publishThirdScreenTrack);
-      ADD_COMPARE(publishFourthScreenTrack);
-      ADD_COMPARE(publishLoopbackAudioTrack);
-      ADD_COMPARE(publishLoopbackDeviceName);
-#endif
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -3522,14 +3469,6 @@ struct DirectCdnStreamingMediaOptions {
         REPLACE_BY(publishMediaPlayerAudioTrack);
         REPLACE_BY(customVideoTrackId);
         REPLACE_BY(publishMediaPlayerId);
-#if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
-        REPLACE_BY(publishScreenTrack);
-        REPLACE_BY(publishSecondaryScreenTrack);
-        REPLACE_BY(publishThirdScreenTrack);
-        REPLACE_BY(publishFourthScreenTrack);
-        REPLACE_BY(publishLoopbackAudioTrack);
-        REPLACE_BY(publishLoopbackDeviceName);
-#endif
 #undef REPLACE_BY
     }
     return *this;
@@ -5316,10 +5255,6 @@ class IRtcEngine : public agora::base::IEngineBase {
    * @note
    * - To ensure smooth communication, limit the size of the audio effect file.
    * - Agora recommends calling this method before joining the channel.
-   * - If preloadEffect is called before playEffect is executed, the file resource will not be closed after playEffect. 
-   * The next time playEffect is executed, it will directly seek to play at the beginning.
-   * - If preloadEffect is not called before playEffect is executed, the resource will be destroyed after playEffect. 
-   * The next time playEffect is executed, it will try to reopen the file and play it from the beginning.
    *
    * @param soundId The ID of the audio effect.
    * @param filePath The absolute path of the local audio effect file or the URL
@@ -5344,10 +5279,6 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - Agora recommends playing no more than three audio effects at the same time.
    * - The ID and file path of the audio effect in this method must be the same
    * as that in the \ref IRtcEngine::preloadEffect "preloadEffect" method.
-   * - If preloadEffect is called before playEffect is executed, the file resource will not be closed after playEffect. 
-   * The next time playEffect is executed, it will directly seek to play at the beginning.
-   * - If preloadEffect is not called before playEffect is executed, the resource will be destroyed after playEffect. 
-   * The next time playEffect is executed, it will try to reopen the file and play it from the beginning.
    *
    * @param soundId The ID of the audio effect.
    * @param filePath The absolute path of the local audio effect file or the URL
@@ -6011,23 +5942,6 @@ class IRtcEngine : public agora::base::IEngineBase {
    */
   virtual int uploadLogFile(agora::util::AString& requestId) = 0;
 
-   /** * Write the log to SDK . @technical preview
-   *
-   * You can Write the log to SDK log files of the specified level.
-   *
-   * @param level The log level:
-   * - `LOG_LEVEL_NONE (0x0000)`: Do not output any log file.
-   * - `LOG_LEVEL_INFO (0x0001)`: (Recommended) Output log files of the INFO level.
-   * - `LOG_LEVEL_WARN (0x0002)`: Output log files of the WARN level.
-   * - `LOG_LEVEL_ERROR (0x0004)`: Output log files of the ERROR level.
-   * - `LOG_LEVEL_FATAL (0x0008)`: Output log files of the FATAL level.
-   *
-   *  @return
-   *  - 0: Success.
-   *  - < 0: Failure.
-   */
-  virtual int writeLog(commons::LOG_LEVEL level, const char* fmt, ...) = 0;
-
   /**
    * Updates the display mode of the local video view.
    *
@@ -6069,27 +5983,6 @@ class IRtcEngine : public agora::base::IEngineBase {
    */
   virtual int setRemoteRenderMode(uid_t uid, media::base::RENDER_MODE_TYPE renderMode,
                                   VIDEO_MIRROR_MODE_TYPE mirrorMode) = 0;
-  
-    /**
-     * Sets the target frames per second (FPS) for the local render target.
-     *
-     * @param sourceType The type of video source.
-     * @param targetFps The target frames per second to be set.
-     *
-     * @return
-     * - 0: Success.
-     * - < 0: Failure.
-     */
-    virtual int setLocalRenderTargetFps(VIDEO_SOURCE_TYPE sourceType, int targetFps) = 0;
-    /**
-     * Sets the target frames per second (FPS) for the remote render target.
-     *
-     * @param targetFps The target frames per second to be set for the remote render target.
-     * @return
-     * - 0: Success.
-     * - < 0: Failure.
-     */
-    virtual int setRemoteRenderTargetFps(int targetFps) = 0;
 
   // The following APIs are either deprecated and going to deleted.
 
@@ -7140,7 +7033,6 @@ class IRtcEngine : public agora::base::IEngineBase {
                                              const Rectangle& regionRect,
                                              const ScreenCaptureParameters& captureParams) __deprecated = 0;
 
-
 #endif  // _WIN32
 
 #if defined(__ANDROID__)
@@ -7151,22 +7043,8 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure..
    */
   virtual int getAudioDeviceInfo(DeviceInfo& deviceInfo) = 0;
-#endif  // __ANDROID__
 
- /**
-  * Sets the rotation of remote render.
-  * 
-  * @note
-  * For example, the sending end is a screen sharing scene. 
-  * When the screen of the sending end changes horizontally or vertically, 
-  * the rendered screen of the receiving end also wants to change synchronously with that of the peer end. 
-  * In this case, you can set the Angle of the receiving end.
-  * 
-  * @return
-  * - 0: Success.
-  * - < 0: Failure.
-  */
- virtual int setRemoteRenderRotation(uid_t uid, VIDEO_ORIENTATION rotation) = 0;
+#endif  // __ANDROID__
 
 #if defined(_WIN32) || (defined(__APPLE__) && TARGET_OS_MAC && !TARGET_OS_IPHONE)
 
@@ -7670,6 +7548,27 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int sendStreamMessage(int streamId, const char* data, size_t length) = 0;
+
+  /** Send Reliable message to remote uid in channel.
+   * @param uid remote user id.
+   * @param type Reliable Data Transmission tunnel message type.
+   * @param data The pointer to the sent data.
+   * @param length The length of the sent data.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int sendRdtMessage(uid_t uid, RdtStreamType type, const char *data, size_t length) = 0;
+
+  /** Send media control message
+   * @param uid Remote user id. In particular, if uid=0, the user is broadcast to the channel
+   * @param data The pointer to the sent data.
+   * @param length The length of the sent data, max 1024.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int sendMediaControlMessage(uid_t uid, const char* data, size_t length) = 0;
 
   /** **DEPRECATED** Adds a watermark image to the local video or CDN live stream.
 
