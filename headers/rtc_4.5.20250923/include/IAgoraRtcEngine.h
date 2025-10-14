@@ -1481,13 +1481,19 @@ struct LeaveChannelOptions {
    */
   bool stopAllEffect;
   /**
+   * Whether to unload all audio effects when a user leaves the channel.
+   * - `true`: Unload all audio effects.
+   * - `false`: (Default) Do not unload any audio effect.
+   */
+  bool unloadAllEffect;
+  /**
    * Whether to stop microphone recording when a user leaves the channel.
    * - `true`: (Default) Stop microphone recording.
    * - `false`: Do not stop microphone recording.
    */
   bool stopMicrophoneRecording;
 
-  LeaveChannelOptions() : stopAudioMixing(true), stopAllEffect(true), stopMicrophoneRecording(true) {}
+  LeaveChannelOptions() : stopAudioMixing(true), stopAllEffect(true), unloadAllEffect(false), stopMicrophoneRecording(true) {}
 };
 
 /**
