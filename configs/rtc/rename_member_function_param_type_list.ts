@@ -304,6 +304,13 @@ module.exports = {
     is_const: true,
     is_builtin_type: false,
   },
+  'agora::rtc::IRtcEngineEx.createDataStreamEx.config@type': {
+    name: 'DataStreamConfig',
+    source: 'const DataStreamConfig&',
+    kind: SimpleTypeKind.reference_t,
+    is_const: true,
+    is_builtin_type: false,
+  },
   'agora::rtc::ext::IRtcEngineEx.createDataStreamEx.config@type': {
     name: 'DataStreamConfig',
     source: 'const DataStreamConfig&',
@@ -427,6 +434,13 @@ module.exports = {
     name: 'media::IMediaRecorderObserver',
     source: 'const media::IMediaRecorderObserver*',
     kind: SimpleTypeKind.pointer_t,
+    is_const: true,
+    is_builtin_type: false,
+  },
+  'agora::rtc::IBaseSpatialAudioEngine.setZones.zones@type': {
+    name: 'agora::rtc::SpatialAudioZone',
+    source: 'const agora::rtc::SpatialAudioZone*',
+    kind: SimpleTypeKind.array_t,
     is_const: true,
     is_builtin_type: false,
   },
