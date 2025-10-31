@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update headers
         run: |
@@ -45,8 +46,8 @@ jobs:
 
       - name: Push custom headers to GitHub
         run: |
-          # git config --global user.name "${{ secrets.GIT_USERNAME }}"
-          # git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git config --global user.name "${{ secrets.GIT_USERNAME }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
           git add headers/*
           git commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
           git pull --rebase origin main
