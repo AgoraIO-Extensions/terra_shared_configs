@@ -8,6 +8,9 @@
 namespace agora {
 namespace rtc {
 
+// Forward declaration
+struct AudioDeviceInfo;
+
 /**
  * The maximum device ID length.
  */
@@ -40,6 +43,20 @@ public:
 
   /**
    * Gets the information of a specified audio device.
+   * 
+   * @param index An input parameter that specifies the audio device.
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getDeviceInfo(int index, AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
+   * Gets the information of a specified audio device.
+   * 
+   * @deprecated This method is deprecated. Use getDeviceInfo(int, AudioDeviceInfo&) instead.
+   * 
    * @param index An input parameter that specifies the audio device.
    * @param deviceName An output parameter that indicates the device name.
    * @param deviceId An output parameter that indicates the device ID.
@@ -52,7 +69,9 @@ public:
 
   /**
    * Gets the information of a specified audio device.
-   * @note 
+   * 
+   * @deprecated This method is deprecated. Use getDeviceInfo(int, AudioDeviceInfo&) instead.
+   * 
    * @param index An input parameter that specifies the audio device.
    * @param deviceName An output parameter that indicates the device name.
    * @param deviceTypeName An output parameter that indicates the device type name. such as Built-in, USB, HDMI, etc. (MacOS only)
@@ -76,6 +95,18 @@ public:
   /**
    * Gets the default audio device of the system (for macOS and Windows only).
    *
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getDefaultDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
+   * Gets the default audio device of the system (for macOS and Windows only).
+   *
+   * @deprecated This method is deprecated. Use getDefaultDeviceInfo(AudioDeviceInfo&) instead.
+   *
    * @param deviceName The name of the system default audio device.
    * @param deviceId The device ID of the the system default audio device.
    *
@@ -87,6 +118,8 @@ public:
 
    /**
    * Gets the default audio device of the system (for macOS and Windows only).
+   *
+   * @deprecated This method is deprecated. Use getDefaultDeviceInfo(AudioDeviceInfo&) instead.
    *
    * @param deviceName The name of the system default audio device.
    * @param deviceTypeName The device type name of the the system default audio device, such as Built-in, USB, HDMI, etc. (MacOS only)
@@ -214,7 +247,20 @@ public:
   virtual int getPlaybackDevice(char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * Gets the information of the current audio playback device.
+   * 
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getPlaybackDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
    * Gets the device ID and device name of the audio playback device.
+   * 
+   * @deprecated This method is deprecated. Use getPlaybackDeviceInfo(AudioDeviceInfo&) instead.
+   * 
    * @param deviceId An output parameter that specifies the ID of the audio
    * playback device.
    * @param deviceName An output parameter that specifies the name of the audio
@@ -228,6 +274,9 @@ public:
 
   /**
    * Gets the device ID and device name and device type name of the audio playback device.
+   * 
+   * @deprecated This method is deprecated. Use getPlaybackDeviceInfo(AudioDeviceInfo&) instead.
+   * 
    * @param deviceId An output parameter that specifies the ID of the audio playback device.
    * @param deviceName An output parameter that specifies the name of the audio playback device.
    * @param deviceTypeName An output parameter that specifies the device type name. such as Built-in, USB, HDMI, etc. (MacOS only)
@@ -280,8 +329,20 @@ public:
   virtual int getRecordingDevice(char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * Gets the information of the current audio recording device.
+   *
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getRecordingDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
    * Gets the information of the audio recording device by the device ID and
    * device name.
+   *
+   * @deprecated This method is deprecated. Use getRecordingDeviceInfo(AudioDeviceInfo&) instead.
    *
    * @param deviceId ID of the audio recording device.
    * @param deviceName The name of the audio recording device.
@@ -294,6 +355,8 @@ public:
 
   /**
    * Gets the device ID and device name and device type name of the audio recording device.
+   *
+   * @deprecated This method is deprecated. Use getRecordingDeviceInfo(AudioDeviceInfo&) instead.
    *
    * @param deviceId An output parameter that indicates the device id.
    * @param deviceName An output parameter that indicates the device name.
