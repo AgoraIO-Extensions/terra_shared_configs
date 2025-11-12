@@ -36,6 +36,10 @@ function fixEnumConstantValue(
       value = value.replace(it, TYPES_SIZE[it] as string);
     }
   });
+
+  // 移除无符号整数后缀 'U' (例如：1U<<0 -> 1<<0)
+  // 必须在 eval 之前处理，否则 JavaScript 会因为不认识 'U' 而报错
+  value = value.replace(/(\d+)U/g, '$1');
   if (!args?.skipCalEnumValue) {
     if (!/^\d+$/.test(value)) {
       // 当前枚举值不是纯数字, 执行表达式计算，示例如下：
@@ -65,7 +69,7 @@ export function FixEnumConstantParser(
             enumConstant.source = `${++lastEnumValue}`;
           }
           lastEnumValue = parseInt(enumConstant.source);
-          if (isNaN(lastEnumValue)) {
+          if (isNaN(lastEnumValue) || !/^\d+$/.test(enumConstant.source)) {
             enumConstant.value = fixEnumConstantValue(
               enumz,
               enumConstant,
