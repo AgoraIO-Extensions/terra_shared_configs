@@ -29,13 +29,13 @@ class IAudioDeviceManager {
    * @iris_api_id: AudioDeviceManager_getPlaybackDeviceInfo_109b949
    * @source: virtual int getPlaybackDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
    */
-  virtual int getPlaybackDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+  virtual AudioDeviceInfo getPlaybackDeviceInfo() = 0;
 
   /**
    * @iris_api_id: AudioDeviceManager_getRecordingDeviceInfo_109b949
    * @source: virtual int getRecordingDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
    */
-  virtual int getRecordingDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+  virtual AudioDeviceInfo getRecordingDeviceInfo() = 0;
 
   // ----------------------------- 👆🏻overload API👆🏻 ----------------------------- 
 
