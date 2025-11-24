@@ -3517,6 +3517,10 @@ struct LocalAudioStats
    * The AI-Music-Detection result
    */
   int aedMusicRes;
+  /**
+   * The Traditional-Howling-Protection state
+   */
+  int edThpState;
 };
 
 
