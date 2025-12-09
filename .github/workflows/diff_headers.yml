@@ -21,18 +21,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Diff headers
-        id: diff
-        run: |
-          bash scripts/diff.sh ${{ inputs.base-version }} ${{ inputs.target-version }}
-        shell: bash
-      
-      - name: Upload diff artifact
-        if: steps.diff.outputs.DIFF_TOO_LARGE == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-${{ inputs.base-version }}-${{ inputs.target-version }}
-          path: ${{ steps.diff.outputs.DIFF_FILE }}
-          retention-days: 7
+        run: bash scripts/diff.sh ${{ inputs.base-version }} ${{ inputs.target-version }}
       - name: Notification
         run: |
           URL=https://github.com/AgoraIO-Extensions/terra_shared_configs/actions/runs/${{ github.run_id }}

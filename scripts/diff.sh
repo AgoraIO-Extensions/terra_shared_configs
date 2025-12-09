@@ -7,29 +7,64 @@ TARGET=$2
 BASE_PATH=headers/${BASE}/include
 TARGET_PATH=headers/${TARGET}/include
 
-RESULT=$(diff -u -b -r ${BASE_PATH} ${TARGET_PATH})
+# Get list of changed files
+CHANGED_FILES=$(diff -rq -b ${BASE_PATH} ${TARGET_PATH} | grep -E "^Files|^Only" || true)
 
-retVal=$?
-if [ $retVal -eq 1 ]; then
-    SUMMARY="\`\`\`diff"$'\n'$'\n'"${RESULT}"$'\n'"\`\`\`"
-
-    # GitHub step summary has a 1024KB limit
-    MAX_SIZE=$((1000 * 1024))  # 1000KB to leave some margin
-    SUMMARY_SIZE=${#SUMMARY}
-    
-    if [ $SUMMARY_SIZE -gt $MAX_SIZE ]; then
-        # Save full diff to file for artifact upload
-        DIFF_FILE="diff_${BASE}_${TARGET}.txt"
-        echo "${RESULT}" > "${DIFF_FILE}"
-        echo "DIFF_FILE=${DIFF_FILE}" >> $GITHUB_OUTPUT
-        echo "DIFF_TOO_LARGE=true" >> $GITHUB_OUTPUT
-        
-        SUMMARY="## Diff between ${BASE} and ${TARGET}"$'\n'$'\n'"⚠️ **Diff output is too large (${SUMMARY_SIZE} bytes > 1024KB limit)**"$'\n'$'\n'"The full diff has been uploaded as an artifact. Please download it from the Artifacts section at the bottom of this page."
-    fi
-
-    # Output the github action summary.
-    echo "${SUMMARY}" >> $GITHUB_STEP_SUMMARY
-    exit 0;
+if [ -z "$CHANGED_FILES" ]; then
+    echo "No diff found between ${BASE} and ${TARGET} headers." >> $GITHUB_STEP_SUMMARY
+    exit 0
 fi
 
-echo "No diff found between ${BASE} and ${TARGET} headers." >> $GITHUB_STEP_SUMMARY
+# Header
+echo "## Diff between ${BASE} and ${TARGET}" >> $GITHUB_STEP_SUMMARY
+echo "" >> $GITHUB_STEP_SUMMARY
+
+# Process each file that differs
+MAX_CHUNK_SIZE=$((200 * 1024))  # 200KB per file chunk to stay safe
+CURRENT_SIZE=0
+
+# Find files that exist in both but differ
+diff -rq -b ${BASE_PATH} ${TARGET_PATH} 2>/dev/null | while read -r line; do
+    if [[ "$line" == Files* ]]; then
+        # Extract file paths: "Files path1 and path2 differ"
+        FILE1=$(echo "$line" | awk '{print $2}')
+        FILE2=$(echo "$line" | awk '{print $4}')
+        FILENAME=$(basename "$FILE1")
+        
+        FILE_DIFF=$(diff -u -b "$FILE1" "$FILE2" 2>/dev/null || true)
+        FILE_DIFF_SIZE=${#FILE_DIFF}
+        
+        # Check if adding this would exceed limit
+        NEW_SIZE=$((CURRENT_SIZE + FILE_DIFF_SIZE + 100))
+        
+        if [ $NEW_SIZE -gt $MAX_CHUNK_SIZE ]; then
+            # Start a new summary section
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "---" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            CURRENT_SIZE=0
+        fi
+        
+        echo "<details>" >> $GITHUB_STEP_SUMMARY
+        echo "<summary>📄 ${FILENAME}</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '```diff' >> $GITHUB_STEP_SUMMARY
+        echo "$FILE_DIFF" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        CURRENT_SIZE=$((CURRENT_SIZE + FILE_DIFF_SIZE + 100))
+        
+    elif [[ "$line" == Only* ]]; then
+        # Handle files only in one directory
+        echo "<details>" >> $GITHUB_STEP_SUMMARY
+        echo "<summary>🆕 ${line}</summary>" >> $GITHUB_STEP_SUMMARY
+        echo "</details>" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+    fi
+done
+
+echo "" >> $GITHUB_STEP_SUMMARY
+echo "---" >> $GITHUB_STEP_SUMMARY
+echo "✅ Diff complete" >> $GITHUB_STEP_SUMMARY
