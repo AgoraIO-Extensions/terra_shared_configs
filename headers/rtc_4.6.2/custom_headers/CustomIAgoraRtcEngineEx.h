@@ -42,6 +42,12 @@ class IRtcEngineEx {
    */
   virtual int createDataStreamEx(int* streamId, const DataStreamConfig& config, const RtcConnection& connection) = 0;
 
+  /**
+   * @iris_api_id: RtcEngineEx_addVideoWatermarkEx_985f23a
+   * @source: virtual int addVideoWatermarkEx(const WatermarkConfig& config, const RtcConnection& connection) = 0;
+   */
+  virtual int addVideoWatermarkWithConfigEx(const WatermarkConfig& config, const RtcConnection& connection) = 0;
+
   // ----------------------------- 👆🏻overload API👆🏻 -----------------------------
 };
 
