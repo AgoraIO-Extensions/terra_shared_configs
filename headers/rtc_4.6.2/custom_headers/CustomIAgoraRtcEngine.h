@@ -138,23 +138,11 @@ class IRtcEngine {
                                const DataStreamConfig &config) = 0;
 
   /**
-   * @iris_api_id: RtcEngine_setPlaybackAudioFrameBeforeMixingParameters_ee7e270
-   * @source: virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
-   */
-  virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
-  
-  /**
    * @iris_api_id: RtcEngine_addVideoWatermark_7480410
    * @source: virtual int addVideoWatermark(const char* watermarkUrl, const WatermarkOptions& options) = 0;
    */
   virtual int addVideoWatermark(const char *watermarkUrl,
                                 const WatermarkOptions &options) = 0;
-
-  /**
-   * @iris_api_id: RtcEngine_addVideoWatermark_af84754
-   * @source: virtual int addVideoWatermark(const WatermarkConfig& configs) = 0;
-   */
-  virtual int addVideoWatermarkWithConfig(const WatermarkConfig &configs) = 0;
 
   /**
    * @iris_api_id: RtcEngine_joinChannelWithUserAccount_4685af9
