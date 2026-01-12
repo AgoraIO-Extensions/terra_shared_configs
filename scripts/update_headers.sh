@@ -82,9 +82,13 @@ done
 
 if [ "$found" -eq 1 ]; then
     if [ "$index" -gt 1 ]; then
-        echo "the last folder: '${folders[index-2]}'"
-        cp -r "${directory}/${folders[index-2]}/custom_headers" "$destination/custom_headers"
-        echo "copied custom_headers from '${folders[index-2]}' to '$target_folder'."
+        if [ -d "$destination/custom_headers" ]; then
+            echo "custom_headers already exists in '$target_folder', skipping inheritance."
+        else
+            echo "the last folder: '${folders[index-2]}'"
+            cp -r "${directory}/${folders[index-2]}/custom_headers" "$destination/custom_headers"
+            echo "copied custom_headers from '${folders[index-2]}' to '$target_folder'."
+        fi
     else
         echo "this is first folder."
     fi
