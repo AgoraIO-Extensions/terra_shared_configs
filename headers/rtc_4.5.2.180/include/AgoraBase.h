@@ -3124,7 +3124,14 @@ enum LOCAL_VIDEO_STREAM_REASON {
   LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_RESUMED = 29,
   /** 30: The shared display has been disconnected */
   LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_DISPLAY_DISCONNECTED = 30,
-
+  /**
+   * 35: (Windows only) The alpha channel in the current screen sharing cannot be supported.
+   *
+   * This reason indicates that alpha channel sharing is requested, but cannot be used due to factors such as
+   * unsupported data format, unsupported Windows system version, or fallback to a screen capture type that 
+   * does not support alpha channel, or other platform limitations preventing alpha channel usage.
+   */
+  LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_ALPHA_NOT_SUPPORTED = 35,
 };
 
 /**
@@ -5857,25 +5864,17 @@ struct ScreenCaptureParameters {
   bool enableHighLight;
 
   /**
-   * Determines whether to include the alpha (transparency) channel in the shared window stream.
-   * - `true`: Enable the alpha channel (transparency) when sharing a window.
-   * - `false`: (Default) Disable the alpha channel.
+   * Whether to enable alpha (transparency) channel when sharing a window.
+   * - `true`: Attempt to include the alpha channel (transparency) in the shared window stream.
+   * - `false`: (Default) Do not include the alpha channel.
    *
-   * @note Only effective when sharing a specific window. This parameter is ignored when sharing the entire screen.
-   * @note Currently supported on Windows only.
+   * @note This feature is only available when sharing a specific window (not effective for screen or display sharing).
+   * @note Only supported on Windows, and not all Windows system versions provide this capability.
+   * @note Not all window styles support alpha sharing; some windows may not allow transparency capture due to style, platform, or system restrictions.
+   * @note If you enable this option but alpha sharing is not supported for the current window or platform, 
+   * you will receive the LOCAL_VIDEO_STREAM_REASON_SCREEN_CAPTURE_ALPHA_NOT_SUPPORTED callback.
    */
   bool enableAlpha;
-
-  /**
-   * Specifies the relative position of the alpha buffer to the video frame.
-   *
-   * @see agora::media::base::ALPHA_STITCH_MODE
-   *
-   * @note This parameter takes effect only when `enableAlpha` is set to true.
-   *       If not specified, the default value is `NO_ALPHA_STITCH` and may be adjusted by the SDK.
-   *       This parameter is currently supported only on Windows.
-   */
-  media::base::ALPHA_STITCH_MODE alphaStitchMode;
 
   ScreenCaptureParameters()
       : captureAudio(false),
@@ -5889,8 +5888,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
   ScreenCaptureParameters(const VideoDimensions& d, int f, int b)
       : captureAudio(false),dimensions(d),
         frameRate(f),
@@ -5902,8 +5900,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
   ScreenCaptureParameters(int width, int height, int f, int b)
       : captureAudio(false),
         dimensions(width, height),
@@ -5916,8 +5913,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
   ScreenCaptureParameters(int width, int height, int f, int b, bool cur, bool fcs)
       : captureAudio(false),
         dimensions(width, height),
@@ -5930,8 +5926,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
   ScreenCaptureParameters(int width, int height, int f, int b, view_t* ex, int cnt)
       : captureAudio(false),
         dimensions(width, height),
@@ -5944,8 +5939,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
   ScreenCaptureParameters(int width, int height, int f, int b, bool cur, bool fcs, view_t* ex,
                           int cnt)
       : captureAudio(false),
@@ -5959,8 +5953,7 @@ struct ScreenCaptureParameters {
         highLightWidth(0),
         highLightColor(0),
         enableHighLight(false),
-        enableAlpha(false),
-        alphaStitchMode(media::base::NO_ALPHA_STITCH) {}
+        enableAlpha(false) {}
 };
 
 /**
