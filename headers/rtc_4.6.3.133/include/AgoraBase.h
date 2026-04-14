@@ -4207,6 +4207,18 @@ struct LocalAudioStats {
    * when audio is played locally before being locally captured.
    */
   int aecEstimatedDelay;
+  /**
+   * The AI-Voice-Activity-Detection result.
+   */
+  int aedVoiceRes;
+  /**
+   * The AI-Music-Detection result.
+   */
+  int aedMusicRes;
+  /**
+   * The Traditional-Howling-Protection state.
+   */
+  int edThpState;
 };
 
 /**
