@@ -255,6 +255,61 @@ struct AudioParameters {
   AudioParameters() : sample_rate(0), channels(0), frames_per_buffer(0) {}
 };
 
+static const int kAdmMaxDeviceNameSize = 128;
+static const int kAdmMaxGuidSize = 128;
+static const int kIntervalInMillseconds = 200;
+
+/**
+ * The struct of AudioDeviceInfo.
+ *
+ * @note
+ * This struct applies to Windows and macOS only.
+ */
+struct AudioDeviceInfo {
+  /**
+   * The name of the device. The maximum name size is 128 bytes. The default value is 0.
+   */
+  char deviceName[kAdmMaxDeviceNameSize];
+  /**
+   * The type name of the device. such as Built-in, USB, HDMI, etc. The maximum size is 128 bytes. The default value is 0.
+   * @note This member applies to macOS only.
+   */
+  char deviceTypeName[kAdmMaxDeviceNameSize];
+  /**
+   * The ID of the device. The maximum size is 128 bytes. The default value is 0.
+   */
+  char deviceId[kAdmMaxGuidSize];
+  /**
+   * The vendor ID of the device. The maximum size is 128 bytes. The default value is 0.  
+   */
+  char vendorId[kAdmMaxGuidSize];
+  /**
+   * The product ID of the device. The maximum size is 128 bytes. The default value is 0.
+   */
+  char productId[kAdmMaxGuidSize];
+  /**
+   * Determines whether the current device is selected for audio capturing or playback.
+   * - true: Select the current device for audio capturing or playback.
+   * - false: (Default) Do not select the current device for audio capturing or playback.
+   */
+  bool isCurrentSelected;
+  /**
+   * Determines whether the current device is the audio playout device.
+   * - true: (Default) The current device is the playout device.
+   * - false: The current device is not the playout device.
+   */
+  bool isPlayoutDevice;
+
+  AudioDeviceInfo() : isCurrentSelected(false),
+                      isPlayoutDevice(true) {
+    memset(deviceName, 0, sizeof(deviceName));
+    memset(deviceTypeName, 0, sizeof(deviceTypeName));
+    memset(deviceId, 0, sizeof(deviceId));
+    memset(vendorId, 0, sizeof(vendorId));
+    memset(productId, 0, sizeof(productId));
+  }
+};
+
 /**
  * @brief The use mode of the audio data.
  */
@@ -274,6 +329,107 @@ enum RAW_AUDIO_FRAME_OP_MODE_TYPE {
   RAW_AUDIO_FRAME_OP_MODE_READ_WRITE = 2,
 };
 
+/** Definition of IMetadataObserver
+*/
+class IMetadataObserver {
+public:
+    virtual ~IMetadataObserver() {}
+
+    /**
+     * @brief Metadata type of the observer. We only support video metadata for now.
+     */
+    enum METADATA_TYPE
+    {
+        /**
+         * -1: The type of metadata is unknown.
+         */
+        UNKNOWN_METADATA = -1,
+        /**
+         * 0: The type of metadata is video.
+         */
+        VIDEO_METADATA = 0,
+    };
+    /**
+      * The maximum metadata size.
+      */
+    enum MAX_METADATA_SIZE_TYPE
+    {
+        INVALID_METADATA_SIZE_IN_BYTE = -1,
+        DEFAULT_METADATA_SIZE_IN_BYTE = 512,
+        MAX_METADATA_SIZE_IN_BYTE = 1024
+    };
+
+    /**
+     * @brief Media metadata.
+     */
+    struct Metadata
+    {
+        /**
+         * The channel name.
+         */
+        const char* channelId;
+        /**
+         * The user ID.
+         * - For the recipient: The ID of the remote user who sent the `Metadata`.
+         * - For the sender: Ignore it.
+         */
+        unsigned int uid;
+        /**
+         * The buffer size of the sent or received `Metadata`.
+         */
+        unsigned int size;
+        /**
+         * The buffer address of the received `Metadata`.
+         */
+        unsigned char *buffer;
+        /**
+         * The timestamp (ms) of when the `Metadata` is sent.
+         */
+        long long timeStampMs;
+
+          Metadata() : channelId(NULL), uid(0), size(0), buffer(NULL), timeStampMs(0) {}
+    };
+
+    /**
+     * @brief Occurs when the SDK requests the maximum size of the metadata.
+     *
+     * @details
+     * After successfully complete the registration by calling `registerMediaMetadataObserver`, the SDK
+     * triggers this callback once every video frame is sent. You need to specify the maximum size of
+     * the metadata in the return value of this callback.
+     *
+     * @return
+     * The maximum size of the `buffer` of the metadata that you want to use. The highest value is 1024
+     * bytes. Ensure that you set the return value.
+     */
+    virtual int getMaxMetadataSize() { return DEFAULT_METADATA_SIZE_IN_BYTE; }
+
+    /**
+     * @brief Occurs when the SDK is ready to send metadata.
+     *
+     * @details
+     * This callback is triggered when the SDK is ready to send metadata.
+     *
+     * @note Ensure that the size of the metadata does not exceed the value set in the
+     * `getMaxMetadataSize` callback.
+     *
+     * @param source_type Video data type. See `VIDEO_SOURCE_TYPE`.
+     * @param metadata The metadata that the user wants to send. See `Metadata`.
+     *
+     * @return
+     * - `true`: Send the video frame.
+     * - `false`: Do not send the video frame.
+     */
+    virtual bool onReadyToSendMetadata(Metadata &metadata, VIDEO_SOURCE_TYPE source_type) = 0;
+
+    /**
+     * @brief Occurs when the local user receives the metadata.
+     *
+     * @param metadata The metadata received. See `Metadata`.
+     *
+     */
+    virtual void onMetadataReceived(const Metadata& metadata) = 0;
+};
 }  // namespace rtc
 
 namespace media {
@@ -786,8 +942,7 @@ struct Hdr10MetadataInfo {
         maxFrameAverageLightLevel(0){}
 
   bool validate() const {
-    return maxContentLightLevel >= 0 && maxContentLightLevel <= 20000 &&
-           maxFrameAverageLightLevel >= 0 &&
+    return maxContentLightLevel <= 20000 &&
            maxFrameAverageLightLevel <= 20000;
   }
 };
@@ -1939,7 +2094,7 @@ class IVideoEncodedFrameObserver {
    * Without practical meaning.
    */
   virtual bool onEncodedVideoFrameReceived(
-      const char* channelId, rtc::uid_t uid, const uint8_t* imageBuffer, size_t length,
+      const char* channelId, base::user_id_t uid, const uint8_t* imageBuffer, size_t length,
       const rtc::EncodedVideoFrameInfo& videoEncodedFrameInfo) = 0;
 
   virtual ~IVideoEncodedFrameObserver() {}
