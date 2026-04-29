@@ -1534,7 +1534,7 @@ struct ChannelMediaOptions {
 
   /**
    * The channel type. See `CHANNEL_TYPE`.
-   * @note The channelType can only be set with join channel method, it will be ignored with updateChannelMediaOptions method.
+   * @note Valid only when calling channel joining methods (e.g. `joinChannel`, `joinChannelEx`); ignored by `updateChannelMediaOptions`.
    * @since 4.6.3
    */
   Optional<CHANNEL_TYPE> channelType;

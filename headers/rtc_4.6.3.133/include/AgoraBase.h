@@ -292,9 +292,18 @@ enum CHANNEL_PROFILE_TYPE {
   CHANNEL_PROFILE_COMMUNICATION_1v1 __deprecated = 4,
 };
 
+/**
+ * The channel types.
+ */
 enum CHANNEL_TYPE {
-  CHANNEL_TYPE_STANDARD = 0,     // standard channel type.
-  CHANNEL_TYPE_LARGE_SCALE = 1,  // channel type with large scale scenario, eg. greater than 200 broadcasters.
+  /**
+   * 0: Standard channel type.
+   */
+  CHANNEL_TYPE_STANDARD = 0,
+  /**
+   * 1: Channel type with a large-scale scenario, for example, more than 200 broadcasters.
+   */
+  CHANNEL_TYPE_LARGE_SCALE = 1,
 };
 
 /**

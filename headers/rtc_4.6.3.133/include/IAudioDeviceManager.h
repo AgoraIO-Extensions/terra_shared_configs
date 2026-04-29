@@ -4,7 +4,7 @@
 //  Copyright (c) 2021 Agora.io. All rights reserved.
 //
 #pragma once // NOLINT(build/header_guard)
-
+#include "AgoraMediaBase.h"
 namespace agora {
 namespace rtc {
 
@@ -39,6 +39,18 @@ public:
   virtual int getCount() = 0;
 
   /**
+   * Gets the information of a specified audio device.
+   * 
+   * @param index An input parameter that specifies the audio device.
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getDeviceInfo(int index, AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
+   * @deprecated This method is deprecated. Use getDeviceInfo(int, AudioDeviceInfo&) instead.
    * @brief Gets a specified piece of information about an indexed video device.
    *
    * @param index The index value of the video device. The value of this parameter must be less than
@@ -55,6 +67,7 @@ public:
                         char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * @deprecated This method is deprecated. Use getDeviceInfo(int, AudioDeviceInfo&) instead.
    * @brief Gets the audio device information and device type by index.
    *
    * @details
@@ -96,6 +109,15 @@ public:
   /**
    * @brief Gets the default audio device of the system.
    *
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getDefaultDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
+   * @deprecated This method is deprecated. Use getDefaultDeviceInfo(AudioDeviceInfo&) instead.
    * @details
    * - This method is for Windows and macOS only.
    * - You need to call `enumeratePlaybackDevices` or `enumerateRecordingDevices` to get the device
@@ -105,7 +127,6 @@ public:
    * length is `MAX_DEVICE_ID_LENGTH_TYPE`.
    * @param deviceId Output parameter; the device ID of the system default audio device. The maximum
    * length is `MAX_DEVICE_ID_LENGTH_TYPE`.
-   *
    * @return
    * - 0: Success.
    * - < 0: Failure.
@@ -115,6 +136,7 @@ public:
   /**
    * @brief Gets the system‘s default audio device and its type.
    *
+   * @deprecated This method is deprecated. Use getDefaultDeviceInfo(AudioDeviceInfo&) instead.
    * @details
    * - This method applies to macOS only.
    * - You need to call `enumeratePlaybackDevices` or `enumerateRecordingDevices` to get the device
@@ -267,6 +289,17 @@ public:
   virtual int getPlaybackDevice(char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * Gets the information of the current audio playback device.
+   * 
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getPlaybackDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /** 
+   * @deprecated This method is deprecated. Use getPlaybackDeviceInfo(AudioDeviceInfo&) instead.
    * @brief Retrieves the information of the audio playback device.
    *
    * @note This method is for Windows and macOS only.
@@ -284,6 +317,7 @@ public:
                                     char deviceName[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * @deprecated This method is deprecated. Use getPlaybackDeviceInfo(AudioDeviceInfo&) instead.
    * @brief Gets the information and type of the audio playback device.
    *
    * @details
@@ -365,6 +399,17 @@ public:
   virtual int getRecordingDevice(char deviceId[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * Gets the information of the current audio recording device.
+   *
+   * @param deviceInfo An output parameter that contains the complete device information.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int getRecordingDeviceInfo(AudioDeviceInfo& deviceInfo) = 0;
+
+  /**
+   * @deprecated This method is deprecated. Use getRecordingDeviceInfo(AudioDeviceInfo&) instead.
    * @brief Retrieves the information of the audio recording device.
    *
    * @note This method is for Windows and macOS only.
@@ -382,6 +427,7 @@ public:
                                      char deviceName[MAX_DEVICE_ID_LENGTH]) = 0;
 
   /**
+   * @deprecated This method is deprecated. Use getRecordingDeviceInfo(AudioDeviceInfo&) instead.
    * @brief Gets the information and type of the audio capturing device.
    *
    * @details

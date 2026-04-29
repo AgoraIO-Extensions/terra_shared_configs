@@ -255,6 +255,61 @@ struct AudioParameters {
   AudioParameters() : sample_rate(0), channels(0), frames_per_buffer(0) {}
 };
 
+static const int kAdmMaxDeviceNameSize = 128;
+static const int kAdmMaxGuidSize = 128;
+static const int kIntervalInMillseconds = 200;
+
+/**
+ * The struct of AudioDeviceInfo.
+ *
+ * @note
+ * This struct applies to Windows and macOS only.
+ */
+struct AudioDeviceInfo {
+  /**
+   * The name of the device. The maximum name size is 128 bytes. The default value is 0.
+   */
+  char deviceName[kAdmMaxDeviceNameSize];
+  /**
+   * The type name of the device. such as Built-in, USB, HDMI, etc. The maximum size is 128 bytes. The default value is 0.
+   * @note This member applies to macOS only.
+   */
+  char deviceTypeName[kAdmMaxDeviceNameSize];
+  /**
+   * The ID of the device. The maximum size is 128 bytes. The default value is 0.
+   */
+  char deviceId[kAdmMaxGuidSize];
+  /**
+   * The vendor ID of the device. The maximum size is 128 bytes. The default value is 0.  
+   */
+  char vendorId[kAdmMaxGuidSize];
+  /**
+   * The product ID of the device. The maximum size is 128 bytes. The default value is 0.
+   */
+  char productId[kAdmMaxGuidSize];
+  /**
+   * Determines whether the current device is selected for audio capturing or playback.
+   * - true: Select the current device for audio capturing or playback.
+   * - false: (Default) Do not select the current device for audio capturing or playback.
+   */
+  bool isCurrentSelected;
+  /**
+   * Determines whether the current device is the audio playout device.
+   * - true: (Default) The current device is the playout device.
+   * - false: The current device is not the playout device.
+   */
+  bool isPlayoutDevice;
+
+  AudioDeviceInfo() : isCurrentSelected(false),
+                      isPlayoutDevice(true) {
+    memset(deviceName, 0, sizeof(deviceName));
+    memset(deviceTypeName, 0, sizeof(deviceTypeName));
+    memset(deviceId, 0, sizeof(deviceId));
+    memset(vendorId, 0, sizeof(vendorId));
+    memset(productId, 0, sizeof(productId));
+  }
+};
+
 /**
  * @brief The use mode of the audio data.
  */
