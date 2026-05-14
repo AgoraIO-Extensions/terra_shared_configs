@@ -202,6 +202,13 @@ class IRtcEngine {
   virtual int stopScreenCapture() = 0;
 
   /**
+   * @iris_api_id: RtcEngine_setPlaybackAudioFrameBeforeMixingParameters_ee7e270
+   * 
+   * @source: virtual int virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
+   */
+  virtual int setPlaybackAudioFrameBeforeMixingParametersWithSamplesPerCall(int sampleRate, int channel, int samplesPerCall) = 0;
+
+  /**
    * @iris_api_id: RtcEngine_stopScreenCapture_4fd718e
    * @source: virtual int stopScreenCapture(VIDEO_SOURCE_TYPE sourceType) = 0;
    */
