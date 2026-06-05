@@ -41,6 +41,12 @@ class IRtcEngine {
   // ----------------------------- 👇🏻overload API👇🏻 -----------------------------
 
   /**
+   * @iris_api_id: RtcEngine_setPlaybackAudioFrameBeforeMixingParameters_ee7e270
+   * @source: virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
+   */
+  virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
+
+  /**
    * @iris_api_id: RtcEngine_joinChannel_cdbb747
    * @source: virtual int joinChannel(const char* token, const char* channelId, uid_t uid, const ChannelMediaOptions& options) = 0;
    */
