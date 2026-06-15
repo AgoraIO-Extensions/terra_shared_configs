@@ -1,0 +1,53 @@
+name: Update Headers
+inputs:
+  url:
+    description: 'URL of the native headers'
+    type: 'string'
+    required: true
+  version:
+    description: 'native headers version'
+    type: 'string'
+    required: true
+  product_type:
+    description: 'product type'
+    type: 'string'
+    required: true
+  ai_json_url:
+    description: 'URL of the AI JSON'
+    type: 'string'
+    required: false
+    default: ''
+  GH_TOKEN:
+    description: 'GitHub token'
+    type: 'string'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Update headers
+      run: |
+        bash scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
+      shell: bash
+
+    - name: Fetch AI JSON if ai_json_url is provided
+      if: ${{ inputs.ai_json_url != '' }}
+      uses: ./.github/actions/fetch_ai_json
+      with:
+        url: ${{ inputs.ai_json_url }}
+        product_type: ${{ inputs.product_type }}
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+
+    - name: Push custom headers to GitHub
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git add headers/*
+        if git diff --cached --quiet; then
+          echo "No header changes to commit."
+          exit 0
+        fi
+        git commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
+        git remote set-url origin https://x-access-token:${{ inputs.GH_TOKEN }}@github.com/${{ github.repository }}
+        git push origin HEAD:${{ github.ref_name }}
+      shell: bash
