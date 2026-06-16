@@ -35,17 +35,20 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout target repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.target_repository }}
-        ref: ${{ inputs.target_branch }}
-        token: ${{ inputs.GH_TOKEN }}
-        path: terra_shared_configs
+    - name: Prepare target repository
+      id: prepare_target_repository
+      run: |
+        worktree_dir=$(mktemp -d "${RUNNER_TEMP}/terra_shared_configs.XXXXXX")
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf git@github.com:
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf https://github.com/
+        git clone --depth 1 --branch "${{ inputs.target_branch }}" "https://github.com/${{ inputs.target_repository }}.git" "$worktree_dir"
+        echo "worktree_dir=$worktree_dir" >> "$GITHUB_OUTPUT"
+      shell: bash
 
     - name: Update headers
       run: |
-        bash terra_shared_configs/scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
+        bash "${{ steps.prepare_target_repository.outputs.worktree_dir }}/scripts/update_headers.sh" ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
       shell: bash
 
     - uses: actions/setup-node@v3
@@ -53,16 +56,10 @@ runs:
       with:
         node-version: '18.x'
 
-    - name: Reconfigure git to use HTTP authentication
-      if: ${{ inputs.ai_json_url != '' }}
-      run: >
-        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
-      shell: bash
-
     - name: Fetch AI JSON if ai_json_url is provided
       if: ${{ inputs.ai_json_url != '' }}
       run: |
-        cd terra_shared_configs
+        cd "${{ steps.prepare_target_repository.outputs.worktree_dir }}"
         yarn
         mkdir -p ai/temp
         curl -o ai/temp/differences.json ${{ inputs.ai_json_url }}
@@ -73,11 +70,17 @@ runs:
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-        git -C terra_shared_configs add -A headers configs ai
-        if git -C terra_shared_configs diff --cached --quiet; then
+        git -C "${{ steps.prepare_target_repository.outputs.worktree_dir }}" add -A headers configs ai
+        if git -C "${{ steps.prepare_target_repository.outputs.worktree_dir }}" diff --cached --quiet; then
           echo "No header changes to commit."
           exit 0
         fi
-        git -C terra_shared_configs commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
-        git -C terra_shared_configs push origin HEAD:${{ inputs.target_branch }}
+        git -C "${{ steps.prepare_target_repository.outputs.worktree_dir }}" commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
+        git -C "${{ steps.prepare_target_repository.outputs.worktree_dir }}" push origin HEAD:${{ inputs.target_branch }}
+      shell: bash
+
+    - name: Cleanup target repository
+      if: ${{ always() }}
+      run: |
+        rm -rf "${{ steps.prepare_target_repository.outputs.worktree_dir }}"
       shell: bash
