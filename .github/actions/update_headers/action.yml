@@ -21,33 +21,57 @@ inputs:
     description: 'GitHub token'
     type: 'string'
     required: true
+  target_repository:
+    description: 'Repository to update'
+    type: 'string'
+    required: false
+    default: 'AgoraIO-Extensions/terra_shared_configs'
+  target_branch:
+    description: 'Branch to push updates to'
+    type: 'string'
+    required: false
+    default: 'main'
 
 runs:
   using: composite
   steps:
+    - name: Checkout target repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ inputs.target_repository }}
+        ref: ${{ inputs.target_branch }}
+        token: ${{ inputs.GH_TOKEN }}
+        path: terra_shared_configs
+
     - name: Update headers
       run: |
-        bash scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
+        bash terra_shared_configs/scripts/update_headers.sh ${{ inputs.url }} ${{ inputs.version }} ${{ inputs.product_type }}
       shell: bash
+
+    - uses: actions/setup-node@v3
+      if: ${{ inputs.ai_json_url != '' }}
+      with:
+        node-version: '18.x'
 
     - name: Fetch AI JSON if ai_json_url is provided
       if: ${{ inputs.ai_json_url != '' }}
-      uses: ./.github/actions/fetch_ai_json
-      with:
-        url: ${{ inputs.ai_json_url }}
-        product_type: ${{ inputs.product_type }}
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+      run: |
+        cd terra_shared_configs
+        yarn
+        mkdir -p ai/temp
+        curl -o ai/temp/differences.json ${{ inputs.ai_json_url }}
+        yarn ts-node ai/index.ts ai/temp/differences.json configs/${{ inputs.product_type }}/ai/parameter_list.ts
+      shell: bash
 
     - name: Push custom headers to GitHub
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-        git add headers/*
-        if git diff --cached --quiet; then
+        git -C terra_shared_configs add -A headers configs ai
+        if git -C terra_shared_configs diff --cached --quiet; then
           echo "No header changes to commit."
           exit 0
         fi
-        git commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
-        git remote set-url origin https://x-access-token:${{ inputs.GH_TOKEN }}@github.com/${{ github.repository }}
-        git push origin HEAD:${{ github.ref_name }}
+        git -C terra_shared_configs commit -m "[AUTO] Update native headers to ${{ inputs.product_type }}_${{ inputs.version }}"
+        git -C terra_shared_configs push origin HEAD:${{ inputs.target_branch }}
       shell: bash
