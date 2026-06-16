@@ -39,10 +39,11 @@ runs:
       id: prepare_target_repository
       run: |
         worktree_dir=$(mktemp -d "${RUNNER_TEMP}/terra_shared_configs.XXXXXX")
-        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
-        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf git@github.com:
-        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf https://github.com/
-        git clone --depth 1 --branch "${{ inputs.target_branch }}" "https://github.com/${{ inputs.target_repository }}.git" "$worktree_dir"
+        auth_prefix="https://x-access-token:${{ inputs.GH_TOKEN }}@github.com/"
+        auth_repo_url="${auth_prefix}${{ inputs.target_repository }}.git"
+        git config --global url."${auth_prefix}".insteadOf ssh://git@github.com/
+        git config --global url."${auth_prefix}".insteadOf git@github.com:
+        git clone --depth 1 --branch "${{ inputs.target_branch }}" "$auth_repo_url" "$worktree_dir"
         echo "worktree_dir=$worktree_dir" >> "$GITHUB_OUTPUT"
       shell: bash
 
