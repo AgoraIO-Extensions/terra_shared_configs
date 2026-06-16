@@ -23,11 +23,12 @@ product_type=$3
 
 # Construct the target directory path
 destination=${PROJECT_ROOT}"/headers/${product_type}_${version}"
+headers_root="${PROJECT_ROOT}/headers"
 
 if [ -d "$destination" ]; then
     rm -rf "$destination"/*
 else
-    mkdir "$destination"
+    mkdir -p "$destination"
 fi
 
 # Download the file with a temporary filename
@@ -45,7 +46,6 @@ mkdir -p "$destination"
 
 # Ensure the nativeSDK was successfully downloaded
 nativeSDK=$(find "$destination" -type d -name "*_Native_SDK_for_Windows*" -print -quit)
-mkdir -p $nativeSDK
 
 if [ -z "$nativeSDK" ]; then
     echo "Native SDK directory not found."
@@ -60,15 +60,15 @@ mv "$nativeSDK/sdk/high_level_api/include" "$destination"
 # Remove the unzipped file
 rm -rf "$nativeSDK"
 
-directory="headers"
-target_folder="$3_$2"
+directory="$headers_root"
+target_folder="${product_type}_${version}"
 
 if [ ! -d "$directory" ]; then
     echo "directory '$directory' not exist!"
     exit 1
 fi
 
-folders=($(find "$directory" -maxdepth 1 -type d | sort -V | xargs -n 1 basename))
+folders=($(find "$directory" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort -V))
 index=0
 found=0
 
@@ -86,8 +86,12 @@ if [ "$found" -eq 1 ]; then
             echo "custom_headers already exists in '$target_folder', skipping inheritance."
         else
             echo "the last folder: '${folders[index-2]}'"
-            cp -r "${directory}/${folders[index-2]}/custom_headers" "$destination/custom_headers"
-            echo "copied custom_headers from '${folders[index-2]}' to '$target_folder'."
+            if [ -d "${directory}/${folders[index-2]}/custom_headers" ]; then
+                cp -r "${directory}/${folders[index-2]}/custom_headers" "$destination/custom_headers"
+                echo "copied custom_headers from '${folders[index-2]}' to '$target_folder'."
+            else
+                echo "custom_headers not found in '${folders[index-2]}', skipping inheritance."
+            fi
         fi
     else
         echo "this is first folder."

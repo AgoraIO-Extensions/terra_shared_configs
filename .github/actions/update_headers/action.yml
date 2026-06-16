@@ -53,6 +53,12 @@ runs:
       with:
         node-version: '18.x'
 
+    - name: Reconfigure git to use HTTP authentication
+      if: ${{ inputs.ai_json_url != '' }}
+      run: >
+        git config --global url."https://${{ inputs.GH_TOKEN }}@github.com/".insteadOf ssh://git@github.com/
+      shell: bash
+
     - name: Fetch AI JSON if ai_json_url is provided
       if: ${{ inputs.ai_json_url != '' }}
       run: |
