@@ -991,7 +991,13 @@ struct ScreenCaptureSourceInfo {
    */
   int64_t sourceDisplayId;
   ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(0), sourceName(nullptr),
-                              processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false), minimizeWindow(false), sourceDisplayId(-2) {}
+                              processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false), minimizeWindow(false), sourceDisplayId(-2), process_id(0) {}
+
+  /*
+  * The process id of the window
+  */
+  unsigned int process_id;
+
 #else
   ScreenCaptureSourceInfo() : type(ScreenCaptureSourceType_Unknown), sourceId(0), sourceName(nullptr), processPath(nullptr), sourceTitle(nullptr), primaryMonitor(false), isOccluded(false) {}
 #endif
@@ -1141,6 +1147,16 @@ struct ChannelMediaOptions {
    * The custom audio track id. The default value is 0.
    */
   Optional<int> publishCustomAudioTrackId;
+  /**
+   * Whether to publish the loopback audio from a specific source:
+   * - true: Publish the loopback audio from a specific source.
+   * - false: (Default) Do not publish the loopback audio from the specific source.
+   */
+  Optional<bool> publishLoopbackAudioTrack;
+  /**
+   * The loopback audio track id.
+   */
+  Optional<int>  publishLoopbackAudioTrackId;
   /**
    * Whether to publish the captured video from a custom source:
    * - `true`: Publish the captured video from a custom source.
@@ -1317,11 +1333,6 @@ struct ChannelMediaOptions {
    */
   Optional<MultipathType> preferMultipathType;
 
-  /**
-   * The custom user info. The maximum input length is `MAX_CUSTOM_USER_INFO_LENGTH`, the exceed part will be truncated.
-   */
-  Optional<const char*> customUserInfo;
-
   ChannelMediaOptions() {}
   ~ChannelMediaOptions() {}
 
@@ -1349,6 +1360,8 @@ struct ChannelMediaOptions {
       SET_FROM(publishLipSyncTrack);
       SET_FROM(publishCustomAudioTrack);
       SET_FROM(publishCustomAudioTrackId);
+      SET_FROM(publishLoopbackAudioTrack);
+      SET_FROM(publishLoopbackAudioTrackId);
       SET_FROM(publishCustomVideoTrack);
       SET_FROM(publishEncodedVideoTrack);
       SET_FROM(publishMediaPlayerAudioTrack);
@@ -1374,7 +1387,6 @@ struct ChannelMediaOptions {
       SET_FROM(uplinkMultipathMode);
       SET_FROM(downlinkMultipathMode);
       SET_FROM(preferMultipathType);
-      SET_FROM(customUserInfo);
 #undef SET_FROM
   }
 
@@ -1405,6 +1417,8 @@ struct ChannelMediaOptions {
       ADD_COMPARE(publishLipSyncTrack);
       ADD_COMPARE(publishCustomAudioTrack);
       ADD_COMPARE(publishCustomAudioTrackId);
+      ADD_COMPARE(publishLoopbackAudioTrack);
+      ADD_COMPARE(publishLoopbackAudioTrackId);
       ADD_COMPARE(publishCustomVideoTrack);
       ADD_COMPARE(publishEncodedVideoTrack);
       ADD_COMPARE(publishMediaPlayerAudioTrack);
@@ -1430,7 +1444,6 @@ struct ChannelMediaOptions {
       ADD_COMPARE(uplinkMultipathMode);
       ADD_COMPARE(downlinkMultipathMode);
       ADD_COMPARE(preferMultipathType);
-      ADD_COMPARE(customUserInfo);
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -1464,6 +1477,8 @@ struct ChannelMediaOptions {
         REPLACE_BY(publishLipSyncTrack);
         REPLACE_BY(publishCustomAudioTrack);
         REPLACE_BY(publishCustomAudioTrackId);
+        REPLACE_BY(publishLoopbackAudioTrack);
+        REPLACE_BY(publishLoopbackAudioTrackId);
         REPLACE_BY(publishCustomVideoTrack);
         REPLACE_BY(publishEncodedVideoTrack);
         REPLACE_BY(publishMediaPlayerAudioTrack);
@@ -1489,7 +1504,6 @@ struct ChannelMediaOptions {
         REPLACE_BY(uplinkMultipathMode);
         REPLACE_BY(downlinkMultipathMode);
         REPLACE_BY(preferMultipathType);
-        REPLACE_BY(customUserInfo);
 #undef REPLACE_BY
     }
     return *this;
@@ -8860,17 +8874,19 @@ enum MEDIA_DEVICE_STATE_TYPE {
   /** 2: The device is disabled.
    */
   MEDIA_DEVICE_STATE_DISABLED = 2,
-  
   /** 3: The device is plugged in.
    */
   MEDIA_DEVICE_STATE_PLUGGED_IN = 3,
-  
+
   /** 4: The device is not present.
    */
   MEDIA_DEVICE_STATE_NOT_PRESENT = 4,
   /** 8: The device is unplugged.
    */
-  MEDIA_DEVICE_STATE_UNPLUGGED = 8
+  MEDIA_DEVICE_STATE_UNPLUGGED = 8,
+  /** 9: The system default device changed, but the device is not in use.
+   */
+  MEDIA_DEVICE_STATE_DEFAULT_DEVICE_CHANGED_READY = 9,
 };
 
 enum VIDEO_PROFILE_TYPE {

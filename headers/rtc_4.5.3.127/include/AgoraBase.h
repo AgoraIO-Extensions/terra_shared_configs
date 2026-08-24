@@ -758,6 +758,35 @@ enum ERROR_CODE_TYPE {
    * 1501: Video Device Module: The camera is not authorized.
    */
   ERR_VDM_CAMERA_NOT_AUTHORIZED = 1501,
+  /**
+   * 2007: Audio Device Module: An error occurs in starting the application loopback.
+   */
+  ERR_ADM_APPLICATION_LOOPBACK = 2007,
+  /**
+   * 2008: Audio Device Module: The application loopback was stopped unexpectedly, typically due to the application exiting or the user disabling loopback.
+   */
+  ERR_ADM_APPLICATION_LOOPBACK_STOPPED = 2008,
+  /**
+   * 2009: Audio Device Module: An error occurred while starting the system loopback. 
+   * This may be due to system restrictions, device conflicts, or other internal errors.
+   */
+  ERR_ADM_SYSTEM_LOOPBACK = 2009,
+  /**
+   * 2010: Audio Device Module: The system loopback was stopped unexpectedly, typically due to the user disabling loopback or a system error occurred.
+   */
+  ERR_ADM_SYSTEM_LOOPBACK_STOPPED = 2010,
+  /**
+   * 2011: Audio Device Module: No permission to start the loopback.
+   */
+  ERR_ADM_LOOPBACK_NO_PERMISSION = 2011,
+  /**
+   * 2012: Audio Device Module: Silent detected in loopback.
+    */
+  ERR_ADM_LOOPBACK_SILENT_DETECTED = 2012,
+  /**
+   * 2013: Audio Device Module: Silent recovered in loopback.
+   */
+  ERR_ADM_LOOPBACK_SILENT_RECOVERED = 2013,
 };
 
 enum LICENSE_ERROR_TYPE {
@@ -1635,14 +1664,6 @@ enum MAX_USER_ACCOUNT_LENGTH_TYPE {
   /** The maximum length of the user account is 256 bytes.
    */
   MAX_USER_ACCOUNT_LENGTH = 256
-};
-
-/** The maximum length of the custom user info.
- */
-enum MAX_CUSTOM_USER_INFO_LENGTH_TYPE {
-  /** The maximum length of the custom user info is 1024 bytes.
-   */
-  MAX_CUSTOM_USER_INFO_LENGTH = 1024
 };
 
 /**
@@ -5537,6 +5558,75 @@ struct AudioTrackConfig {
   AudioTrackConfig() : enableLocalPlayback(true),enableAudioProcessing(false) {}
 };
 
+/** The type of loopback audio source mode
+*/
+enum LOOPBACK_AUDIO_TRACK_TYPE {
+  /** 
+   * 0: loopback the whole system
+   */
+  LOOPBACK_SYSTEM = 0,
+  /** 
+   * 1: loopback the whole system exclude self
+   */
+  LOOPBACK_SYSTEM_EXCLUDE_SELF = 1,
+  /** 
+   * 2: loopback the specific application
+   */
+  LOOPBACK_APPLICATION = 2,
+  /** 
+   * 3: loopback the specific process
+   */
+  LOOPBACK_PROCESS = 3,
+};
+
+/** Defines options for a custom loopback audio track. */
+struct LoopbackAudioTrackConfig {
+  /**
+   * Specifies the loopback source type.
+   * Possible values are defined by LOOPBACK_AUDIO_TRACK_TYPE (e.g., system audio, specific application, or process).
+   * Default: LOOPBACK_SYSTEM.
+   */
+  LOOPBACK_AUDIO_TRACK_TYPE loopbackType;
+
+  /**
+   * Initial playback volume for the loopback audio, valid in the range [0, 400].
+   * 0: mute; 100: original volume; 400: maximum amplified volume.
+   * Default is 100.
+   */
+  int volume;
+
+  /**
+   * Playback device name to capture loopback audio from.
+   *
+   * Platform-specific notes:
+   * - **Windows:** Not supported for now. The `deviceName` parameter is ignored on Windows.
+   * - **macOS:** For `LOOPBACK_SYSTEM` or `LOOPBACK_SYSTEM_EXCLUDE_SELF`, if set, uses the named virtual device; if NULL, uses the default.
+   *   For `LOOPBACK_APPLICATION` and `LOOPBACK_PROCESS`, ignored.
+   *
+   * If set, the name must exactly match the target playback device.
+   * Set to NULL to use the platform default selection.
+   */
+  const char* deviceName;
+
+  /**
+   * Name of the application to capture audio from.
+   * Only used if loopbackType is LOOPBACK_APPLICATION; otherwise ignored.
+   * Must be an exact, case-sensitive match of the application name.
+   * Set to NULL if not capturing a specific application.
+   */
+  const char* appName;
+
+  /**
+   * Process ID of the target application to capture audio from.
+   * Only used if loopbackType is LOOPBACK_PROCESS; otherwise ignored.
+   * Default is -1.
+   */
+  unsigned int processId;
+
+  LoopbackAudioTrackConfig()
+    : loopbackType(LOOPBACK_SYSTEM), volume(100), deviceName(NULL), appName(NULL), processId(-1) {}
+};
+
 /**
  * Preset local voice reverberation options.
  * bitmap allocation:
@@ -6850,12 +6940,7 @@ struct UserInfo {
    */
   char userAccount[MAX_USER_ACCOUNT_LENGTH];
 
-  /**
-   * The custom user info. The maximum data length is `MAX_CUSTOM_USER_INFO_LENGTH`.
-   */
-  char customUserInfo[MAX_CUSTOM_USER_INFO_LENGTH];
-
-  UserInfo() : uid(0) { userAccount[0] = '\0'; customUserInfo[0] = '\0'; }
+  UserInfo() : uid(0) { userAccount[0] = '\0'; }
 };
 
 /**
