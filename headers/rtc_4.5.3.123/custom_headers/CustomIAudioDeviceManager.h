@@ -37,6 +37,12 @@ class IAudioDeviceManager {
    */
   virtual AudioDeviceInfo *getRecordingDeviceInfo() = 0;
 
+  /**
+   * @iris_api_id: AudioDeviceManager_startRecordingDeviceTest_db21a14
+   * @source: virtual int startRecordingDeviceTest(const RecordingDeviceTestConfiguration& config) = 0;
+   */
+  virtual int startRecordingDeviceTest(const RecordingDeviceTestConfiguration &config) = 0;
+
   // ----------------------------- 👆🏻overload API👆🏻 ----------------------------- 
 
 };
