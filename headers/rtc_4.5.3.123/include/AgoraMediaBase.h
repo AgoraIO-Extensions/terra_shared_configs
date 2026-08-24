@@ -790,7 +790,8 @@ struct ExternalVideoFrame {
         fillAlphaBuffer(false),
         alphaStitchMode(NO_ALPHA_STITCH),
         d3d11Texture2d(NULL),
-        textureSliceIndex(0){}
+        textureSliceIndex(0),
+        iosurfaceId(0){}
 
   /**
    * The EGL context type.
@@ -937,7 +938,7 @@ struct ExternalVideoFrame {
   ALPHA_STITCH_MODE alphaStitchMode;
 
   /**
-   * [For Windows only] The pointer of ID3D11Texture2D used by the video frame.
+   * [For Windows only] The D3D11 shared NT handle used by the video frame.
    */
   void *d3d11Texture2d;
 
@@ -945,6 +946,14 @@ struct ExternalVideoFrame {
    * [For Windows only] The index of ID3D11Texture2D array used by the video frame.
    */
   int textureSliceIndex;
+
+  /**
+   * [For macOS only] IOSurfaceID identifying an IOSurface-backed texture shared
+   * across processes. The surface is looked up and retained by the SDK; this
+   * value must not be treated as a pointer or used as a substitute for the
+   * frame dimensions, format, or stride.
+   */
+  uint32_t iosurfaceId;
 
   /**
    * metadata info used for hdr video data
