@@ -26,7 +26,7 @@ destination=${PROJECT_ROOT}"/headers/${product_type}_${version}"
 headers_root="${PROJECT_ROOT}/headers"
 
 if [ -d "$destination" ]; then
-    rm -rf "$destination"/*
+    find "$destination" -mindepth 1 -maxdepth 1 ! -name custom_headers -exec rm -rf {} +
 else
     mkdir -p "$destination"
 fi
