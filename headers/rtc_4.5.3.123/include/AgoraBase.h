@@ -1229,7 +1229,7 @@ enum VIDEO_CODEC_TYPE {
    * 7: Generic H264.
    * @deprecated This codec type is deprecated.
    */
-  VIDEO_CODEC_GENERIC_H264 __deprecated = 7,
+  VIDEO_CODEC_GENERIC_H264 = 7,
   /**
    * 12: AV1.
    * @technical preview
@@ -1664,6 +1664,14 @@ enum MAX_USER_ACCOUNT_LENGTH_TYPE {
   /** The maximum length of the user account is 256 bytes.
    */
   MAX_USER_ACCOUNT_LENGTH = 256
+};
+
+/** The maximum length of the custom user info.
+ */
+enum MAX_CUSTOM_USER_INFO_LENGTH_TYPE {
+  /** The maximum length of the custom user info is 1024 bytes.
+   */
+  MAX_CUSTOM_USER_INFO_LENGTH = 1024
 };
 
 /**
@@ -2346,112 +2354,6 @@ struct WatermarkOptions {
 };
 
 /**
- * @brief Defines how data is transmitted across multiple network paths.
- */
-enum MultipathMode {
-
-  /**
-    * Duplicate mode, the same piece of data is redundantly transmitted over all available paths.
-    * @technical preview
-    */
-  Duplicate= 0,
-  /**
-   * Dynamic mode, the data is transmitted only over the path that the internal algorithm determines to be optimal for transmission quality.
-   */ 
-  Dynamic
-};
-
-/**
- * @brief Defines the types of network paths used in multipath transmission.
- */ 
-enum MultipathType {
-  /**
-   * The local area network (LAN) path.
-   */
-  LAN = 0,
-  /**
-   * The Wi-Fi path.
-   */
-  WIFI,
-  /**
-   * The mobile network path.
-   */
-  Mobile,
-  /**
-   * An unknown or unspecified network path.
-   */
-  Unknown = 99
-};
-
-/**
- * @brief Contains statistics for a specific network path in multipath transmission.
- */
-struct PathStats {
-  /**
-   * The type of the path.
-   */
-  MultipathType type;
-  /**
-   * The transmission bitrate of the path.
-   */
-  int txKBitRate;
-  /**
-   * The receiving bitrate of the path.
-   */
-  int rxKBitRate;
-  PathStats() : type(Unknown), txKBitRate(0), rxKBitRate(0) {}
-  PathStats(MultipathType t, int tx, int rx) : type(t), txKBitRate(tx), rxKBitRate(rx) {}
-};
-
-
-/**
- * @brief Aggregates statistics for all network paths used in multipath transmission.
- */
-struct MultipathStats {
-  /**
-   * The number of bytes transmitted over the LAN path.
-   */
-  uint32_t lanTxBytes;
-  /**
-   * The number of bytes received over the LAN path.
-   */
-  uint32_t lanRxBytes;
-  /**
-   * The number of bytes transmitted over the Wi-Fi path.
-   */
-  uint32_t wifiTxBytes;
-  /**
-   * The number of bytes received over the Wi-Fi path.
-   */
-  uint32_t wifiRxBytes;
-  /**
-   * The number of bytes transmitted over the mobile network path.
-   */
-  uint32_t mobileTxBytes;
-  /**
-   * The number of bytes received over the mobile network path.
-   */
-  uint32_t mobileRxBytes;
-  /**
-   * The number of active paths.
-   */
-  int activePathNum;
-  /**
-   * “An array of statistics for each active path.
-   */
-  const PathStats* pathStats;
-  MultipathStats()
-      : lanTxBytes(0),
-        lanRxBytes(0),
-        wifiTxBytes(0),
-        wifiRxBytes(0),
-        mobileTxBytes(0),
-        mobileRxBytes(0),
-        activePathNum(0),
-        pathStats(nullptr) {}
-};
-
-/**
  * The definition of the RtcStats struct.
  */
 struct RtcStats {
@@ -3129,29 +3031,6 @@ enum LOCAL_VIDEO_STREAM_STATE {
    * 3: Fails to start the local video.
    */
   LOCAL_VIDEO_STREAM_STATE_FAILED = 3
-};
-
-/**
- * @brief The local video event type.
- * @since v4.6.1
- */
-enum LOCAL_VIDEO_EVENT_TYPE {
-  /**
-   * 1: (Android only) The screen capture window is hidden.
-   */
-  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_WINDOW_HIDDEN = 1,
-  /**
-   * 2: (Android only) The screen capture window is recovered from hidden.
-   */
-  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_WINDOW_RECOVER_FROM_HIDDEN = 2,
-  /**
-   * 3: (Android only) The screen capture is stopped by user.
-   */
-  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_STOPPED_BY_USER = 3,
-  /**
-   * 4: (Android only) An internal error occurs during the screen capture.
-   */
-  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_SYSTEM_INTERNAL_ERROR = 4,
 };
 
 /**
@@ -6940,7 +6819,12 @@ struct UserInfo {
    */
   char userAccount[MAX_USER_ACCOUNT_LENGTH];
 
-  UserInfo() : uid(0) { userAccount[0] = '\0'; }
+  /**
+   * The custom user info. The maximum data length is `MAX_CUSTOM_USER_INFO_LENGTH`.
+   */
+  char customUserInfo[MAX_CUSTOM_USER_INFO_LENGTH];
+
+  UserInfo() : uid(0) { userAccount[0] = '\0'; customUserInfo[0] = '\0'; }
 };
 
 /**

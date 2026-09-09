@@ -19,25 +19,6 @@ enum MAX_DEVICE_ID_LENGTH_TYPE {
 };
 
 /**
- * The configuration for the recording device test.
- */
-struct RecordingDeviceTestConfiguration {
-  /**
-   * The interval (ms) at which the SDK reports the audio volume indication.
-   * The value range is [10, +inf). The default value is 200.
-   */
-  int indicationInterval = 200;
-
-  /**
-   * Whether to locally play back the processed microphone signal during the
-   * test.
-   * - true: Enable filtered local playback.
-   * - false: Keep the legacy recording-only device test behavior.
-   */
-  bool enablePlayback = false;
-};
-
-/**
  * The IAudioDeviceCollection class.
  */
 class IAudioDeviceCollection {
@@ -71,6 +52,7 @@ public:
 
   /**
    * Gets the information of a specified audio device.
+   * @note 
    * @param index An input parameter that specifies the audio device.
    * @param deviceName An output parameter that indicates the device name.
    * @param deviceTypeName An output parameter that indicates the device type name. such as Built-in, USB, HDMI, etc. (MacOS only)
@@ -459,23 +441,6 @@ public:
    * - < 0: Failure.
    */
   virtual int startRecordingDeviceTest(int indicationInterval) = 0;
-
-  /**
-   * Starts the recording device test with the specified configuration.
-   *
-   * When `config.enablePlayback` is set to `true`, the SDK locally plays back
-   * the processed microphone signal during the test. During the test, the SDK
-   * uses the \ref IRtcEngineEventHandler::onAudioVolumeIndication
-   * "onAudioVolumeIndication" callback to notify the app of the recording
-   * volume, and when local playback is enabled, the playback volume as well.
-   *
-   * @param config The recording device test configuration.
-   *
-   * @return
-   * - 0: Success.
-   * - < 0: Failure.
-   */
-  virtual int startRecordingDeviceTest(const RecordingDeviceTestConfiguration& config) = 0;
 
   /**
    * Stops the recording device test.

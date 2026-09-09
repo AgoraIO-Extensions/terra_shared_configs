@@ -495,19 +495,19 @@ enum VIDEO_PIXEL_FORMAT {
    */
   VIDEO_TEXTURE_OES = 11,
   /*
-  12: pixel format for iOS CVPixelBuffer NV12
+  12: pixel format for iOS/macOS CVPixelBuffer NV12
   */
   VIDEO_CVPIXEL_NV12 = 12,
   /*
-  13: pixel format for iOS CVPixelBuffer I420
+  13: pixel format for iOS/macOS CVPixelBuffer I420
   */
   VIDEO_CVPIXEL_I420 = 13,
   /*
-  14: pixel format for iOS CVPixelBuffer BGRA
+  14: pixel format for iOS/macOS CVPixelBuffer BGRA
   */
   VIDEO_CVPIXEL_BGRA = 14,
   /**
-  15: pixel format for iOS CVPixelBuffer P010(10bit NV12)
+  15: pixel format for iOS/macOS CVPixelBuffer P010(10bit NV12)
   */
   VIDEO_CVPIXEL_P010 = 15,
   /**
@@ -791,7 +791,7 @@ struct ExternalVideoFrame {
         alphaStitchMode(NO_ALPHA_STITCH),
         d3d11Texture2d(NULL),
         textureSliceIndex(0),
-        iosurfaceId(0){}
+        pixelBuffer(NULL){}
 
   /**
    * The EGL context type.
@@ -938,7 +938,7 @@ struct ExternalVideoFrame {
   ALPHA_STITCH_MODE alphaStitchMode;
 
   /**
-   * [For Windows only] The D3D11 shared NT handle used by the video frame.
+   * [For Windows only] The pointer of ID3D11Texture2D used by the video frame.
    */
   void *d3d11Texture2d;
 
@@ -948,12 +948,11 @@ struct ExternalVideoFrame {
   int textureSliceIndex;
 
   /**
-   * [For macOS only] IOSurfaceID identifying an IOSurface-backed texture shared
-   * across processes. The surface is looked up and retained by the SDK; this
-   * value must not be treated as a pointer or used as a substitute for the
-   * frame dimensions, format, or stride.
+   * [For iOS and macOS only] The CVPixelBufferRef containing the video frame. Set this
+   * field with VIDEO_BUFFER_TEXTURE and one of the VIDEO_CVPIXEL_* formats.
+   * Do not set this field together with buffer.
    */
-  uint32_t iosurfaceId;
+  void* pixelBuffer;
 
   /**
    * metadata info used for hdr video data
