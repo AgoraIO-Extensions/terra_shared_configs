@@ -1003,6 +1003,100 @@ class IScreenCaptureSourceList {
    */
   virtual void release() = 0;
 };
+
+/**
+ * The source categories included in getLoopbackRecordingSources.
+ *
+ * Values can be combined. On Windows, each flag selects the source category
+ * described below. On macOS 14.2 and later, both flags are honored as described
+ * below. On macOS 13.0 to earlier than 14.2, flags are ignored and all
+ * shareable applications provided by the system are returned.
+ */
+enum LOOPBACK_RECORDING_SOURCE_FLAG {
+  /**
+   * Sources associated with application audio output.
+   *
+   * On Windows, this includes applications that have an audio session, whether
+   * or not they are currently playing audio. On macOS 14.2 and later, this
+   * includes applications that have a system audio output object and are
+   * currently outputting audio.
+   */
+  LOOPBACK_RECORDING_SOURCE_FLAG_AUDIO_OUTPUT = 1 << 0,
+  /**
+   * Sources associated with running applications.
+   *
+   * On Windows, this includes applications that own visible top-level windows.
+   * On macOS 14.2 and later, this includes regular running applications.
+   */
+  LOOPBACK_RECORDING_SOURCE_FLAG_RUNNING_APPLICATION = 1 << 1,
+};
+
+/**
+ * Options for getLoopbackRecordingSources.
+ */
+struct LoopbackRecordingSourceOptions {
+  /** The source categories to enumerate. See LOOPBACK_RECORDING_SOURCE_FLAG. */
+  unsigned int flags;
+
+  LoopbackRecordingSourceOptions()
+      : flags(LOOPBACK_RECORDING_SOURCE_FLAG_AUDIO_OUTPUT |
+              LOOPBACK_RECORDING_SOURCE_FLAG_RUNNING_APPLICATION) {}
+};
+
+/** Information about a target that can be used as a loopback recording source. */
+struct LoopbackRecordingSourceInfo {
+  /**
+   * The application name. UTF-8 encoding.
+   *
+   * This value is for display and is not a unique key. Multiple sources can
+   * have the same appName. This value is always non-null and non-empty for
+   * returned sources. If the process name cannot be resolved, the source is not
+   * returned.
+   */
+  const char* appName;
+#if defined(_WIN32)
+  /**
+   * The window title. UTF-8 encoding.
+   *
+   * Only valid on Windows. For sources without a window, this value is the same as appName.
+   */
+  const char* windowTitle;
+#endif
+  /**
+   * The process IDs that identify the source.
+   *
+   * On Windows, each source contains one process ID. Loopback include/exclude applies
+   * to the process tree associated with the selected process ID. On macOS, a source
+   * can contain multiple process IDs.
+   */
+  const unsigned int* processIds;
+  /** The number of elements in processIds. */
+  unsigned int processCount;
+
+  LoopbackRecordingSourceInfo() : appName(NULL)
+#if defined(_WIN32)
+      , windowTitle(NULL)
+#endif
+      , processIds(NULL), processCount(0)
+  {}
+};
+
+/** A snapshot of the available loopback recording sources. */
+class ILoopbackRecordingSourceList {
+ protected:
+  virtual ~ILoopbackRecordingSourceList() {}
+
+ public:
+  /** Gets the number of loopback recording sources. */
+  virtual unsigned int getCount() = 0;
+  /**
+   * Gets a loopback recording source by index.
+   * The returned pointer fields are valid until this list is released.
+   */
+  virtual LoopbackRecordingSourceInfo getSourceInfo(unsigned int index) = 0;
+  /** Releases this snapshot. */
+  virtual void release() = 0;
+};
 #endif // _WIN32 || (__APPLE__ && !TARGET_OS_IPHONE && TARGET_OS_MAC)
 /**
  * The advanced options for audio.
@@ -7081,6 +7175,18 @@ class IRtcEngine : public agora::base::IEngineBase {
     * - IScreenCaptureSourceList* a pointer to an instance of IScreenCaptureSourceList
     */
   virtual IScreenCaptureSourceList* getScreenCaptureSources(const SIZE& thumbSize, const SIZE& iconSize, const bool includeScreen) = 0;
+
+  /**
+   * Gets a snapshot of the available loopback recording sources.
+   *
+   * @param options The source enumeration options.
+   * @return
+   * - A source list: The enumeration succeeded. The list can be empty and must be released by
+   *   calling ILoopbackRecordingSourceList::release.
+   * - nullptr: The SDK is not initialized or the enumeration failed.
+   */
+  virtual ILoopbackRecordingSourceList* getLoopbackRecordingSources(
+      const LoopbackRecordingSourceOptions& options) = 0;
 #endif // _WIN32 || (__APPLE__ && !TARGET_OS_IPHONE && TARGET_OS_MAC)
 #if (defined(__APPLE__) && TARGET_OS_IOS)
   /** Sets the operational permission of the SDK on the audio session.

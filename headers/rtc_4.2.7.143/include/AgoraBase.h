@@ -4651,8 +4651,50 @@ struct LoopbackAudioTrackConfig {
    */
   unsigned int processId;
 
+  /**
+   * Process names to exclude from system loopback capture.
+   *
+   * On macOS, names are matched exactly and case-sensitively when the track is created, and
+   * multiple names can take effect. On Windows, this list is used only when
+   * excludedProcessCount is 0; only excludedAppNames[0] can take effect and the process name must
+   * include its extension, for example "xxx.exe". The SDK prefers the first matching process that
+   * is currently available as an audio source; if no matching process is available, the SDK falls
+   * back to the first matching process in the system process list order.
+   *
+   * This field is ignored for LOOPBACK_APPLICATION and LOOPBACK_PROCESS. It is also ignored for
+   * LOOPBACK_SYSTEM_EXCLUDE_SELF on Windows.
+   */
+  const char* const* excludedAppNames;
+
+  /** The number of elements in excludedAppNames. */
+  unsigned int excludedAppCount;
+
+  /**
+   * Process IDs to exclude from system loopback capture.
+   *
+   * On macOS, multiple process IDs can take effect. On Windows, this list takes precedence over
+   * excludedAppNames and only excludedProcessIds[0] can take effect. On Windows, include/exclude
+   * applies to the process tree associated with that process ID. The target tree does not need to
+   * have an active audio source or be outputting at the time of the call.
+   *
+   * This field is ignored for LOOPBACK_APPLICATION and LOOPBACK_PROCESS. It is also ignored for
+   * LOOPBACK_SYSTEM_EXCLUDE_SELF on Windows.
+   */
+  const unsigned int* excludedProcessIds;
+
+  /** The number of elements in excludedProcessIds. */
+  unsigned int excludedProcessCount;
+
   LoopbackAudioTrackConfig()
-    : loopbackType(LOOPBACK_SYSTEM), volume(100), deviceName(NULL), appName(NULL), processId(-1) {}
+    : loopbackType(LOOPBACK_SYSTEM),
+      volume(100),
+      deviceName(NULL),
+      appName(NULL),
+      processId(-1),
+      excludedAppNames(NULL),
+      excludedAppCount(0),
+      excludedProcessIds(NULL),
+      excludedProcessCount(0) {}
 };
 
 /**
