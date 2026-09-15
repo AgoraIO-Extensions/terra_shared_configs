@@ -102,6 +102,7 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
   using IRtcEngineEventHandler::onSetRtmFlagResult;
   using IRtcEngineEventHandler::onTranscodedStreamLayoutInfo;
   using IRtcEngineEventHandler::onAudioMetadataReceived;
+  using IRtcEngineEventHandler::onMultipathStats;
 
   virtual const char* eventHandlerType() const { return "event_handler_ex"; }
 
@@ -1039,6 +1040,19 @@ class IRtcEngineEventHandlerEx : public IRtcEngineEventHandler {
   virtual void onAudioMetadataReceived(const RtcConnection& connection, uid_t uid, const char* metadata, size_t length) {
     (void)metadata;
     (void)length;
+  }
+
+    /**
+   * @brief Report the multipath transmission statistics
+   *
+   * @post This callback is triggered after you set `enableMultipath` to `true` to enable multipath transmission.
+   *
+   * @param connection The RtcConnection object.
+   * @param stats The multipath statistics. See the MultipathStats structure for details.
+   */
+  virtual void onMultipathStats(const RtcConnection& connection, const MultipathStats& stats) {
+    (void)stats;
+    (void)connection;
   }
 };
 

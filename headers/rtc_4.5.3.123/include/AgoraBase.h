@@ -758,35 +758,42 @@ enum ERROR_CODE_TYPE {
    * 1501: Video Device Module: The camera is not authorized.
    */
   ERR_VDM_CAMERA_NOT_AUTHORIZED = 1501,
+
+  // Video Effect (Beauty) errors: 1700~1799
   /**
-   * 2007: Audio Device Module: An error occurs in starting the application loopback.
+   * 1700: The video effect asset is invalid. The asset bundle may be corrupted,
+   * the configuration file cannot be parsed, or required fields are missing.
    */
-  ERR_ADM_APPLICATION_LOOPBACK = 2007,
+  ERR_VIDEOEFFECT_ASSET_INVALID = 1700,
   /**
-   * 2008: Audio Device Module: The application loopback was stopped unexpectedly, typically due to the application exiting or the user disabling loopback.
+   * 1701: Failed to save the video effect configuration. The file write
+   * operation failed, possibly due to insufficient disk space or permission issues.
    */
-  ERR_ADM_APPLICATION_LOOPBACK_STOPPED = 2008,
+  ERR_VIDEOEFFECT_SAVE_FAILED = 1701,
   /**
-   * 2009: Audio Device Module: An error occurred while starting the system loopback. 
-   * This may be due to system restrictions, device conflicts, or other internal errors.
+   * 1702: The video effect engine is in an invalid state. The beauty processing
+   * engine is not initialized or the render engine instance does not exist.
    */
-  ERR_ADM_SYSTEM_LOOPBACK = 2009,
+  ERR_VIDEOEFFECT_ENGINE_INVALID = 1702,
   /**
-   * 2010: Audio Device Module: The system loopback was stopped unexpectedly, typically due to the user disabling loopback or a system error occurred.
+   * 1704: The target video effect node is not active. Call
+   * addOrUpdateVideoEffect to activate the node first.
    */
-  ERR_ADM_SYSTEM_LOOPBACK_STOPPED = 2010,
+  ERR_VIDEOEFFECT_NODE_NOT_ACTIVE = 1704,
   /**
-   * 2011: Audio Device Module: No permission to start the loopback.
+   * 1705: The video effect parameter is invalid. For example, the nodeId,
+   * actionId, option, or key is invalid or empty.
    */
-  ERR_ADM_LOOPBACK_NO_PERMISSION = 2011,
+  ERR_VIDEOEFFECT_INVALID_PARAM = 1705,
   /**
-   * 2012: Audio Device Module: Silent detected in loopback.
-    */
-  ERR_ADM_LOOPBACK_SILENT_DETECTED = 2012,
-  /**
-   * 2013: Audio Device Module: Silent recovered in loopback.
+   * 1706: The video effect is not supported on this device.
    */
-  ERR_ADM_LOOPBACK_SILENT_RECOVERED = 2013,
+  ERR_VIDEOEFFECT_NOT_SUPPORTED = 1706,
+  /**
+   * 1707: The video effect bundle path is invalid. The path is empty or
+   * does not exist on the file system.
+   */
+  ERR_VIDEOEFFECT_INVALID_BUNDLE_PATH = 1707,
 };
 
 enum LICENSE_ERROR_TYPE {
@@ -1229,7 +1236,7 @@ enum VIDEO_CODEC_TYPE {
    * 7: Generic H264.
    * @deprecated This codec type is deprecated.
    */
-  VIDEO_CODEC_GENERIC_H264 = 7,
+  VIDEO_CODEC_GENERIC_H264 __deprecated = 7,
   /**
    * 12: AV1.
    * @technical preview
@@ -1664,14 +1671,6 @@ enum MAX_USER_ACCOUNT_LENGTH_TYPE {
   /** The maximum length of the user account is 256 bytes.
    */
   MAX_USER_ACCOUNT_LENGTH = 256
-};
-
-/** The maximum length of the custom user info.
- */
-enum MAX_CUSTOM_USER_INFO_LENGTH_TYPE {
-  /** The maximum length of the custom user info is 1024 bytes.
-   */
-  MAX_CUSTOM_USER_INFO_LENGTH = 1024
 };
 
 /**
@@ -2354,6 +2353,112 @@ struct WatermarkOptions {
 };
 
 /**
+ * @brief Defines how data is transmitted across multiple network paths.
+ */
+enum MultipathMode {
+
+  /**
+    * Duplicate mode, the same piece of data is redundantly transmitted over all available paths.
+    * @technical preview
+    */
+  Duplicate= 0,
+  /**
+   * Dynamic mode, the data is transmitted only over the path that the internal algorithm determines to be optimal for transmission quality.
+   */ 
+  Dynamic
+};
+
+/**
+ * @brief Defines the types of network paths used in multipath transmission.
+ */ 
+enum MultipathType {
+  /**
+   * The local area network (LAN) path.
+   */
+  LAN = 0,
+  /**
+   * The Wi-Fi path.
+   */
+  WIFI,
+  /**
+   * The mobile network path.
+   */
+  Mobile,
+  /**
+   * An unknown or unspecified network path.
+   */
+  Unknown = 99
+};
+
+/**
+ * @brief Contains statistics for a specific network path in multipath transmission.
+ */
+struct PathStats {
+  /**
+   * The type of the path.
+   */
+  MultipathType type;
+  /**
+   * The transmission bitrate of the path.
+   */
+  int txKBitRate;
+  /**
+   * The receiving bitrate of the path.
+   */
+  int rxKBitRate;
+  PathStats() : type(Unknown), txKBitRate(0), rxKBitRate(0) {}
+  PathStats(MultipathType t, int tx, int rx) : type(t), txKBitRate(tx), rxKBitRate(rx) {}
+};
+
+
+/**
+ * @brief Aggregates statistics for all network paths used in multipath transmission.
+ */
+struct MultipathStats {
+  /**
+   * The number of bytes transmitted over the LAN path.
+   */
+  uint32_t lanTxBytes;
+  /**
+   * The number of bytes received over the LAN path.
+   */
+  uint32_t lanRxBytes;
+  /**
+   * The number of bytes transmitted over the Wi-Fi path.
+   */
+  uint32_t wifiTxBytes;
+  /**
+   * The number of bytes received over the Wi-Fi path.
+   */
+  uint32_t wifiRxBytes;
+  /**
+   * The number of bytes transmitted over the mobile network path.
+   */
+  uint32_t mobileTxBytes;
+  /**
+   * The number of bytes received over the mobile network path.
+   */
+  uint32_t mobileRxBytes;
+  /**
+   * The number of active paths.
+   */
+  int activePathNum;
+  /**
+   * “An array of statistics for each active path.
+   */
+  const PathStats* pathStats;
+  MultipathStats()
+      : lanTxBytes(0),
+        lanRxBytes(0),
+        wifiTxBytes(0),
+        wifiRxBytes(0),
+        mobileTxBytes(0),
+        mobileRxBytes(0),
+        activePathNum(0),
+        pathStats(nullptr) {}
+};
+
+/**
  * The definition of the RtcStats struct.
  */
 struct RtcStats {
@@ -3031,6 +3136,29 @@ enum LOCAL_VIDEO_STREAM_STATE {
    * 3: Fails to start the local video.
    */
   LOCAL_VIDEO_STREAM_STATE_FAILED = 3
+};
+
+/**
+ * @brief The local video event type.
+ * @since v4.6.1
+ */
+enum LOCAL_VIDEO_EVENT_TYPE {
+  /**
+   * 1: (Android only) The screen capture window is hidden.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_WINDOW_HIDDEN = 1,
+  /**
+   * 2: (Android only) The screen capture window is recovered from hidden.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_WINDOW_RECOVER_FROM_HIDDEN = 2,
+  /**
+   * 3: (Android only) The screen capture is stopped by user.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_STOPPED_BY_USER = 3,
+  /**
+   * 4: (Android only) An internal error occurs during the screen capture.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_SYSTEM_INTERNAL_ERROR = 4,
 };
 
 /**
@@ -4906,7 +5034,7 @@ struct FaceShapeAreaOptions {
     FACE_SHAPE_AREA_NONE = -1,
     /** 
      * Head Scale, reduces the size of the head. 
-     * The value range is [0, 100]. The default value is 50.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the head reduction effect.
      */
     FACE_SHAPE_AREA_HEADSCALE = 100,
@@ -4923,9 +5051,10 @@ struct FaceShapeAreaOptions {
      */
     FACE_SHAPE_AREA_FACECONTOUR = 102,
     /** 
-     * Face Length, adjusts the length of the face.
+     * Face Length, adjusts the vertical length of the face.
      * The value range is [-100, 100]. The default value is 0.
-     * The larger the absolute value, the stronger the face length effect, negative values indicate the opposite direction.
+     * Positive values elongate the face, while negative values shorten it for a rounder appearance.
+     * The larger the absolute value, the stronger the effect.
      */
     FACE_SHAPE_AREA_FACELENGTH = 103,
     /** 
@@ -4960,8 +5089,14 @@ struct FaceShapeAreaOptions {
     */
     FACE_SHAPE_AREA_CHIN = 108,
     /** 
+     * Face Small, reduces the overall face size for a slimmer appearance.
+     * The value range is [0, 100]. The default value is 0.
+     * The larger the value, the more pronounced the overall face size reduction effect.
+     */
+    FACE_SHAPE_AREA_FACESMALL = 109,
+    /** 
      * Eye Scale, adjusts the size of the eyes.
-     * The value range is [0, 100]. The default value is 50.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the eye size effect.
      */
     FACE_SHAPE_AREA_EYESCALE = 200,
@@ -5008,6 +5143,12 @@ struct FaceShapeAreaOptions {
      */
     FACE_SHAPE_AREA_EYEOUTERCORNER = 206,
     /** 
+     * Eye Angle, adjusts the tilt angle of the eyes (cat-eye effect).
+     * The value range is [-100, 100]. The default value is 0.
+     * The larger the value, the more the outer corners of the eyes are lifted upward.
+     */
+    FACE_SHAPE_AREA_EYEANGLE = 207,
+    /** 
      * Nose Length, adjusts the length of the nose. 
      * The value range is [-100, 100]. The default value is 0.
      */
@@ -5021,7 +5162,7 @@ struct FaceShapeAreaOptions {
     FACE_SHAPE_AREA_NOSEWIDTH = 301,
     /** 
      * Nose Wing, adjusts the size of the nose wings.
-     * The value range is [0, 100]. The default value is 10.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the nose wing effect.
      * @since v4.6.0
      */
@@ -5035,28 +5176,28 @@ struct FaceShapeAreaOptions {
     FACE_SHAPE_AREA_NOSEROOT = 303,
     /** 
      * Nose Bridge, adjusts the size of the nose bridge.
-     * The value range is [0, 100]. The default value is 50.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the nose bridge effect.
      * @since v4.6.0
      */
     FACE_SHAPE_AREA_NOSEBRIDGE = 304,
     /** 
      * Nose Tip, adjusts the size of the nose tip.
-     * The value range is [0, 100]. The default value is 50.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the nose tip effect.
      * @since v4.6.0
      */
     FACE_SHAPE_AREA_NOSETIP = 305,
     /** 
      * Nose General, adjusts the overall size of the nose.
-     * The value range is [-100, 100]. The default value is 50.
+     * The value range is [-100, 100]. The default value is 0.
      * The larger the absolute value, the stronger the nose general effect, negative values indicate the opposite direction.
      * @since v4.6.0
      */
     FACE_SHAPE_AREA_NOSEGENERAL = 306,
     /** 
      * Mouth Scale, adjusts the size of the mouth.
-     * The value range is [-100, 100]. The default value is 20.
+     * The value range is [-100, 100]. The default value is 0.
      * The larger the absolute value, the stronger the mouth size effect, negative values indicate the opposite direction.
      * @since v4.6.0
      */
@@ -5070,7 +5211,7 @@ struct FaceShapeAreaOptions {
     FACE_SHAPE_AREA_MOUTHPOSITION = 401,
     /** 
      * Mouth Smile, adjusts the degree of the mouth's smile.
-     * The value range is [0, 100]. The default value is 30.
+     * The value range is [0, 100]. The default value is 0.
      * The larger the value, the stronger the mouth smile effect.
      * @since v4.6.0
      */
@@ -5435,75 +5576,6 @@ struct AudioTrackConfig {
   bool enableAudioProcessing;
 
   AudioTrackConfig() : enableLocalPlayback(true),enableAudioProcessing(false) {}
-};
-
-/** The type of loopback audio source mode
-*/
-enum LOOPBACK_AUDIO_TRACK_TYPE {
-  /** 
-   * 0: loopback the whole system
-   */
-  LOOPBACK_SYSTEM = 0,
-  /** 
-   * 1: loopback the whole system exclude self
-   */
-  LOOPBACK_SYSTEM_EXCLUDE_SELF = 1,
-  /** 
-   * 2: loopback the specific application
-   */
-  LOOPBACK_APPLICATION = 2,
-  /** 
-   * 3: loopback the specific process
-   */
-  LOOPBACK_PROCESS = 3,
-};
-
-/** Defines options for a custom loopback audio track. */
-struct LoopbackAudioTrackConfig {
-  /**
-   * Specifies the loopback source type.
-   * Possible values are defined by LOOPBACK_AUDIO_TRACK_TYPE (e.g., system audio, specific application, or process).
-   * Default: LOOPBACK_SYSTEM.
-   */
-  LOOPBACK_AUDIO_TRACK_TYPE loopbackType;
-
-  /**
-   * Initial playback volume for the loopback audio, valid in the range [0, 400].
-   * 0: mute; 100: original volume; 400: maximum amplified volume.
-   * Default is 100.
-   */
-  int volume;
-
-  /**
-   * Playback device name to capture loopback audio from.
-   *
-   * Platform-specific notes:
-   * - **Windows:** Not supported for now. The `deviceName` parameter is ignored on Windows.
-   * - **macOS:** For `LOOPBACK_SYSTEM` or `LOOPBACK_SYSTEM_EXCLUDE_SELF`, if set, uses the named virtual device; if NULL, uses the default.
-   *   For `LOOPBACK_APPLICATION` and `LOOPBACK_PROCESS`, ignored.
-   *
-   * If set, the name must exactly match the target playback device.
-   * Set to NULL to use the platform default selection.
-   */
-  const char* deviceName;
-
-  /**
-   * Name of the application to capture audio from.
-   * Only used if loopbackType is LOOPBACK_APPLICATION; otherwise ignored.
-   * Must be an exact, case-sensitive match of the application name.
-   * Set to NULL if not capturing a specific application.
-   */
-  const char* appName;
-
-  /**
-   * Process ID of the target application to capture audio from.
-   * Only used if loopbackType is LOOPBACK_PROCESS; otherwise ignored.
-   * Default is -1.
-   */
-  unsigned int processId;
-
-  LoopbackAudioTrackConfig()
-    : loopbackType(LOOPBACK_SYSTEM), volume(100), deviceName(NULL), appName(NULL), processId(-1) {}
 };
 
 /**
@@ -6819,12 +6891,7 @@ struct UserInfo {
    */
   char userAccount[MAX_USER_ACCOUNT_LENGTH];
 
-  /**
-   * The custom user info. The maximum data length is `MAX_CUSTOM_USER_INFO_LENGTH`.
-   */
-  char customUserInfo[MAX_CUSTOM_USER_INFO_LENGTH];
-
-  UserInfo() : uid(0) { userAccount[0] = '\0'; customUserInfo[0] = '\0'; }
+  UserInfo() : uid(0) { userAccount[0] = '\0'; }
 };
 
 /**

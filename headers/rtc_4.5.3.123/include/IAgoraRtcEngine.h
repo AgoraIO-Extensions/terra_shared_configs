@@ -562,9 +562,9 @@ struct RemoteVideoStats {
    */
   int publishDuration;
   /**
-   * The quality of the remote video stream in the reported interval. 
-   * The quality is determined by the Agora real-time video MOS (Mean Opinion Score) measurement method. 
-   * The return value range is [0, 500]. 
+   * The quality of the remote video stream in the reported interval.
+   * The quality is determined by the Agora real-time video MOS (Mean Opinion Score) measurement method.
+   * The return value range is [0, 500].
    * Dividing the return value by 100 gets the MOS score, which ranges from 0 to 5. The higher the score, the better the video quality.
    * @note For textured video data, this parameter always returns 0.
    */
@@ -1142,16 +1142,6 @@ struct ChannelMediaOptions {
    */
   Optional<int> publishCustomAudioTrackId;
   /**
-   * Whether to publish the loopback audio from a specific source:
-   * - true: Publish the loopback audio from a specific source.
-   * - false: (Default) Do not publish the loopback audio from the specific source.
-   */
-  Optional<bool> publishLoopbackAudioTrack;
-  /**
-   * The loopback audio track id.
-   */
-  Optional<int>  publishLoopbackAudioTrackId;
-  /**
    * Whether to publish the captured video from a custom source:
    * - `true`: Publish the captured video from a custom source.
    * - `false`: (Default) Do not publish the captured video from the custom source.
@@ -1292,11 +1282,40 @@ struct ChannelMediaOptions {
     * @technical preview 
    */
   Optional<const char*> parameters;
+  
+  /**
+   * Whether to enable multipath transmission.
+   * - `true`: Enable multipath transmission.
+   * - `false`: Disable multipath transmission.
+   */
+  Optional<bool> enableMultipath;
 
   /**
-   * The custom user info. The maximum input length is `MAX_CUSTOM_USER_INFO_LENGTH`, the exceed part will be truncated.
+   * The mode for uplink multipath transmission.
+   * This defines how the uplink multipath is managed.
+   *
+   * @note Ensure you set `enableMultipath` to `true` when using this parameter.
+   *
    */
-  Optional<const char*> customUserInfo;
+  Optional<MultipathMode> uplinkMultipathMode;
+
+  /**
+   * The mode for downlink multipath transmission.
+   * This defines how the downlink multipath is managed.
+   *
+   * @note Ensure you set `enableMultipath` to `true` when using this parameter.
+   *
+   */
+  Optional<MultipathMode> downlinkMultipathMode;
+
+  /**
+   * The preferred type of multipath transmission.
+   * This allows the user to specify a preferred multipath type.
+   *
+   * @note Ensure you set `enableMultipath` to `true` when using this parameter.
+   * This parameter is only effective when you set `MultipathMode` to `Dynamic`.
+   */
+  Optional<MultipathType> preferMultipathType;
 
   ChannelMediaOptions() {}
   ~ChannelMediaOptions() {}
@@ -1307,7 +1326,7 @@ struct ChannelMediaOptions {
       SET_FROM(publishCameraTrack);
       SET_FROM(publishSecondaryCameraTrack);
       SET_FROM(publishThirdCameraTrack);
-      SET_FROM(publishFourthCameraTrack);      
+      SET_FROM(publishFourthCameraTrack);
       SET_FROM(publishMicrophoneTrack);
 #if defined(__ANDROID__) || (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) || defined(TARGET_OS_MAC)
       SET_FROM(publishScreenCaptureAudio);
@@ -1325,8 +1344,6 @@ struct ChannelMediaOptions {
       SET_FROM(publishLipSyncTrack);
       SET_FROM(publishCustomAudioTrack);
       SET_FROM(publishCustomAudioTrackId);
-      SET_FROM(publishLoopbackAudioTrack);
-      SET_FROM(publishLoopbackAudioTrackId);
       SET_FROM(publishCustomVideoTrack);
       SET_FROM(publishEncodedVideoTrack);
       SET_FROM(publishMediaPlayerAudioTrack);
@@ -1348,8 +1365,10 @@ struct ChannelMediaOptions {
       SET_FROM(isAudioFilterable);
       SET_FROM(isInteractiveAudience);
       SET_FROM(parameters);
-      SET_FROM(customUserInfo);
-      
+      SET_FROM(enableMultipath);
+      SET_FROM(uplinkMultipathMode);
+      SET_FROM(downlinkMultipathMode);
+      SET_FROM(preferMultipathType);
 #undef SET_FROM
   }
 
@@ -1380,8 +1399,6 @@ struct ChannelMediaOptions {
       ADD_COMPARE(publishLipSyncTrack);
       ADD_COMPARE(publishCustomAudioTrack);
       ADD_COMPARE(publishCustomAudioTrackId);
-      ADD_COMPARE(publishLoopbackAudioTrack);
-      ADD_COMPARE(publishLoopbackAudioTrackId);
       ADD_COMPARE(publishCustomVideoTrack);
       ADD_COMPARE(publishEncodedVideoTrack);
       ADD_COMPARE(publishMediaPlayerAudioTrack);
@@ -1403,7 +1420,10 @@ struct ChannelMediaOptions {
       ADD_COMPARE(isAudioFilterable);
       ADD_COMPARE(isInteractiveAudience);
       ADD_COMPARE(parameters);
-      ADD_COMPARE(customUserInfo);
+      ADD_COMPARE(enableMultipath);
+      ADD_COMPARE(uplinkMultipathMode);
+      ADD_COMPARE(downlinkMultipathMode);
+      ADD_COMPARE(preferMultipathType);
       END_COMPARE();
 
 #undef BEGIN_COMPARE
@@ -1437,8 +1457,6 @@ struct ChannelMediaOptions {
         REPLACE_BY(publishLipSyncTrack);
         REPLACE_BY(publishCustomAudioTrack);
         REPLACE_BY(publishCustomAudioTrackId);
-        REPLACE_BY(publishLoopbackAudioTrack);
-        REPLACE_BY(publishLoopbackAudioTrackId);
         REPLACE_BY(publishCustomVideoTrack);
         REPLACE_BY(publishEncodedVideoTrack);
         REPLACE_BY(publishMediaPlayerAudioTrack);
@@ -1460,7 +1478,10 @@ struct ChannelMediaOptions {
         REPLACE_BY(isAudioFilterable);
         REPLACE_BY(isInteractiveAudience);
         REPLACE_BY(parameters);
-        REPLACE_BY(customUserInfo);
+        REPLACE_BY(enableMultipath);
+        REPLACE_BY(uplinkMultipathMode);
+        REPLACE_BY(downlinkMultipathMode);
+        REPLACE_BY(preferMultipathType);
 #undef REPLACE_BY
     }
     return *this;
@@ -1834,6 +1855,19 @@ class IRtcEngineEventHandler {
     (void)elapsed;
   }
 
+#if defined(__ANDROID__) || (defined(__APPLE__) && TARGET_OS_IOS)
+  /**
+   * @Event of the black screen detected.
+   * @param sourceType source type of the orignated video source.
+   * @param reason  The black screen reason.
+   * @technical preview
+   */
+  virtual void onVideoBlackFrameDetected(VIDEO_SOURCE_TYPE source, int reason) {
+    (void)source;
+    (void)reason;
+  }
+#endif
+
   /** Occurs when the first local video frame is published.
    * The SDK triggers this callback under one of the following circumstances:
    * - The local client enables the video module and calls `joinChannel` successfully.
@@ -1885,7 +1919,24 @@ class IRtcEngineEventHandler {
     (void)width;
     (void)height;
     (void)rotation;
-  }  
+  }
+
+  /** 
+   * @brief Occurs when the local video event occurs.
+   *
+   * @since v4.6.1
+   *
+   * @details
+   * This callback is triggered when a video event occurs. You can use this callback to get the reason for such an event.
+   *
+   * @param source The video source type: #VIDEO_SOURCE_TYPE.
+   * @param event The local video event type: #LOCAL_VIDEO_EVENT_TYPE.
+   *
+   */
+  virtual void onLocalVideoEvent(VIDEO_SOURCE_TYPE source, LOCAL_VIDEO_EVENT_TYPE event) {
+    (void)source;
+    (void)event;
+  }
 
   /** Occurs when the local video stream state changes.
    *
@@ -2020,7 +2071,7 @@ class IRtcEngineEventHandler {
    @note This callback is invalid when the number of users or broadacasters in a
    channel exceeds 20.
 
-   @param userId ID of the remote user.
+   @param uid ID of the remote user.
    @param muted Whether the remote user stops publishing the video stream:
    - true: The remote user has paused sending the video stream.
    - false: The remote user has resumed sending the video stream.
@@ -2438,9 +2489,9 @@ class IRtcEngineEventHandler {
    * - If the most active remote speaker is always the same user, the SDK triggers the `onActiveSpeaker` callback only once.
    * - If the most active remote speaker changes to another user, the SDK triggers this callback again and reports the uid of the new active remote speaker.
    *
-   * @param userId The ID of the active speaker. A `uid` of 0 means the local user.
+   * @param uid The ID of the active speaker. A `uid` of 0 means the local user.
    */
-  virtual void onActiveSpeaker(uid_t uid) { 
+  virtual void onActiveSpeaker(uid_t uid) {
     (void)uid;
   }
 
@@ -2801,7 +2852,7 @@ class IRtcEngineEventHandler {
 
   /**
    * Reports the tracing result of video rendering event of the user.
-   * 
+   *
    * @param uid The user ID.
    * @param currentEvent The current event of the tracing result: #MEDIA_TRACE_EVENT.
    * @param tracingInfo The tracing result: #VideoRenderingTracingInfo.
@@ -2924,7 +2975,7 @@ class IRtcEngineEventHandler {
    * @param uid ID of the remote user.
    * @param metadata The pointer of metadata
    * @param length Size of metadata
-   * @technical preview 
+   * @technical preview
    */
   virtual void onAudioMetadataReceived(uid_t uid, const char* metadata, size_t length) {
     (void)uid;
@@ -2993,6 +3044,17 @@ class IRtcEngineEventHandler {
    */
   virtual void onSetRtmFlagResult(int code) {
     (void)code;
+  }
+
+  /**
+   * @brief Report the multipath transmission statistics
+   *
+   * @post This callback is triggered after you set `enableMultipath` to `true` to enable multipath transmission.
+   *
+   * @param stats The multipath statistics. See the MultipathStats structure for details.
+   */  
+  virtual void onMultipathStats(const MultipathStats& stats) {
+    (void)stats;
   }
 };
 
@@ -3239,6 +3301,21 @@ class IVideoEffectObject : public RefCountInterface {
    * - < 0: Failure.
    */
   virtual int performVideoEffectAction(uint32_t nodeId, VIDEO_EFFECT_ACTION actionId) = 0;
+    
+  /**
+   * @brief Sets a string parameter for the video effect.
+   *
+   * @since v4.6.0
+   *
+   * @param option The option category of the parameter.
+   * @param key The key name of the parameter.
+   * @param param The string value to set.
+   *
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setVideoEffectStringParam(const char* option, const char* key, const char* param) = 0;
 
   /**
    * @brief Sets a float parameter for the video effect.
@@ -3425,10 +3502,18 @@ struct RtcEngineContext {
    */
   bool autoRegisterAgoraExtensions;
 
+
+  /*
+   * Provides the technical preview functionalities or special customizations by configuring the SDK with JSON options.
+   * Pointer to the set parameters in a JSON string.
+   * @technical preview
+  */
+  const char* parameters;
+
   RtcEngineContext()
       : eventHandler(NULL), appId(NULL), context(NULL), channelProfile(CHANNEL_PROFILE_LIVE_BROADCASTING),
         license(NULL), audioScenario(AUDIO_SCENARIO_DEFAULT), areaCode(AREA_CODE_GLOB),
-        logConfig(), useExternalEglContext(false), domainLimit(false), autoRegisterAgoraExtensions(true) {}
+        logConfig(), useExternalEglContext(false), domainLimit(false), autoRegisterAgoraExtensions(true), parameters(NULL) {}
 };
 
 /** Definition of IMetadataObserver
@@ -3833,9 +3918,9 @@ class IRtcEngine : public agora::base::IEngineBase {
   /**
    * Queries the capacity of the current device codec.
    *
-   * @param codec_info An array of the codec cap information: CodecCapInfo.
+   * @param codecInfo An array of the codec cap information: CodecCapInfo.
    * @param size The array size.
-   * @return 
+   * @return
    * 0: Success.
    * < 0: Failure.
    */
@@ -3844,10 +3929,10 @@ class IRtcEngine : public agora::base::IEngineBase {
     /**
    * Queries the score of the current device.
    *
-   * @return 
+   * @return
    * > 0: If the value is greater than 0, it means that the device score has been retrieved and represents the score value.
    * Most devices score between 60-100, with higher scores indicating better performance.
-   * 
+   *
    * < 0: Failure.
    */
   virtual int queryDeviceScore() = 0;
@@ -4221,7 +4306,7 @@ class IRtcEngine : public agora::base::IEngineBase {
 
   /** Starts a video call test.
    *
-   * @param config: configuration for video call test.
+   * @param config configuration for video call test.
    *
    * @return
    * - 0: Success.
@@ -4433,10 +4518,10 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - You can call this method either before or after joining a channel.
    * - The filter effect feature has specific performance requirements for devices. If your device overheats after enabling the filter effect, Agora recommends disabling it entirely.
    *
-   * @param enabled. Whether to enable filter effect:
+   * @param enabled Whether to enable filter effect:
    * - `true`: Enable.
    * - `false`: (Default) Disable.
-   * @param options. Set the filter effect options. See FilterEffectOptions.
+   * @param options Set the filter effect options. See FilterEffectOptions.
    *
    * @return
    * - 0: Success.
@@ -4698,7 +4783,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int disableAudio() = 0;
-  
+
   /**
    * Sets the audio parameters and application scenarios.
    *
@@ -5208,7 +5293,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * Creates a media recorder object and return its pointer.
    *
    * @param info The RecorderStreamInfo object. It contains the user ID and the channel name.
-   * 
+   *
    * @return
    * - The pointer to \ref rtc::IMediaRecorder "IMediaRecorder",
    *   if the method call succeeds.
@@ -5494,7 +5579,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int setAudioMixingPlaybackSpeed(int speed) = 0;
-  
+
   /**
    * Gets the volume of audio effects.
    *
@@ -5806,7 +5891,7 @@ class IRtcEngine : public agora::base::IEngineBase {
   /** Sets remote user parameters for spatial audio
 
    @param uid The ID of the remote user.
-   @param param spatial audio parameters: SpatialAudioParams.
+   @param params spatial audio parameters: SpatialAudioParams.
 
    @return int
    - 0: Success.
@@ -6081,8 +6166,8 @@ class IRtcEngine : public agora::base::IEngineBase {
 
   /** Changes the voice formant ratio for local speaker.
 
-  @param formantRatio The voice formant ratio. The value ranges between -1.0 and 1.0. 
-  The lower the value, the deeper the sound, and the higher the value, the more it 
+  @param formantRatio The voice formant ratio. The value ranges between -1.0 and 1.0.
+  The lower the value, the deeper the sound, and the higher the value, the more it
   sounds like a child. The default value is 0.0 (the local user's voice will not be changed).
 
   @return
@@ -6143,7 +6228,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - true: Enable the voice AI tuner
    * - false: (default) Disable the voice AI tuner.
    *
-   * @param type. The options for SDK voice AI tuner types. See #VOICE_AI_TUNER_TYPE.
+   * @param type The options for SDK voice AI tuner types. See #VOICE_AI_TUNER_TYPE.
    * @return
    * - 0: Success.
    * - < 0: Failure.
@@ -6547,6 +6632,25 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel) = 0;
+
+  /**
+   * Sets the audio playback format before mixing in the
+   * \ref agora::media::IAudioFrameObserver::onPlaybackAudioFrameBeforeMixing "onPlaybackAudioFrameBeforeMixing"
+   * callback.
+   *
+   * @param sampleRate The sample rate (Hz) of the audio data returned in
+   * `onPlaybackAudioFrameBeforeMixing`, which can set be as 8000, 16000, 32000, 44100, or 48000.
+   * @param channel Number of channels of the audio data returned in `onPlaybackAudioFrameBeforeMixing`,
+   * which can be set as 1 or 2:
+   * - 1: Mono
+   * - 2: Stereo
+   * @param samplesPerCall Sampling points in the called data returned in
+   * `onPlaybackAudioFrameBeforeMixing`. For example, it is usually set as 1024 for stream pushing.
+   * @return
+   * - 0: Success.
+   * - < 0: Failure.
+   */
+  virtual int setPlaybackAudioFrameBeforeMixingParameters(int sampleRate, int channel, int samplesPerCall) = 0;
 
   /**
    * Enable the audio spectrum monitor.
@@ -7475,12 +7579,12 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - < 0: Failure.
    */
   virtual int updateScreenCapture(const ScreenCaptureParameters2& captureParams) = 0;
-    
+
    /**
    * Queries the ability of screen sharing to support the maximum frame rate.
    *
    * @since v4.2.0
-   * 
+   *
    * @return
    * - 0: support 15 fps, Low devices.
    * - 1: support 30 fps, Usually low - to mid-range devices.
@@ -7491,11 +7595,11 @@ class IRtcEngine : public agora::base::IEngineBase {
 
   /**
    * Query all focal attributes supported by the camera.
-   * 
+   *
    * @param focalLengthInfos The camera supports the collection of focal segments.Ensure the size of array is not less than 8.
-   * 
+   *
    * @param size The camera supports the size of the focal segment set. Ensure the size is not less than 8.
-   * 
+   *
    * @return
    * - 0: Success.
    * - < 0: Failure..
@@ -7541,7 +7645,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - ERR_NOT_INITIALIZED (7): You have not initialized IRtcEngine when set screencapture scenario.
    */
   virtual int setScreenCaptureScenario(SCREEN_SCENARIO_TYPE screenScenario) = 0;
-  
+
   /**
    * Stops the screen sharing.
    *
@@ -7777,7 +7881,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * Stop sharing the screen.
    *
    * After calling `startScreenCapture`, you can call this method to stop sharing the first screen.
-   * 
+   *
    * @param sourceType source type of screen. See #VIDEO_SOURCE_TYPE.
    * @return
    * - 0: Success.
@@ -8032,6 +8136,10 @@ class IRtcEngine : public agora::base::IEngineBase {
    @note
    - Call this method before the `joinChannel` method.
    - This method applies to the `LIVE_BROADCASTING` channel profile.
+   - If your receiving-side logic requires metadata to stay synchronized with the current decoded
+   frame, and you send external video frames to the SDK while also implementing the video frame
+   observer, prefer attaching metadata to `pushVideoFrame` and reading it back from
+   `onRenderVideoFrame`, instead of relying on this observer callback.
 
    @param observer IMetadataObserver.
    @param type The metadata type. See \ref IMetadataObserver::METADATA_TYPE "METADATA_TYPE". The SDK supports VIDEO_METADATA (0) only for now.
@@ -8380,7 +8488,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * "IDirectCdnStreamingEventHandler".
    * @param publishUrl The url of the cdn used to publish the stream.
    * @param options The direct cdn streaming media options: DirectCdnStreamingMediaOptions.
-   * This API must pass an audio-related option, and temporarily cannot pass more than one. 
+   * This API must pass an audio-related option, and temporarily cannot pass more than one.
    * For video-related options, you can either choose to not pass any, or only one.
    *
    * @return
@@ -8706,7 +8814,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    */
   virtual uint64_t getNtpWallTimeInMs() = 0;
 
-  /** 
+  /**
    * @brief Whether the target feature is available for the device.
    * @since v4.3.0
    * @param type The feature type. See FeatureType.

@@ -906,13 +906,16 @@ struct ExternalVideoFrame {
    */
   float matrix[16];
   /**
-   * [Texture related parameter] The MetaData buffer.
-   *  The default value is NULL
+   * The MetaData buffer.
+   * The default value is NULL.
+   * @note The default maximum metadata size is 1024 bytes. If the input size exceeds the current
+   * metadata limit, the SDK truncates the payload to the effective limit.
    */
   uint8_t* metadataBuffer;
   /**
-   * [Texture related parameter] The MetaData size.
-   *  The default value is 0
+   * The MetaData size.
+   * The default value is 0.
+   * @note The default maximum metadata size is 1024 bytes.
    */
   int metadataSize;
   /**
@@ -948,13 +951,6 @@ struct ExternalVideoFrame {
   int textureSliceIndex;
 
   /**
-   * [For iOS and macOS only] The CVPixelBufferRef containing the video frame. Set this
-   * field with VIDEO_BUFFER_TEXTURE and one of the VIDEO_CVPIXEL_* formats.
-   * Do not set this field together with buffer.
-   */
-  void* pixelBuffer;
-
-  /**
    * metadata info used for hdr video data
    */
   Hdr10MetadataInfo hdr10MetadataInfo;
@@ -963,6 +959,9 @@ struct ExternalVideoFrame {
    * The ColorSpace of the video frame.
    */
   ColorSpace colorSpace;
+
+  /** [For iOS and macOS only] CVPixelBufferRef used with VIDEO_BUFFER_TEXTURE. */
+  void* pixelBuffer;
 };
 
 /**
@@ -1045,13 +1044,17 @@ struct VideoFrame {
    */
   int avsync_type;
   /**
-   * [Texture related parameter] The MetaData buffer.
-   *  The default value is NULL
+   * The MetaData buffer.
+   * The default value is NULL.
+   * @note This buffer is only guaranteed to be valid during the current callback. If you need to
+   * use it asynchronously or after the callback returns, make a copy first.
    */
   uint8_t* metadata_buffer;
   /**
-   * [Texture related parameter] The MetaData size.
-   *  The default value is 0
+   * The MetaData size.
+   * The default value is 0.
+   * @note This size is only meaningful while `metadata_buffer` is valid during the current
+   * callback.
    */
   int metadata_size;
   /**
@@ -1782,6 +1785,9 @@ class IVideoFrameObserver {
    * `videoFrame` parameter in this callback.
    *
    * @note This callback does not support sending processed RGBA video data back to the SDK.
+   * @note If your business logic requires metadata to stay synchronized with the current decoded
+   * frame, prefer reading the metadata carried in `videoFrame` instead of consuming it from a
+   * separate metadata observer callback.
    *
    * @param channelId The channel name
    * @param remoteUid ID of the remote user who sends the current video frame.
