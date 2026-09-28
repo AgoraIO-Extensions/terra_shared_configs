@@ -1498,6 +1498,11 @@ public:
      * If you enable loopback recording, the output of the default sound card is mixed into
      * the audio stream sent to the other end.
      *
+     * @deprecated This method is deprecated. Use `IMediaEngine::createLoopbackAudioTrack` to
+     * create a loopback audio track, then use the connection's channel media options and
+     * `publishLoopbackAudioTrackIds` to publish it. Use
+     * `IMediaEngine::adjustLoopbackAudioPublishVolume` to adjust its volume.
+     *
      * @note This method is for Windows only.
      *
      * @param connection The RtcConnection object.
@@ -1512,7 +1517,8 @@ public:
      * - 0: Success.
      * - < 0: Failure.
      */
-    virtual int enableLoopbackRecordingEx(const RtcConnection& connection, bool enabled, const char* deviceName = NULL) = 0;
+    virtual int enableLoopbackRecordingEx(const RtcConnection& connection, bool enabled,
+                                          const char* deviceName = NULL) __deprecated = 0;
     
     /**
      * Adjusts the recording volume.

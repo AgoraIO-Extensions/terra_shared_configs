@@ -92,6 +92,7 @@
 #endif
 
 #define INVALID_DISPLAY_ID (-2)
+#define MAX_AUDIO_CHANNELS (8)
 
 namespace agora {
 namespace util {
@@ -5654,6 +5655,39 @@ enum LOOPBACK_AUDIO_TRACK_TYPE {
   LOOPBACK_PROCESS = 3,
 };
 
+/** The volume information of an audio track. */
+struct AudioTrackVolumeInfo {
+  /** The number of valid entries in levels. */
+  int channelCount;
+
+  /**
+   * The publish channel volumes in the range [0, 255]. Only the first channelCount entries are
+   * valid.
+   */
+  int levels[MAX_AUDIO_CHANNELS];
+};
+
+/** The per-track observer for audio tracks. */
+class IAudioTrackObserver {
+ public:
+  virtual ~IAudioTrackObserver() {}
+
+  /**
+   * Occurs when the publish channel volumes of an audio track are available.
+   *
+   * The SDK invokes this callback at the interval configured by
+   * IMediaEngine::enableAudioTrackVolumeIndication().
+   *
+   * @param trackId The audio track ID.
+   * @param volumeInfo The volume information. This pointer is valid only for the duration of the
+   * callback.
+   */
+  virtual void onAudioTrackVolumeIndication(track_id_t trackId, const AudioTrackVolumeInfo* volumeInfo) {
+    (void)trackId;
+    (void)volumeInfo;
+  }
+};
+
 /**
  * Defines options for a custom loopback audio track.
  *
@@ -5668,7 +5702,7 @@ struct LoopbackAudioTrackConfig {
   LOOPBACK_AUDIO_TRACK_TYPE loopbackType;
 
   /**
-   * Initial playback volume for the loopback audio, valid in the range [0, 400].
+   * Initial publish volume for the loopback audio, valid in the range [0, 400].
    * 0: mute; 100: original volume; 400: maximum amplified volume.
    * Default is 100.
    */

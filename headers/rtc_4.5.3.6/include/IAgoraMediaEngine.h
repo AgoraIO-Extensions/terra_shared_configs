@@ -293,6 +293,27 @@ class IMediaEngine {
   virtual int removeVideoFrameRenderer(IVideoFrameObserver *renderer) = 0;
 
   /**
+   * Enables, updates, or disables the volume indication interval for an audio track.
+   *
+   * @technical preview
+   *
+   * @param id The audio track ID.
+   * @param interval The callback interval in milliseconds. A value greater than 0 enables or
+   * updates the interval. Positive values that are not multiples of 50 are rounded up to the
+   * next multiple of 50. A value less than or equal to 0 disables volume indication.
+   *
+   * @note Currently, volume indication is supported only for loopback audio tracks created by
+   * createLoopbackAudioTrack(). Custom audio tracks are not supported.
+   * @return
+   * - 0: Success.
+   * - -ERR_FAILED: id does not identify an existing loopback audio track, including when it
+   * identifies a custom audio track.
+   * - -ERR_INVALID_ARGUMENT: interval is too large to round up safely.
+   * - -ERR_NOT_SUPPORTED: The current platform does not support loopback audio tracks.
+   */
+  virtual int enableAudioTrackVolumeIndication(rtc::track_id_t id, int interval) = 0;
+
+  /**
    * Create a loopback audio track and get the audio track id.
    *
    * @technical preview
@@ -307,6 +328,22 @@ class IMediaEngine {
    * - If the call fails, SDK returns 0xffffffff.
    */
   virtual rtc::track_id_t createLoopbackAudioTrack(const rtc::LoopbackAudioTrackConfig& config) = 0;
+
+  /**
+   * Adjusts the publish volume of a loopback audio track.
+   *
+   * @technical preview
+   *
+   * @param trackId The loopback audio track ID.
+   * @param volume The publish volume in the range [0, 400].
+   *
+   * @note This method replaces the deprecated `updateLoopbackAudioTrackConfig` method.
+   * @return
+   * - 0: Success.
+   * - -ERR_INVALID_ARGUMENT: volume is outside the range [0, 400].
+   * - -ERR_FAILED: no loopback audio track matches trackId.
+   */
+  virtual int adjustLoopbackAudioPublishVolume(rtc::track_id_t trackId, int volume) = 0;
 
   /**
    * Destroy loopback audio track by trackId
@@ -324,19 +361,50 @@ class IMediaEngine {
   virtual int destroyLoopbackAudioTrack(rtc::track_id_t trackId) = 0;
 
   /**
-   * Update the configuration of the loopback audio track 
+   * Registers an observer for an audio track.
    *
    * @technical preview
    *
-   * @note This method is only supported on macOS and Windows for now.
+   * The same observer can be registered for multiple tracks. Registering the same observer for
+   * the same track more than once fails.
    *
-   * @param trackId The loopback audio track id.
-   * @param config The configuration of the loopback audio track.
+   * @note Currently, registration is supported only for loopback audio tracks created by
+   * createLoopbackAudioTrack(). A custom PCM track cannot be registered through this API, even
+   * though the PCM track implementation supports volume indication internally.
+   * The caller must keep the observer valid until unregisterAudioTrackObserver() returns.
+   *
+   * @param id The loopback audio track ID.
+   * @param observer The observer that receives publish volume indications. This pointer must not
+   * be null.
    * @return
    * - 0: Success.
-   * - < 0: Failure.
+   * - -ERR_INVALID_ARGUMENT: observer is null.
+   * - -ERR_FAILED: id does not identify an existing audio track, observer is already registered
+   * for id, or the observer cannot be registered.
+   * - -ERR_NOT_SUPPORTED: id identifies an existing custom audio track.
    */
-  virtual int updateLoopbackAudioTrackConfig(rtc::track_id_t trackId, const rtc::LoopbackAudioTrackConfig& config) = 0;
+  virtual int registerAudioTrackObserver(rtc::track_id_t id,
+                                         rtc::IAudioTrackObserver* observer) = 0;
+
+  /**
+   * Unregisters an observer from an audio track.
+   *
+   * @technical preview
+   *
+   * When this method returns, the observer no longer receives callbacks for the specified track.
+   *
+   * @note Currently, only observers registered for loopback audio tracks can be unregistered
+   * through this API. Custom audio tracks are not supported.
+   * @param id The loopback audio track ID.
+   * @param observer The observer previously registered for id. This pointer must not be null.
+   * @return
+   * - 0: Success.
+   * - -ERR_INVALID_ARGUMENT: observer is null.
+   * - -ERR_FAILED: id does not identify an existing loopback audio track (including a custom
+   * audio track ID), or observer is not registered for id.
+   */
+  virtual int unregisterAudioTrackObserver(rtc::track_id_t id,
+                                           rtc::IAudioTrackObserver* observer) = 0;
 
   /**
    * Release the media engine

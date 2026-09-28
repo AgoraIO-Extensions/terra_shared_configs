@@ -1049,6 +1049,11 @@ struct ImageTrackOptions {
   ImageTrackOptions() : imageUrl(NULL), fps(1), mirrorMode(VIDEO_MIRROR_MODE_DISABLED) {}
 };
 
+struct AudioTrackIdList {
+  const track_id_t* trackIds;
+  int trackCount;
+};
+
 /**
  * The channel media options.
  *
@@ -1150,11 +1155,20 @@ struct ChannelMediaOptions {
    */
   Optional<bool> publishLoopbackAudioTrack;
   /**
-   * The loopback audio track id.
+   * The loopback audio track IDs to publish or unpublish.
+   *
+   * When `publishLoopbackAudioTrack` is `true`, the SDK publishes every track in
+   * this list; when it is `false`, the SDK unpublishes every track in this
+   * list. If `publishLoopbackAudioTrack` is not set, this option does not
+   * trigger a publish operation.
+   *
+   * @note `trackIds` must remain valid until the method that receives
+   * `ChannelMediaOptions` returns.
+   * The removed `publishLoopbackAudioTrackId` option is replaced by this list-based option.
    *
    * @technical preview
    */
-  Optional<int>  publishLoopbackAudioTrackId;
+  Optional<AudioTrackIdList> publishLoopbackAudioTrackIds;
   /**
    * Whether to publish the captured video from a custom source:
    * - `true`: Publish the captured video from a custom source.
@@ -1365,7 +1379,7 @@ struct ChannelMediaOptions {
       SET_FROM(publishCustomAudioTrack);
       SET_FROM(publishCustomAudioTrackId);
       SET_FROM(publishLoopbackAudioTrack);
-      SET_FROM(publishLoopbackAudioTrackId);
+      SET_FROM(publishLoopbackAudioTrackIds);
       SET_FROM(publishCustomVideoTrack);
       SET_FROM(publishEncodedVideoTrack);
       SET_FROM(publishMediaPlayerAudioTrack);
@@ -1423,7 +1437,6 @@ struct ChannelMediaOptions {
       ADD_COMPARE(publishCustomAudioTrack);
       ADD_COMPARE(publishCustomAudioTrackId);
       ADD_COMPARE(publishLoopbackAudioTrack);
-      ADD_COMPARE(publishLoopbackAudioTrackId);
       ADD_COMPARE(publishCustomVideoTrack);
       ADD_COMPARE(publishEncodedVideoTrack);
       ADD_COMPARE(publishMediaPlayerAudioTrack);
@@ -1484,7 +1497,7 @@ struct ChannelMediaOptions {
         REPLACE_BY(publishCustomAudioTrack);
         REPLACE_BY(publishCustomAudioTrackId);
         REPLACE_BY(publishLoopbackAudioTrack);
-        REPLACE_BY(publishLoopbackAudioTrackId);
+        REPLACE_BY(publishLoopbackAudioTrackIds);
         REPLACE_BY(publishCustomVideoTrack);
         REPLACE_BY(publishEncodedVideoTrack);
         REPLACE_BY(publishMediaPlayerAudioTrack);
@@ -6905,6 +6918,10 @@ class IRtcEngine : public agora::base::IEngineBase {
    * If you enable loopback recording, the output of the default sound card is mixed into
    * the audio stream sent to the other end.
    *
+   * @deprecated This method is deprecated. Use `IMediaEngine::createLoopbackAudioTrack` to
+   * create a loopback audio track, then use `ChannelMediaOptions::publishLoopbackAudioTrackIds`
+   * to publish it. Use `IMediaEngine::adjustLoopbackAudioPublishVolume` to adjust its volume.
+   *
    * @note This method is for Windows only.
    *
    * @param enabled Sets whether to enable/disable loopback recording.
@@ -6918,7 +6935,7 @@ class IRtcEngine : public agora::base::IEngineBase {
    * - 0: Success.
    * - < 0: Failure.
    */
-  virtual int enableLoopbackRecording(bool enabled, const char* deviceName = NULL) = 0;
+  virtual int enableLoopbackRecording(bool enabled, const char* deviceName = NULL) __deprecated = 0;
 
 
   /** Adjusts the loopback recording volume.
