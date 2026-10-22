@@ -1874,8 +1874,8 @@ public:
      * within five seconds, the SDK triggers the `onStreamMessageError` callback and returns an error
      * code.
      *
-     * @note Each user can create up to five data streams during the lifecycle of `IRtcEngine`. The data
-     * stream will be destroyed when leaving the channel, and the data stream needs to be recreated if
+     * @note Each client can have up to five data streams simultaneously in a channel. The data
+     * stream is destroyed when leaving the channel, and the data stream needs to be recreated if
      * needed.
      *
      * @param streamId An output parameter; the ID of the data stream created.
@@ -1909,9 +1909,8 @@ public:
      * Call timing: Call this method after `joinChannelEx`.
      *
      * @note
-     * Each user can create up to five data streams during the lifecycle of `IRtcEngine`. The data
-     * stream will be destroyed when leaving the channel, and the data stream needs to be recreated if
-     * needed.
+     * Each client can have up to five data streams simultaneously in a channel. The data stream is
+     * destroyed when leaving the channel, and the data stream needs to be recreated if needed.
      * If you need a more comprehensive solution for low-latency, high-concurrency, and scalable
      * real-time messaging and status synchronization, it is recommended to use [Signaling](https://docs.agora.io/en/signaling/overview/product-overview).
      *

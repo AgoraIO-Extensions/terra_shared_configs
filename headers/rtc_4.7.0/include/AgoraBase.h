@@ -294,6 +294,7 @@ enum CHANNEL_PROFILE_TYPE {
 
 /**
  * The channel types.
+ * @technical preview
  */
 enum CHANNEL_TYPE {
   /**
@@ -646,7 +647,8 @@ enum ERROR_CODE_TYPE {
    */
   ERR_SIZE_TOO_LARGE = 114,
   /**
-   * 115: The data bitrate exceeds 6 KB/s when calling the `sendStreamMessage` method.
+   * 115: The data bitrate exceeds the data stream bitrate limit when calling the `sendStreamMessage`
+   * method.
    */
   ERR_BITRATE_LIMIT = 115,
   /**
@@ -1211,9 +1213,10 @@ enum DEGRADATION_PREFERENCE {
    */
   MAINTAIN_AUTO = -1,
   /**
-   * 0: Prefers to reduce the video frame rate while maintaining video resolution during video
-   * encoding under limited bandwidth. This degradation preference is suitable for scenarios where
-   * video quality is prioritized.
+   * 0: Deprecated. Use `MAINTAIN_RESOLUTION` instead. During video encoding under limited
+   * bandwidth, this option has the same behavior as `MAINTAIN_RESOLUTION`: The SDK reduces the video
+   * frame rate while maintaining video resolution. This degradation preference is suitable for
+   * scenarios where video quality is prioritized.
    */
   MAINTAIN_QUALITY = 0,
   /**
@@ -3610,6 +3613,15 @@ enum LOCAL_VIDEO_EVENT_TYPE {
    * 4: (Android only) An internal error occurs during the screen capture.
    */
   LOCAL_VIDEO_EVENT_TYPE_SCREEN_CAPTURE_SYSTEM_INTERNAL_ERROR = 4,
+  /**
+   * 5: (Android only) The requested wide-angle or ultra-wide-angle camera is applied.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_CAMERA_FOCAL_LENGTH_APPLIED = 5,
+  /**
+   * 6: (Android only) The requested wide-angle or ultra-wide-angle camera cannot be opened, and
+   * the SDK falls back to the default camera.
+   */
+  LOCAL_VIDEO_EVENT_TYPE_CAMERA_FOCAL_LENGTH_FALLBACK_TO_DEFAULT = 6,
 };
 
 /**
@@ -4551,13 +4563,16 @@ enum CONNECTION_STATE_TYPE {
    */
   CONNECTION_STATE_RECONNECTING = 4,
   /**
-   * 5: The SDK fails to connect to the Agora edge server or join the channel. This state indicates
-   * that the SDK stops trying to rejoin the channel. You must call `leaveChannel()` to leave the
-   * channel.
-   * - You can call `joinChannel(const char* token, const char* channelId, uid_t uid, const
-   * ChannelMediaOptions& options)` to rejoin the channel.
-   * - If the SDK is banned from joining the channel by the Agora edge server through the RESTful API,
-   * the SDK triggers the `onConnectionStateChanged` callback.
+   * 5: The SDK fails to connect to the Agora edge server or join the channel and stops reconnecting.
+   * The reason reported by `onConnectionStateChanged` can vary when the user is kicked by the
+   * server, the token expires, or authentication fails, but the recovery flow is the same:
+   * - For `joinChannel`, call `leaveChannel()`, wait until CONNECTION_STATE_DISCONNECTED(1) is
+   * reported, and then call `joinChannel` with a valid new token. If you do not leave the channel
+   * first, `joinChannel` returns ERR_JOIN_CHANNEL_REJECTED(-17).
+   * - For `joinChannelEx`, call `leaveChannelEx` for the corresponding `RtcConnection`, wait until
+   * that connection enters CONNECTION_STATE_DISCONNECTED(1), and then call `joinChannelEx` with a
+   * valid new token. To clear only that connection, use `leaveChannelEx`; calling `leaveChannel`
+   * leaves all joined channels.
    */
   CONNECTION_STATE_FAILED = 5,
 };
@@ -6192,75 +6207,6 @@ struct AudioTrackConfig {
   bool enableAudioProcessing;
 
   AudioTrackConfig() : enableLocalPlayback(true),enableAudioProcessing(false) {}
-};
-
-/** The type of loopback audio source mode
-*/
-enum LOOPBACK_AUDIO_TRACK_TYPE {
-  /** 
-   * 0: loopback the whole system
-   */
-  LOOPBACK_SYSTEM = 0,
-  /** 
-   * 1: loopback the whole system exclude self
-   */
-  LOOPBACK_SYSTEM_EXCLUDE_SELF = 1,
-  /** 
-   * 2: loopback the specific application
-   */
-  LOOPBACK_APPLICATION = 2,
-  /** 
-   * 3: loopback the specific process
-   */
-  LOOPBACK_PROCESS = 3,
-};
-
-/** Defines options for a custom loopback audio track. */
-struct LoopbackAudioTrackConfig {
-  /**
-   * Specifies the loopback source type.
-   * Possible values are defined by LOOPBACK_AUDIO_TRACK_TYPE (e.g., system audio, specific application, or process).
-   * Default: LOOPBACK_SYSTEM.
-   */
-  LOOPBACK_AUDIO_TRACK_TYPE loopbackType;
-
-  /**
-   * Initial playback volume for the loopback audio, valid in the range [0, 400].
-   * 0: mute; 100: original volume; 400: maximum amplified volume.
-   * Default is 100.
-   */
-  int volume;
-
-  /**
-   * Playback device name to capture loopback audio from.
-   *
-   * Platform-specific notes:
-   * - **Windows:** Not supported for now. The `deviceName` parameter is ignored on Windows.
-   * - **macOS:** For `LOOPBACK_SYSTEM` or `LOOPBACK_SYSTEM_EXCLUDE_SELF`, if set, uses the named virtual device; if NULL, uses the default.
-   *   For `LOOPBACK_APPLICATION` and `LOOPBACK_PROCESS`, ignored.
-   *
-   * If set, the name must exactly match the target playback device.
-   * Set to NULL to use the platform default selection.
-   */
-  const char* deviceName;
-
-  /**
-   * Name of the application to capture audio from.
-   * Only used if loopbackType is LOOPBACK_APPLICATION; otherwise ignored.
-   * Must be an exact, case-sensitive match of the application name.
-   * Set to NULL if not capturing a specific application.
-   */
-  const char* appName;
-
-  /**
-   * Process ID of the target application to capture audio from.
-   * Only used if loopbackType is LOOPBACK_PROCESS; otherwise ignored.
-   * Default is -1.
-   */
-  unsigned int processId;
-
-  LoopbackAudioTrackConfig()
-    : loopbackType(LOOPBACK_SYSTEM), volume(100), deviceName(NULL), appName(NULL), processId(-1) {}
 };
 
 /**

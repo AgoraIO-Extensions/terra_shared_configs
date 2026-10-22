@@ -613,6 +613,8 @@ class PlayerObserver {
    * play the mixed audio RTE URL, you can use this callback to get the volume information of each
    * audio stream before mixing.
    *
+   * @technical preview
+   *
    * @param stream_data The received stream data.
    * @return void
    */
