@@ -31,6 +31,7 @@ module.exports = [
   'agora::rtc::IAudioDeviceCollection',
   'agora::rtc::IVideoDeviceCollection',
   'agora::rtc::IScreenCaptureSourceList',
+  'agora::rtc::ILoopbackRecordingSourceList',
   'agora::rtc::AAudioDeviceManager',
   'agora::rtc::AVideoDeviceManager',
   'agora::rtc::IRtcEngineParameter',

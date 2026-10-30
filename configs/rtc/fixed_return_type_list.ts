@@ -1,6 +1,13 @@
 import { SimpleTypeKind } from '@agoraio-extensions/cxx-parser';
 
 module.exports = {
+  'agora::rtc::IRtcEngine.getLoopbackRecordingSources': {
+    name: 'agora::rtc::LoopbackRecordingSourceInfo',
+    source: 'agora::rtc::LoopbackRecordingSourceInfo*',
+    kind: SimpleTypeKind.array_t,
+    is_const: false,
+    is_builtin_type: false,
+  },
   'agora::rtc::IRtcEngine.getScreenCaptureSources': {
     name: 'agora::rtc::ScreenCaptureSourceInfo',
     source: 'agora::rtc::ScreenCaptureSourceInfo*',
