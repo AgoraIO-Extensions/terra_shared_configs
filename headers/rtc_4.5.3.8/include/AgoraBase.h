@@ -5749,7 +5749,7 @@ struct LoopbackAudioTrackConfig {
    * This field is ignored for LOOPBACK_APPLICATION and LOOPBACK_PROCESS. It is also ignored for
    * LOOPBACK_SYSTEM_EXCLUDE_SELF on Windows.
    */
-  const char* const* excludedAppNames;
+  const char** excludedAppNames;
 
   /** The number of elements in excludedAppNames. */
   unsigned int excludedAppCount;
