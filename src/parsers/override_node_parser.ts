@@ -17,6 +17,7 @@ import {
 } from '../utils/parser_utils';
 
 import { applyIrisApiId, getIrisApiIdValue } from './iris_api_id_parser';
+import { ValidateCustomHeadersParser } from './validate_custom_headers_parser';
 
 export type OverrideNodeParserArgs = CXXParserConfigs & {
   customHeaderFileNamePrefix?: string;
@@ -44,6 +45,7 @@ export const OverrideNodeParser = (
 ): ParseResult | undefined => {
   let customHeaderFileNamePrefix = args.customHeaderFileNamePrefix ?? 'Custom';
   let overrideSourceNodes = args.overrideSourceNodes ?? true;
+  ValidateCustomHeadersParser(terraContext, args, preParseResult);
   const customNodes = generateNodes(terraContext, args, 'overridenode');
   let overrideCXXFiles = (customNodes?.nodes as CXXFile[]) ?? [];
 
