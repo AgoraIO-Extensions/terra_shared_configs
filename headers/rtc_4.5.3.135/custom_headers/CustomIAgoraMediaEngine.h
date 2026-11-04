@@ -8,6 +8,13 @@ namespace media {
 namespace ext {
 
 class IMediaEngine {
+  /**
+   * @iris_api_id: MediaEngine_createLoopbackAudioTrack_7dc7df9
+   * @source: virtual rtc::track_id_t createLoopbackAudioTrack(const rtc::LoopbackAudioTrackConfig& config, bool enable) = 0;
+   */
+  virtual rtc::track_id_t createLoopbackAudioTrack(
+      const rtc::LoopbackAudioTrackConfig& config, bool enable = true) = 0;
+
   // ----------------------------- 👇🏻new API👇🏻 -----------------------------
 
   /**
